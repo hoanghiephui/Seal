@@ -282,7 +282,7 @@ fun DownloadPage(
 @Composable
 fun DownloadPageImpl(
     downloaderState: Downloader.State,
-    taskState: Downloader.DownloadTaskItem,
+    taskState: Downloader.DownloadTaskState,
     viewState: DownloadViewModel.ViewState,
     errorState: Downloader.ErrorState,
     showVideoCard: Boolean = false,
@@ -667,7 +667,7 @@ fun DownloadPagePreview() {
         Column() {
             DownloadPageImpl(
                 downloaderState = Downloader.State.DownloadingVideo,
-                taskState = Downloader.DownloadTaskItem(),
+                taskState = Downloader.DownloadTaskState(),
                 viewState = DownloadViewModel.ViewState(),
                 errorState = Downloader.ErrorState(),
                 processCount = 99,
