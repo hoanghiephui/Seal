@@ -2,6 +2,7 @@ package com.junkfood.seal.ui.svg.drawablevectors
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType.Companion.NonZero
 import androidx.compose.ui.graphics.SolidColor
@@ -186,7 +187,7 @@ fun DynamicColorImageVectors.download(): ImageVector {
             close()
         }
         path(
-            fill = SolidColor(MaterialTheme.colorScheme.onBackground),
+            fill = SolidColor(FixedAccentColors.onSecondaryFixed),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = Butt,
@@ -206,7 +207,7 @@ fun DynamicColorImageVectors.download(): ImageVector {
             close()
         }
         path(
-            fill = SolidColor(MaterialTheme.colorScheme.surfaceVariant),
+            fill = SolidColor(FixedAccentColors.secondaryFixedDim),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = Butt,
@@ -304,7 +305,7 @@ fun DynamicColorImageVectors.download(): ImageVector {
             close()
         }
         path(
-            fill = SolidColor(MaterialTheme.colorScheme.surfaceVariant),
+            fill = SolidColor(FixedAccentColors.secondaryFixedDim),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = Butt,
@@ -323,7 +324,7 @@ fun DynamicColorImageVectors.download(): ImageVector {
             close()
         }
         path(
-            fill = SolidColor(MaterialTheme.colorScheme.surfaceVariant),
+            fill = SolidColor(FixedAccentColors.secondaryFixedDim),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = Butt,
@@ -342,7 +343,7 @@ fun DynamicColorImageVectors.download(): ImageVector {
             close()
         }
         path(
-            fill = SolidColor(MaterialTheme.colorScheme.surfaceVariant),
+            fill = SolidColor(FixedAccentColors.secondaryFixedDim),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = Butt,

@@ -4,9 +4,9 @@ package com.junkfood.seal.ui.page.downloadv2
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -51,9 +51,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.Downloader.DownloadTask.State.Status
@@ -62,6 +64,8 @@ import com.junkfood.seal.ui.component.CustomCommandTaskItem
 import com.junkfood.seal.ui.component.FilterChipWithIcon
 import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.TaskStatus
+import com.junkfood.seal.ui.svg.DynamicColorImageVectors
+import com.junkfood.seal.ui.svg.drawablevectors.download
 import com.junkfood.seal.ui.theme.SealTheme
 import kotlinx.coroutines.delay
 
@@ -320,31 +324,48 @@ private fun DownloadPageEmptyPreview() {
         mutableStateOf(false)
     }
     SealTheme {
-        Column() {
-            DownloadPageImplV2(
-                onSwitchView = { b = it },
-                showFilterChipGroup = false,
-                isUsingGridView = b,
-                isScrollable = false
-            ) {
-                BoxWithConstraints() {
-                    Box(
-                        modifier = Modifier
-                            .height(maxHeight)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Manage your downloads here",
-                            modifier = Modifier.align(
-                                Alignment.Center
-                            )
-                        )
-                    }
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val painter =
+                rememberVectorPainter(image = DynamicColorImageVectors.download())
+            Column() {
+                DownloadPageImplV2(
+                    onSwitchView = { b = it },
+                    showFilterChipGroup = false,
+                    isUsingGridView = b,
+                    isScrollable = false
+                ) {
                 }
-                /*               DownloadCard(modifier = Modifier
-                                   .padding(horizontal = 20.dp)
-                                   .padding(top = 24.dp))*/
+            }
 
+            Column(
+                modifier = Modifier.align(
+                    Alignment.Center
+                ), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(0.5f)
+                )
+                Text(
+                    text = "You'll find your downloads here",
+                    modifier = Modifier
+                        .padding(top = 36.dp)
+                        .padding(horizontal = 24.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Tap on the download button or share a video link to this app to start a download",
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 24.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
