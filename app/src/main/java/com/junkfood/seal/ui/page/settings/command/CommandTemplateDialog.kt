@@ -2,6 +2,8 @@ package com.junkfood.seal.ui.page.settings.command
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -40,7 +42,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.google.accompanist.flowlayout.FlowRow
 import com.junkfood.seal.R
 import com.junkfood.seal.database.CommandTemplate
 import com.junkfood.seal.database.OptionShortcut
@@ -55,7 +56,6 @@ import com.junkfood.seal.ui.component.ShortcutChip
 import com.junkfood.seal.util.DatabaseUtil
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun CommandTemplateDialog(
@@ -155,7 +155,7 @@ fun CommandTemplateDialog(
         })
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun OptionChipsDialog(onDismissRequest: () -> Unit = {}) {
     val scope = rememberCoroutineScope()

@@ -1,7 +1,10 @@
 package com.junkfood.seal.ui.page.settings.command
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,8 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.SizeMode
 import com.junkfood.seal.R
 import com.junkfood.seal.database.CommandTemplate
 import com.junkfood.seal.ui.component.AdjacentLabel
@@ -59,7 +60,9 @@ import com.junkfood.seal.util.DatabaseUtil
 import com.junkfood.seal.util.PreferenceUtil
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun TemplateEditPage(onDismissRequest: () -> Unit, templateId: Int) {
     val scope = rememberCoroutineScope()
@@ -196,8 +199,8 @@ fun TemplateEditPage(onDismissRequest: () -> Unit, templateId: Int) {
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .width(500.dp),
-                        mainAxisSize = SizeMode.Expand,
-                        crossAxisSpacing = 2.dp,
+//                        mainAxisSize = SizeMode.Expand,
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         shortcuts.forEach { item ->
                             ShortcutChip(text = item.option, onClick = {

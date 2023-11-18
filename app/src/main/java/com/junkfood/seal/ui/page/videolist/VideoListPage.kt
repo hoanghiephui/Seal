@@ -1,12 +1,12 @@
 package com.junkfood.seal.ui.page.videolist
 
-import VideoStreamSVG
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,8 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
@@ -52,6 +52,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -64,7 +65,6 @@ import com.junkfood.seal.App
 import com.junkfood.seal.R
 import com.junkfood.seal.database.DownloadedVideoInfo
 import com.junkfood.seal.ui.common.LocalWindowWidthState
-import com.junkfood.seal.ui.common.SVGImage
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.CheckBoxItem
 import com.junkfood.seal.ui.component.ConfirmButton
@@ -73,6 +73,8 @@ import com.junkfood.seal.ui.component.LargeTopAppBar
 import com.junkfood.seal.ui.component.MediaListItem
 import com.junkfood.seal.ui.component.SealDialog
 import com.junkfood.seal.ui.component.VideoFilterChip
+import com.junkfood.seal.ui.svg.DynamicColorImageVectors
+import com.junkfood.seal.ui.svg.drawablevectors.videoSteaming
 import com.junkfood.seal.util.AUDIO_REGEX
 import com.junkfood.seal.util.DatabaseUtil
 import com.junkfood.seal.util.FileUtil
@@ -168,7 +170,7 @@ fun VideoListPage(
             )
             if (filterSet.size > 1) {
                 Row {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .padding(horizontal = 6.dp)
                             .height(24.dp)
@@ -191,7 +193,7 @@ fun VideoListPage(
     val selectedItemIds =
         remember(videoList, isSelectEnabled, viewState) { mutableStateListOf<Int>() }
     val selectedVideos = remember(selectedItemIds.size) {
-        mutableStateOf(
+        mutableIntStateOf(
             videoList.count { info ->
                 selectedItemIds.contains(info.id) && info.filterByType(
                     videoFilter = true,
@@ -200,7 +202,7 @@ fun VideoListPage(
             })
     }
     val selectedAudioFiles = remember(selectedItemIds.size) {
-        mutableStateOf(
+        mutableIntStateOf(
             videoList.count { info ->
                 selectedItemIds.contains(info.id) && info.filterByType(
                     videoFilter = false,
@@ -219,13 +221,13 @@ fun VideoListPage(
 
     val visibleItemCount = remember(
         videoList, viewState
-    ) { mutableStateOf(videoList.count { it.filterSort(viewState) }) }
+    ) { mutableIntStateOf(videoList.count { it.filterSort(viewState) }) }
 
     val checkBoxState by remember(selectedItemIds, visibleItemCount) {
         derivedStateOf {
             if (selectedItemIds.isEmpty())
                 ToggleableState.Off
-            else if (selectedItemIds.size == visibleItemCount.value && selectedItemIds.isNotEmpty())
+            else if (selectedItemIds.size == visibleItemCount.intValue && selectedItemIds.isNotEmpty())
                 ToggleableState.On
             else
                 ToggleableState.Indeterminate
@@ -300,8 +302,8 @@ fun VideoListPage(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = stringResource(R.string.multiselect_item_count).format(
-                            selectedVideos.value,
-                            selectedAudioFiles.value
+                            selectedVideos.intValue,
+                            selectedAudioFiles.intValue
                         ),
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -322,12 +324,14 @@ fun VideoListPage(
             Box(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                val painter =
+                    rememberVectorPainter(image = DynamicColorImageVectors.videoSteaming())
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SVGImage(
-                        SVGString = VideoStreamSVG,
+                    Image(
+                        painter = painter,
                         contentDescription = null,
                         modifier = Modifier.padding(horizontal = 72.dp, vertical = 20.dp)
                     )

@@ -1,7 +1,10 @@
 package com.junkfood.seal.ui.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -25,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.google.accompanist.flowlayout.FlowRow
 import com.junkfood.seal.R
 
 private val DialogVerticalPadding = PaddingValues(vertical = 24.dp)
@@ -53,7 +55,7 @@ fun HelpDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SealDialog(
     onDismissRequest: () -> Unit,
@@ -144,8 +146,8 @@ fun SealDialog(
                         MaterialTheme.typography.labelLarge
                     ProvideTextStyle(value = textStyle) {
                         FlowRow(
-                            mainAxisSpacing = ButtonsMainAxisSpacing,
-                            crossAxisSpacing = ButtonsCrossAxisSpacing
+                            horizontalArrangement = Arrangement.spacedBy(ButtonsMainAxisSpacing),
+                            verticalArrangement = Arrangement.spacedBy(ButtonsCrossAxisSpacing)
                         ) {
                             dismissButton?.invoke()
                             confirmButton()

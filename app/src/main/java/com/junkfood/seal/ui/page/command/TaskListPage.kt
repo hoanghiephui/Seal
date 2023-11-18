@@ -60,7 +60,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
 import com.junkfood.seal.database.CommandTemplate
-import com.junkfood.seal.ui.common.SVGImage
 import com.junkfood.seal.ui.common.intState
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.CustomCommandTaskItem
@@ -74,7 +73,6 @@ import com.junkfood.seal.ui.component.SealDialog
 import com.junkfood.seal.ui.component.SealModalBottomSheet
 import com.junkfood.seal.ui.component.TaskStatus
 import com.junkfood.seal.ui.page.settings.command.CommandTemplateDialog
-import com.junkfood.seal.ui.svg.TaskSVG
 import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.updateInt
 import com.junkfood.seal.util.TEMPLATE_ID
@@ -147,28 +145,6 @@ fun TaskListPage(onBackPressed: () -> Unit, onNavigateToDetail: (Int) -> Unit) {
                     )
                 }
             }
-        }
-        if (Downloader.mutableTaskList.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    SVGImage(
-                        SVGString = TaskSVG,
-                        contentDescription = null,
-                        modifier = Modifier.padding(horizontal = 72.dp, vertical = 20.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.no_custom_command_tasks),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
         }
     }
     val onDismissRequest: () -> Unit = {
