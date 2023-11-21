@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.Downloader.DownloadTask.State.Status
 import com.junkfood.seal.R
@@ -153,17 +156,8 @@ fun DownloadPageImplV2(
 
 
         ) {
-/*            Text(
-                modifier = Modifier
-//                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 32.dp),
-                text = "Download queue",
-                style = MaterialTheme.typography.headlineSmall
-            )*/
             Text(
                 modifier = Modifier
-//                    .align(Alignment.CenterHorizontally)
                     .padding(horizontal = 20.dp)
                     .padding(top = 32.dp),
                 text = "Seal",
@@ -185,7 +179,7 @@ fun DownloadPageImplV2(
             }
 
 
-            var selectedChip by remember { mutableStateOf(-1) }
+            var selectedChip by remember { mutableIntStateOf(-1) }
             AnimatedVisibility(visible = showFilterChipGroup) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 20.dp),
@@ -214,15 +208,6 @@ fun DownloadPageImplV2(
                 ) {
                     Text(text = "0 Download task", style = MaterialTheme.typography.labelMedium)
                     Spacer(modifier = Modifier.weight(1f))
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Text(text = "Recently Added", style = MaterialTheme.typography.labelMedium)
-//                    Icon(
-//                        imageVector = Icons.Outlined.ArrowDropDown,
-//                        contentDescription = null,
-//                        modifier = Modifier.size(18.dp)
-//                    )
-//                }
-
                     IconButton(
                         onClick = { onSwitchView(!isUsingGridView) },
                         modifier = Modifier.size(32.dp)
@@ -249,11 +234,9 @@ fun DownloadPageImplV2(
 
 
                 Column(
-                    Modifier
-//                    .padding(horizontal = 24.dp)
+                    modifier = Modifier
                 ) {
                     content()
-//                    VideoCardPreview()
                 }
 
 
@@ -293,17 +276,17 @@ fun FABs(
 @Composable
 @Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(name = "Night", uiMode = Configuration.UI_MODE_NIGHT_YES)
-private fun DownloadPageModePreview() {
-    var b by remember {
-        mutableStateOf(false)
-    }
+private fun DownloadPageModePreview(@PreviewParameter(SampleBooleanProvider::class) isUsingGridView: Boolean) {
+//    var b by remember {
+//        mutableStateOf(false)
+//    }
     SealTheme {
         Column() {
             DownloadPageImplV2(
-                onSwitchView = { b = it },
-                isUsingGridView = b
+//                onSwitchView = { b = it },
+                isUsingGridView = isUsingGridView
             ) {
-                AnimatedContent(targetState = b) {
+                AnimatedContent(targetState = isUsingGridView) {
                     if (it)
                         VideoCardPreview()
                     else
@@ -315,6 +298,9 @@ private fun DownloadPageModePreview() {
     }
 }
 
+class SampleBooleanProvider : PreviewParameterProvider<Boolean> {
+    override val values = sequenceOf(true, false)
+}
 
 @Composable
 @Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO)
