@@ -126,7 +126,7 @@ class QuickDownloadActivity : ComponentActivity() {
                     var showDialog by remember { mutableStateOf(true) }
                     val sheetState =
                         rememberModalBottomSheetState(skipPartiallyExpanded = true)
-                    
+
                     val useDialog = LocalWindowWidthState.current != WindowWidthSizeClass.Compact
                     DownloadSettingDialog(
                         useDialog = useDialog,

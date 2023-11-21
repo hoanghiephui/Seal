@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                     LocaleListCompat.forLanguageTags(PreferenceUtil.getLanguageConfiguration())
                 )
         }
+        enableEdgeToEdge()
         context = this.baseContext
         setContent {
             val cookiesViewModel: CookiesViewModel = viewModel()
