@@ -449,4 +449,6 @@
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>
     </plurals>
+
+    <string name="paste_youtube_fail_msg">Sorry, your link is not supported.</string>
 </resources>

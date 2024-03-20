@@ -117,8 +117,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalPermissionsApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class,
 )
 @Composable
 fun DownloadPage(
@@ -553,7 +552,8 @@ fun InputUrl(
         ) {
             val progressAnimationValue by animateFloatAsState(
                 targetValue = progress / 100f,
-                animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+                label = "progress"
             )
             if (progressAnimationValue < 0) LinearProgressIndicator(
                 modifier = Modifier
@@ -561,7 +561,7 @@ fun InputUrl(
                     .clip(MaterialTheme.shapes.large),
             )
             else LinearProgressIndicator(
-                progress = progressAnimationValue,
+                progress = { progressAnimationValue },
                 modifier = Modifier
                     .weight(0.75f)
                     .clip(MaterialTheme.shapes.large),
@@ -586,7 +586,6 @@ fun InputUrl(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TitleWithProgressIndicator(
     showProgressIndicator: Boolean = true,
@@ -595,7 +594,7 @@ fun TitleWithProgressIndicator(
     currentIndex: Int = 1,
     downloadItemCount: Int = 4,
 ) {
-    Column(modifier = Modifier.padding(start = 12.dp, top = 24.dp)) {
+    Column(modifier = Modifier.padding(start = 12.dp, top = 0.dp)) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.extraLarge)

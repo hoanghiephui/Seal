@@ -66,6 +66,9 @@ fun matchUrlFromClipboard(string: String, isMatchingMultiLink: Boolean = false):
     matchUrlFromString(string, isMatchingMultiLink).run {
         if (isEmpty())
             ToastUtil.makeToast(R.string.paste_fail_msg)
+        else if (isYouTubeLink(string)) {
+            ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
+        }
         else
             ToastUtil.makeToast(R.string.paste_msg)
         return this
@@ -76,7 +79,9 @@ fun matchUrlFromSharedText(s: String): String {
     matchUrlFromString(s).run {
         if (isEmpty())
             ToastUtil.makeToast(R.string.share_fail_msg)
-//            else makeToast(R.string.share_success_msg)
+        else if (isYouTubeLink(s)) {
+            ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
+        }
         return this
     }
 }
@@ -110,3 +115,10 @@ fun connectWithBlank(s1: String, s2: String): String {
     val blank = if (s1.isEmpty() || s2.isEmpty()) "" else " "
     return s1 + blank + s2
 }
+
+fun isYouTubeLink(url: String): Boolean {
+    val pattern = Pattern.compile("^(https?://)?(www\\.)?(youtube\\.com/watch\\?v=|youtu\\.be/)[a-zA-Z0-9_-]{11}\$")
+    val matcher = pattern.matcher(url)
+    return matcher.matches()
+}
+
