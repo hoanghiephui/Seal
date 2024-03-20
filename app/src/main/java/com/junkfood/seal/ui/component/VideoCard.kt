@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -40,7 +39,6 @@ import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.toDurationText
 import com.junkfood.seal.util.toFileSizeText
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoCard(
     modifier: Modifier = Modifier,
@@ -53,106 +51,118 @@ fun VideoCard(
     progress: Float = 100f,
     fileSizeApprox: Double = 1024 * 1024 * 69.0,
     duration: Int = 359,
-    isPreview: Boolean = false
+    isPreview: Boolean = false,
+    isAds: Boolean = false
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth(),
         onClick = onClick, shape = MaterialTheme.shapes.small
     ) {
-        Column {
-            Box(Modifier.fillMaxWidth()) {
-                AsyncImageImpl(
-                    modifier = Modifier
-                        .padding()
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f, matchHeightConstraintsFirst = true)
-                        .clip(MaterialTheme.shapes.small),
-                    model = thumbnailUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    isPreview = isPreview
-                )
-                Surface(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .align(Alignment.BottomEnd),
-                    color = Color.Black.copy(alpha = 0.68f),
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    val fileSizeText = fileSizeApprox.toFileSizeText()
-                    val durationText = duration.toDurationText()
-                    Text(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        text = "$fileSizeText · $durationText",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White
+        if (!isAds) {
+            Column {
+                Box(Modifier.fillMaxWidth()) {
+                    AsyncImageImpl(
+                        modifier = Modifier
+                            .padding()
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f, matchHeightConstraintsFirst = true)
+                            .clip(MaterialTheme.shapes.small),
+                        model = thumbnailUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        isPreview = isPreview
                     )
+                    Surface(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .align(Alignment.BottomEnd),
+                        color = Color.Black.copy(alpha = 0.68f),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) {
+                        val fileSizeText = fileSizeApprox.toFileSizeText()
+                        val durationText = duration.toDurationText()
+                        Text(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            text = "$fileSizeText · $durationText",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.align(Alignment.Center)
+                    ) {
+                        AnimatedVisibility(
+                            visible = showCancelButton,
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            FilledTonalIconButton(
+                                onClick = onCancel,
+                                modifier = Modifier
+                                    .size(56.dp),
+                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+                                        alpha = 0.68f
+                                    )
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Cancel,
+                                    contentDescription = stringResource(id = R.string.cancel),
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+
+                        }
+                    }
                 }
 
                 Column(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    AnimatedVisibility(
-                        visible = showCancelButton,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = onCancel,
-                            modifier = Modifier
-                                .size(56.dp),
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
-                                    alpha = 0.68f
-                                )
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Cancel,
-                                contentDescription = stringResource(id = R.string.cancel),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-
-                    }
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 3.dp),
+                        text = author,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                val progressAnimationValue by animateFloatAsState(
+                    targetValue = progress,
+                    animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec, label = "progress"
                 )
-                Text(
-                    modifier = Modifier.padding(top = 3.dp),
-                    text = author,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (progress < 0f)
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                else
+                    LinearProgressIndicator(
+                        progress = { progressAnimationValue / 100f },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
             }
-            val progressAnimationValue by animateFloatAsState(
-                targetValue = progress,
-                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+        } else {
+            Text(
+                modifier = Modifier.padding(top = 3.dp),
+                text = "Demo",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
-            if (progress < 0f)
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            else
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                    progress = progressAnimationValue / 100f,
-                )
         }
     }
 }

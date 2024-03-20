@@ -154,11 +154,20 @@ fun DownloadPage(
     val useDialog = LocalWindowWidthState.current != WindowWidthSizeClass.Compact
     var showDownloadDialog by rememberSaveable { mutableStateOf(false) }
     var showMeteredNetworkDialog by remember { mutableStateOf(false) }
-
+    var showAds by remember { mutableStateOf(true) }
+    var isStartDownload by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = downloaderState, key2 = isStartDownload) {
+        showAds = if (isStartDownload) {
+            downloaderState !is Downloader.State.DownloadingVideo
+        } else {
+            true
+        }
+    }
     val checkNetworkOrDownload = {
         if (!PreferenceUtil.isNetworkAvailableForDownload()) {
             showMeteredNetworkDialog = true
         } else {
+            isStartDownload = true
             downloadViewModel.startDownloadVideo()
         }
     }
@@ -270,7 +279,10 @@ fun DownloadPage(
             showVideoCard = showVideoCard,
             showOutput = showOutput,
             showDownloadProgress = taskState.taskId.isNotEmpty(),
+            showAdsCard = showAds,
             pasteCallback = {
+                isStartDownload = false
+                showAds = true
                 matchUrlFromClipboard(
                     string = clipboardManager.getText().toString(),
                     isMatchingMultiLink = CUSTOM_COMMAND.getBoolean()
@@ -278,6 +290,7 @@ fun DownloadPage(
                     .let { downloadViewModel.updateUrl(it) }
             },
             cancelCallback = {
+                isStartDownload = false
                 Downloader.cancelDownload()
             },
             onVideoCardClicked = { Downloader.openDownloadResult() },
@@ -313,6 +326,7 @@ fun DownloadPageImpl(
     viewState: DownloadViewModel.ViewState,
     errorState: Downloader.ErrorState,
     showVideoCard: Boolean = false,
+    showAdsCard: Boolean = true,
     showOutput: Boolean = false,
     showDownloadProgress: Boolean = false,
     processCount: Int = 0,
@@ -436,9 +450,9 @@ fun DownloadPageImpl(
             ) {
                 with(taskState) {
                     AnimatedVisibility(
-                        visible = showDownloadProgress && showVideoCard
+                        visible = showDownloadProgress && showVideoCard || showAdsCard
                     ) {
-                        Box() {
+                        Box {
                             VideoCard(
                                 modifier = Modifier,
                                 title = title,
@@ -450,7 +464,8 @@ fun DownloadPageImpl(
                                 fileSizeApprox = fileSizeApprox,
                                 duration = duration,
                                 onClick = onVideoCardClicked,
-                                isPreview = isPreview
+                                isPreview = isPreview,
+                                isAds = showAdsCard
                             )
 
                         }
@@ -508,8 +523,6 @@ fun DownloadPageImpl(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun InputUrl(
     url: String,
