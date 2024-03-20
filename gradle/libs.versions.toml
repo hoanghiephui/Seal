@@ -1,39 +1,39 @@
 [versions]
 accompanist = "0.34.0"
-androidGradlePlugin = "8.4.0-alpha12"
-androidxComposeBom = "2024.02.01"
-androidxComposeCompiler = "1.5.3"
+androidGradlePlugin = "8.3.1"
+androidxComposeBom = "2024.02.02"
+androidxComposeCompiler = "1.5.8"
 androidxCore = "1.12.0"
 androidMaterial = "1.11.0"
 androidxAppCompat = "1.7.0-alpha03"
 androidxActivity = "1.8.2"
 
-androidxLifecycle = "2.6.2"
+androidxLifecycle = "2.7.0"
 androidxNavigation = "2.7.7"
 androidxFoundation = "1.6.0-beta03"
 androidxComposeMaterial3 = "1.2.0-beta01"
 androidxComposeAnimation = "1.5.0-beta01"
 
-androidxEspresso = "3.5.0"
-androidxHiltNavigationCompose = "1.0.0"
+androidxEspresso = "3.5.1"
+androidxHiltNavigationCompose = "1.2.0"
 
 
-androidxTestExt = "1.1.4"
+androidxTestExt = "1.1.5"
 
 
 coil = "2.5.0"
-hilt = "2.45"
-hiltExt = "1.0.0"
+hilt = "2.50"
+hiltExt = "1.2.0"
 
 junit4 = "4.13.2"
-kotlin = "1.9.10"
-kotlinxCoroutines = "1.7.1"
-kotlinxDatetime = "0.4.0"
+kotlin = "1.9.22"
+kotlinxCoroutines = "1.7.3"
+kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.2"
 okhttp = "5.0.0-alpha.10"
 
-room = "2.6.0"
-ksp = "1.9.10-1.0.13"
+room = "2.6.1"
+ksp = "1.9.22-1.0.17"
 
 youtubedlAndroid = "23b26d55f8"
 
