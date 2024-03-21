@@ -7,6 +7,7 @@ import androidx.core.text.isDigitsOnly
 import com.junkfood.seal.App.Companion.applicationScope
 import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.R
+import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
@@ -66,7 +67,7 @@ fun matchUrlFromClipboard(string: String, isMatchingMultiLink: Boolean = false):
     matchUrlFromString(string, isMatchingMultiLink).run {
         if (isEmpty())
             ToastUtil.makeToast(R.string.paste_fail_msg)
-        else if (isYouTubeLink(string)) {
+        else if (isYouTubeLink()) {
             ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
         }
         else
@@ -79,7 +80,7 @@ fun matchUrlFromSharedText(s: String): String {
     matchUrlFromString(s).run {
         if (isEmpty())
             ToastUtil.makeToast(R.string.share_fail_msg)
-        else if (isYouTubeLink(s)) {
+        else if (isYouTubeLink()) {
             ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
         }
         return this
@@ -116,9 +117,16 @@ fun connectWithBlank(s1: String, s2: String): String {
     return s1 + blank + s2
 }
 
-fun isYouTubeLink(url: String): Boolean {
-    val pattern = Pattern.compile("^(https?://)?(www\\.)?(youtube\\.com/watch\\?v=|youtu\\.be/)[a-zA-Z0-9_-]{11}\$")
-    val matcher = pattern.matcher(url)
+fun String.isYouTubeLink(): Boolean {
+    if (DEBUG.getBoolean()) return false
+    val pattern = Pattern.compile("(?:https?://)?(?:www\\.)?(?:youtube\\.com(?:/\\S+)?|youtu\\.be)(?:[/?]\\S*)?")
+    val matcher = pattern.matcher(this)
+    return matcher.matches()
+}
+
+fun String.isTikTokLink(): Boolean {
+    val pattern = Pattern.compile("(?:https?://)?(?:www\\.)?(?:tiktok\\.com(?:/\\S+)?|vm\\.tiktok\\.com)(?:[/?]\\S*)?")
+    val matcher = pattern.matcher(this)
     return matcher.matches()
 }
 

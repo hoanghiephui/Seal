@@ -15,6 +15,7 @@ import com.junkfood.seal.util.COMMAND_DIRECTORY
 import com.junkfood.seal.util.DownloadUtil
 import com.junkfood.seal.util.Entries
 import com.junkfood.seal.util.FileUtil
+import com.junkfood.seal.util.FileUtil.filePath
 import com.junkfood.seal.util.Format
 import com.junkfood.seal.util.NotificationUtil
 import com.junkfood.seal.util.PlaylistResult
@@ -51,6 +52,7 @@ object Downloader {
         data object DownloadingVideo : State()
         data object FetchingInfo : State()
         data object Idle : State()
+        data object Downloaded : State()
     }
 
     data class ErrorState(
@@ -463,7 +465,7 @@ object Downloader {
      * @see downloadVideoWithConfigurations
      */
     @CheckResult
-    private suspend fun downloadVideo(
+    private fun downloadVideo(
         playlistIndex: Int = 0,
         playlistUrl: String = "",
         videoInfo: VideoInfo,
@@ -530,6 +532,7 @@ object Downloader {
                     ) else null
                 )
             }
+            updateState(State.Downloaded)
         }
     }
 
@@ -660,6 +663,9 @@ object Downloader {
     fun openDownloadResult() {
         if (taskState.value.progress == 100f) FileUtil.openFileFromResult(downloadResultTemp)
     }
+
+    val filePathDownloaded get() =
+        downloadResultTemp.filePath
 
     fun onProcessStarted() = mutableProcessCount.update { it + 1 }
     fun String.toNotificationId(): Int = this.hashCode()

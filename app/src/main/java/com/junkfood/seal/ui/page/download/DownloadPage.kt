@@ -1,6 +1,8 @@
 package com.junkfood.seal.ui.page.download
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -10,7 +12,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.ContentPaste
@@ -66,7 +66,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
@@ -105,16 +104,19 @@ import com.junkfood.seal.util.CONFIGURE
 import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DEBUG
 import com.junkfood.seal.util.DISABLE_PREVIEW
+import com.junkfood.seal.util.FileUtil
 import com.junkfood.seal.util.NOTIFICATION
 import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
 import com.junkfood.seal.util.ToastUtil
+import com.junkfood.seal.util.isTikTokLink
 import com.junkfood.seal.util.matchUrlFromClipboard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(
     ExperimentalPermissionsApi::class,
     ExperimentalMaterial3Api::class,
@@ -129,7 +131,7 @@ fun DownloadPage(
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     downloadViewModel: DownloadViewModel = hiltViewModel(),
 ) {
-
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val downloaderState by Downloader.downloaderState.collectAsStateWithLifecycle()
     val taskState by Downloader.taskState.collectAsStateWithLifecycle()
@@ -156,6 +158,8 @@ fun DownloadPage(
     var showMeteredNetworkDialog by remember { mutableStateOf(false) }
     var showAds by remember { mutableStateOf(true) }
     var isStartDownload by remember { mutableStateOf(false) }
+    var isDownloaded by remember { mutableStateOf(false) }
+    var showDownloadCompleteDialog by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = downloaderState, key2 = isStartDownload) {
         showAds = if (isStartDownload) {
             downloaderState !is Downloader.State.DownloadingVideo
@@ -168,6 +172,7 @@ fun DownloadPage(
             showMeteredNetworkDialog = true
         } else {
             isStartDownload = true
+            isDownloaded = false
             downloadViewModel.startDownloadVideo()
         }
     }
@@ -249,6 +254,8 @@ fun DownloadPage(
     }
     LaunchedEffect(downloaderState) {
         showOutput = PreferenceUtil.getValue(DEBUG) && downloaderState !is Downloader.State.Idle
+        isStartDownload = downloaderState is Downloader.State.DownloadingVideo
+        isDownloaded = downloaderState is Downloader.State.Downloaded
     }
     if (viewState.isUrlSharingTriggered) {
         downloadViewModel.onShareIntentConsumed()
@@ -282,6 +289,7 @@ fun DownloadPage(
             showAdsCard = showAds,
             pasteCallback = {
                 isStartDownload = false
+                isDownloaded = false
                 showAds = true
                 matchUrlFromClipboard(
                     string = clipboardManager.getText().toString(),
@@ -291,13 +299,15 @@ fun DownloadPage(
             },
             cancelCallback = {
                 isStartDownload = false
+                isDownloaded = false
                 Downloader.cancelDownload()
             },
             onVideoCardClicked = { Downloader.openDownloadResult() },
             onUrlChanged = { url -> downloadViewModel.updateUrl(url) }) {}
 
 
-        DownloadSettingDialog(useDialog = useDialog,
+        DownloadSettingDialog(
+            useDialog = useDialog,
             showDialog = showDownloadDialog,
             sheetState = sheetState,
             onNavigateToCookieGeneratorPage = onNavigateToCookieGeneratorPage,
@@ -310,6 +320,35 @@ fun DownloadPage(
                 } else {
                     showDownloadDialog = false
                 }
+            },
+            isTiktok = viewState.url.isTikTokLink()
+        )
+        if (isDownloaded) scope.launch {
+            showDownloadCompleteDialog = true
+            delay(50)
+            sheetState.show()
+        }
+        val shareTitle = stringResource(id = R.string.share)
+        DownloadCompleteDialog(
+            showDialog = showDownloadCompleteDialog,
+            sheetState = sheetState,
+            onShare = {
+                FileUtil.createIntentForSharingFile("${Downloader.filePathDownloaded}")?.runCatching {
+                    context.startActivity(
+                        Intent.createChooser(this, shareTitle)
+                    )
+                }
+            },
+            onDismissRequest = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    showDownloadCompleteDialog = false
+                    isDownloaded = false
+                    Downloader.updateState(Downloader.State.Idle)
+                }
+            },
+            taskState = taskState,
+            onVideoCardClicked = {
+                Downloader.openDownloadResult()
             }
         )
     }
@@ -446,7 +485,7 @@ fun DownloadPageImpl(
             Column(
                 Modifier
                     .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp)
+                    .padding(top = 16.dp)
             ) {
                 with(taskState) {
                     AnimatedVisibility(
@@ -478,6 +517,7 @@ fun DownloadPageImpl(
                         showCancelButton = showCancelButton && !showVideoCard,
                         onCancel = cancelCallback,
                         onDone = downloadCallback,
+                        showProgressIndicator = downloaderState is Downloader.State.FetchingInfo
                     ) { url -> onUrlChanged(url) }
                     AnimatedVisibility(
                         modifier = Modifier.fillMaxWidth(),
@@ -528,6 +568,7 @@ fun InputUrl(
     url: String,
     error: Boolean,
     showDownloadProgress: Boolean = false,
+    showProgressIndicator: Boolean = false,
     progress: Float,
     onDone: () -> Unit,
     showCancelButton: Boolean,
@@ -537,27 +578,40 @@ fun InputUrl(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
-    OutlinedTextField(
-        value = url,
-        isError = error,
-        onValueChange = onValueChange,
-        label = { Text(stringResource(R.string.video_url)) },
-        modifier = Modifier
-            .padding(0f.dp, 16f.dp)
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
-        textStyle = MaterialTheme.typography.bodyLarge,
-        maxLines = 3,
-        trailingIcon = {
-            if (url.isNotEmpty()) ClearButton { onValueChange("") }
+    Box(contentAlignment = Alignment.Center) {
+        OutlinedTextField(
+            enabled = !showProgressIndicator,
+            value = url,
+            isError = error,
+            onValueChange = onValueChange,
+            label = { Text(stringResource(R.string.video_url)) },
+            modifier = Modifier
+                .padding(0f.dp, 16f.dp)
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            textStyle = MaterialTheme.typography.bodyLarge,
+            maxLines = 3,
+            trailingIcon = {
+                if (url.isNotEmpty()) ClearButton { onValueChange("") }
 //            else PasteUrlButton { onPaste() }
-        }, keyboardActions = KeyboardActions(onDone = {
-            softwareKeyboardController?.hide()
-            focusManager.moveFocus(FocusDirection.Down)
-            onDone()
-        }),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-    )
+            }, keyboardActions = KeyboardActions(onDone = {
+                softwareKeyboardController?.hide()
+                focusManager.moveFocus(FocusDirection.Down)
+                onDone()
+            }),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        )
+        AnimatedVisibility(visible = showProgressIndicator) {
+            Column(
+                modifier = Modifier.padding(start = 12.dp)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp), strokeWidth = 3.dp
+                )
+            }
+        }
+    }
+
     AnimatedVisibility(visible = showDownloadProgress) {
         Row(
             Modifier.padding(0.dp, 12.dp),
@@ -608,27 +662,6 @@ fun TitleWithProgressIndicator(
     downloadItemCount: Int = 4,
 ) {
     Column(modifier = Modifier.padding(start = 12.dp, top = 0.dp)) {
-        Row(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.extraLarge)
-                .padding(horizontal = 12.dp)
-                .padding(top = 12.dp, bottom = 3.dp)
-        ) {
-            Text(
-                modifier = Modifier,
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.displaySmall
-            )
-            AnimatedVisibility(visible = showProgressIndicator) {
-                Column(
-                    modifier = Modifier.padding(start = 12.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp), strokeWidth = 3.dp
-                    )
-                }
-            }
-        }
         AnimatedVisibility(visible = showDownloadText) {
             Text(
                 if (isDownloadingPlaylist) stringResource(R.string.playlist_indicator_text).format(

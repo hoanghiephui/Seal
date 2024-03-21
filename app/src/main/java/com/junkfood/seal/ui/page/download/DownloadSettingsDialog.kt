@@ -122,6 +122,7 @@ private enum class DownloadType {
 fun DownloadSettingDialog(
     useDialog: Boolean = false,
     showDialog: Boolean = false,
+    isTiktok: Boolean = false,
     isQuickDownload: Boolean = false,
     sheetState: SheetState,
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
@@ -240,19 +241,20 @@ fun DownloadSettingDialog(
                     }
                     SingleChoiceSegmentedButton(
                         text = stringResource(id = R.string.video),
-                        selected = type == DownloadType.Video
+                        selected = type == DownloadType.Video,
+                        position = SegmentedButtonValues.END
                     ) {
                         type = DownloadType.Video
                         updatePreferences()
                     }
-                    SingleChoiceSegmentedButton(
-                        text = stringResource(id = R.string.commands),
+                    /*SingleChoiceSegmentedButton(
+                        text = stringResource(id = R.string.video_without_watermark),
                         selected = type == DownloadType.Command,
                         position = SegmentedButtonValues.END
                     ) {
                         type = DownloadType.Command
                         updatePreferences()
-                    }
+                    }*/
                 }
             }
             if (!isQuickDownload) {
@@ -265,6 +267,15 @@ fun DownloadSettingDialog(
                         }, enabled = type != DownloadType.Command,
                         label = stringResource(id = R.string.auto)
                     )
+                    if (isTiktok && type == DownloadType.Video) {
+                        SingleChoiceChip(
+                            selected = formatSelection || playlist, onClick = {
+                                formatSelection = true
+
+                            },
+                            label = stringResource(id = R.string.video_without_watermark)
+                        )
+                    }
                     SingleChoiceChip(
                         selected = formatSelection && !playlist,
                         onClick = {

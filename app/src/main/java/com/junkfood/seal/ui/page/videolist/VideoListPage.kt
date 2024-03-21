@@ -1,7 +1,6 @@
 package com.junkfood.seal.ui.page.videolist
 
 import VideoStreamSVG
-import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -77,7 +77,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.App
 import com.junkfood.seal.R
@@ -486,55 +485,61 @@ fun VideoListPage(
                 }
 
             }
-            for (info in videoList) {
+            items(
+                items = videoList,
+                key = {it.id},
+                contentType = { it.videoPath.contains(AUDIO_REGEX) }) {info ->
+                with(info) {
+                    AnimatedVisibility(
+                        visible = info.filterSort(viewState, filterSet),
+                        exit = shrinkVertically() + fadeOut(),
+                        enter = expandVertically() + fadeIn()
+                    ) {
+                        MediaListItem(
+                            modifier = Modifier,
+                            title = videoTitle,
+                            author = videoAuthor,
+                            thumbnailUrl = thumbnailUrl,
+                            videoPath = videoPath,
+                            videoFileSize = fileSizeMap.getOrElse(id) { 0L },
+                            videoUrl = videoUrl,
+                            isSelectEnabled = { isSelectEnabled },
+                            isSelected = { selectedItemIds.contains(id) },
+                            onSelect = {
+                                if (selectedItemIds.contains(id)) selectedItemIds.remove(
+                                    id
+                                )
+                                else selectedItemIds.add(id)
+                            },
+                            onClick = {
+                                FileUtil.openFile(path = videoPath) {
+                                    ToastUtil.makeToastSuspend(App.context.getString(R.string.file_unavailable))
+                                }
+                            }, onLongClick = {
+                                isSelectEnabled = true
+                                selectedItemIds.add(id)
+                            },
+                            onShowContextMenu = {
+                                view.slightHapticFeedback()
+                                currentVideoInfo = info
+                                scope.launch {
+                                    showBottomSheet = true
+                                    delay(50)
+                                    sheetState.show()
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+            /*for (info in videoList) {
 
                 item(
                     key = info.id,
                     contentType = { info.videoPath.contains(AUDIO_REGEX) }) {
-                    with(info) {
-                        AnimatedVisibility(
-                            visible = info.filterSort(viewState, filterSet),
-                            exit = shrinkVertically() + fadeOut(),
-                            enter = expandVertically() + fadeIn()
-                        ) {
-                            MediaListItem(
-                                modifier = Modifier,
-                                title = videoTitle,
-                                author = videoAuthor,
-                                thumbnailUrl = thumbnailUrl,
-                                videoPath = videoPath,
-                                videoFileSize = fileSizeMap.getOrElse(id) { 0L },
-                                videoUrl = videoUrl,
-                                isSelectEnabled = { isSelectEnabled },
-                                isSelected = { selectedItemIds.contains(id) },
-                                onSelect = {
-                                    if (selectedItemIds.contains(id)) selectedItemIds.remove(
-                                        id
-                                    )
-                                    else selectedItemIds.add(id)
-                                },
-                                onClick = {
-                                    FileUtil.openFile(path = videoPath) {
-                                        ToastUtil.makeToastSuspend(App.context.getString(R.string.file_unavailable))
-                                    }
-                                }, onLongClick = {
-                                    isSelectEnabled = true
-                                    selectedItemIds.add(id)
-                                },
-                                onShowContextMenu = {
-                                    view.slightHapticFeedback()
-                                    currentVideoInfo = info
-                                    scope.launch {
-                                        showBottomSheet = true
-                                        delay(50)
-                                        sheetState.show()
-                                    }
-                                }
-                            )
-                        }
-                    }
+
                 }
-            }
+            }*/
 
         }
 

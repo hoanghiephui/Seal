@@ -8,6 +8,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 
@@ -44,3 +45,9 @@ val preferenceTitle = TextStyle(
     fontSize = 20.sp, lineHeight = 24.sp,
     lineBreak = LineBreak.Paragraph,
 )
+
+fun TextStyle.bold() = this.merge(TextStyle(fontWeight = FontWeight.Bold))
+
+fun TextStyle.start() = this.merge(TextStyle(textAlign = TextAlign.Start))
+fun TextStyle.center() = this.merge(TextStyle(textAlign = TextAlign.Center))
+fun TextStyle.end() = this.merge(TextStyle(textAlign = TextAlign.End))

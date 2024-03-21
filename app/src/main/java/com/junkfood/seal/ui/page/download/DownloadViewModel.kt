@@ -19,6 +19,7 @@ import com.junkfood.seal.util.PLAYLIST
 import com.junkfood.seal.util.PlaylistResult
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.VideoInfo
+import com.junkfood.seal.util.isYouTubeLink
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,6 +65,10 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
             return
         if (url.isBlank()) {
             showErrorMessage(R.string.url_empty)
+            return
+        }
+        if(url.isYouTubeLink()) {
+            showErrorMessage(R.string.paste_youtube_fail_msg)
             return
         }
         if (PLAYLIST.getBoolean()) {

@@ -222,7 +222,7 @@ fun SettingsPage(
                     navController.navigate(Route.APPEARANCE) { launchSingleTop = true }
                 }
             }
-            item {
+            /*item {
 
                 SettingItem(
                     title = stringResource(id = R.string.about), description = stringResource(
@@ -231,7 +231,7 @@ fun SettingsPage(
                 ) {
                     navController.navigate(Route.ABOUT) { launchSingleTop = true }
                 }
-            }
+            }*/
         }
     }
 }

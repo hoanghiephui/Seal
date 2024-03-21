@@ -50,7 +50,6 @@ import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.FileUtil
 import com.junkfood.seal.util.ToastUtil
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoDetailDrawer(
     sheetState: ModalBottomSheetState,
