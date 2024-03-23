@@ -106,6 +106,7 @@ import com.junkfood.seal.util.THUMBNAIL
 import com.junkfood.seal.util.USE_PREVIOUS_SELECTION
 import com.junkfood.seal.util.VIDEO_FORMAT
 import com.junkfood.seal.util.VIDEO_QUALITY
+import com.junkfood.seal.util.WITHOUT_WATERMARK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -135,6 +136,7 @@ fun DownloadSettingDialog(
     var playlist by remember { mutableStateOf(PreferenceUtil.getValue(PLAYLIST)) }
     var subtitle by remember { mutableStateOf(PreferenceUtil.getValue(SUBTITLE)) }
     var formatSelection by FORMAT_SELECTION.booleanState
+    var withoutWaterMark by WITHOUT_WATERMARK.booleanState
     var videoFormatPreference by VIDEO_FORMAT.intState
     var videoQuality by VIDEO_QUALITY.intState
     var cookies by COOKIES.booleanState
@@ -261,26 +263,30 @@ fun DownloadSettingDialog(
                 DrawerSheetSubtitle(text = stringResource(id = R.string.format_selection))
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                     SingleChoiceChip(
-                        selected = !formatSelection || playlist, onClick = {
+                        selected = (!formatSelection || playlist) && !withoutWaterMark, onClick = {
                             formatSelection = false
+                            withoutWaterMark = false
                             FORMAT_SELECTION.updateBoolean(false)
+                            WITHOUT_WATERMARK.updateBoolean(false)
                         }, enabled = type != DownloadType.Command,
                         label = stringResource(id = R.string.auto)
                     )
                     if (isTiktok && type == DownloadType.Video) {
                         SingleChoiceChip(
-                            selected = formatSelection || playlist, onClick = {
-                                formatSelection = true
-
+                            selected = withoutWaterMark, onClick = {
+                                withoutWaterMark = true
+                                WITHOUT_WATERMARK.updateBoolean(true)
                             },
                             label = stringResource(id = R.string.video_without_watermark)
                         )
                     }
                     SingleChoiceChip(
-                        selected = formatSelection && !playlist,
+                        selected = formatSelection && !playlist && !withoutWaterMark,
                         onClick = {
                             formatSelection = true
+                            withoutWaterMark = false
                             FORMAT_SELECTION.updateBoolean(true)
+                            WITHOUT_WATERMARK.updateBoolean(false)
                         },
                         enabled = type != DownloadType.Command && !playlist,
                         label = stringResource(id = R.string.custom)

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.junkfood.seal.ui.page.download
 
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +27,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-@OptIn(ExperimentalMaterial3Api::class)
 
 // TODO: Refactoring for introducing multitasking and download queue management
 class DownloadViewModel @Inject constructor() : ViewModel() {

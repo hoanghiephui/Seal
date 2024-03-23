@@ -21,6 +21,7 @@ import com.junkfood.seal.Downloader.toNotificationId
 import com.junkfood.seal.R
 import com.junkfood.seal.database.objects.CommandTemplate
 import com.junkfood.seal.database.objects.DownloadedVideoInfo
+import com.junkfood.seal.ui.common.booleanState
 import com.junkfood.seal.ui.page.settings.network.Cookie
 import com.junkfood.seal.util.FileUtil.getArchiveFile
 import com.junkfood.seal.util.FileUtil.getConfigFile
@@ -166,6 +167,9 @@ object DownloadUtil {
                     addOption("--extractor-args", "youtube:skip=translated_subs")
                 }
             }
+            if (withoutWatermark) {
+                addOption("-f 0")
+            }
         }
         addOption("--dump-json")
         addOption("-R", "1")
@@ -226,7 +230,8 @@ object DownloadUtil {
         val restrictFilenames: Boolean = RESTRICT_FILENAMES.getBoolean(),
         val supportAv1HardwareDecoding: Boolean = checkIfAv1HardwareAccelerated(),
         val forceIpv4: Boolean = FORCE_IPV4.getBoolean(),
-        val mergeAudioStream: Boolean = false
+        val mergeAudioStream: Boolean = false,
+        val withoutWatermark: Boolean = WITHOUT_WATERMARK.getBoolean()
     )
 
     private fun YoutubeDLRequest.enableCookies(userAgentString: String): YoutubeDLRequest =
@@ -535,6 +540,9 @@ object DownloadUtil {
                 }
                 if (debug) {
                     addOption("-v")
+                }
+                if (withoutWatermark) {
+                    addOption("-f 0")
                 }
                 if (useDownloadArchive) {
                     val archiveFile = context.getArchiveFile()
