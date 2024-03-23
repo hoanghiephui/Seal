@@ -55,7 +55,7 @@ fun VideoCard(
     showCancelButton: Boolean = false,
     onCancel: () -> Unit = {},
     onClick: () -> Unit = {},
-    progress: Float = 100f,
+    progress: Float = 90f,
     fileSizeApprox: Double = 1024 * 1024 * 69.0,
     duration: Int = 359,
     isPreview: Boolean = false,
