@@ -1,6 +1,6 @@
 package com.junkfood.seal.ui.page.download
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.junkfood.seal.App.Companion.applicationScope
@@ -11,7 +11,9 @@ import com.junkfood.seal.Downloader.manageDownloadError
 import com.junkfood.seal.Downloader.notSupportError
 import com.junkfood.seal.Downloader.updatePlaylistResult
 import com.junkfood.seal.R
-import com.junkfood.seal.SupportModel
+import com.junkfood.seal.model.MainActivityUiState
+import com.junkfood.seal.model.SupportModel
+import com.junkfood.seal.repository.OfflineFirstRepository
 import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DownloadUtil
 import com.junkfood.seal.util.FORMAT_SELECTION
@@ -24,16 +26,29 @@ import com.junkfood.seal.util.isYouTubeLink
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 
 // TODO: Refactoring for introducing multitasking and download queue management
-class DownloadViewModel @Inject constructor() : ViewModel() {
-
+class DownloadViewModel @Inject constructor(
+    private val repository: OfflineFirstRepository
+) : ViewModel() {
+    val uiState: StateFlow<MainActivityUiState> = repository.userData.map {
+        MainActivityUiState.Success(it)
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = MainActivityUiState.Loading,
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
 
     private val mutableViewStateFlow = MutableStateFlow(ViewState())
     val viewStateFlow = mutableViewStateFlow.asStateFlow()
@@ -67,7 +82,7 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
             ToastUtil.makeToast(context.getString(R.string.url_empty))
             return
         }
-        if(url.isYouTubeLink()) {
+        if (url.isYouTubeLink()) {
             ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
             return
         }
@@ -165,12 +180,72 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
         notSupportError(url = url, errorReport = context.getString(R.string.paste_youtube_fail_msg))
     }
 
-    val itemsSupport get() = listOf(
-        SupportModel("https://cdn-icons-png.flaticon.com/128/5968/5968764.png", 0xFFEFF4FB, "Facebook"),
-        SupportModel("https://cdn-icons-png.flaticon.com/128/3669/3669950.png", 0xFFD3D3D3, "Tiktok"),
-        SupportModel("https://cdn-icons-png.flaticon.com/128/3955/3955024.png", 0xFFFBEFF7, "Instagram"),
-        SupportModel("https://cdn-icons-png.flaticon.com/128/3670/3670151.png", 0xFFEFFBF0, "Twitter"),
-    )
+    val itemsSupport
+        get() = listOf(
+            SupportModel(
+                "https://cdn-icons-png.flaticon.com/128/5968/5968764.png",
+                0xFFEFF4FB,
+                "Facebook"
+            ),
+            SupportModel(
+                "https://cdn-icons-png.flaticon.com/128/3669/3669950.png",
+                0xFFD3D3D3,
+                "Tiktok"
+            ),
+            SupportModel(
+                "https://cdn-icons-png.flaticon.com/128/3955/3955024.png",
+                0xFFFBEFF7,
+                "Instagram"
+            ),
+            SupportModel(
+                "https://cdn-icons-png.flaticon.com/128/3670/3670151.png",
+                0xFFEFFBF0,
+                "Twitter"
+            ),
+        )
+
+    fun resetPointsIfDaily(lastUpdated: Long) {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = lastUpdated
+        val lastUpdatedDay = calendar.get(Calendar.DAY_OF_YEAR)
+
+        calendar.timeInMillis = System.currentTimeMillis()
+        val currentDay = calendar.get(Calendar.DAY_OF_YEAR)
+
+        if (currentDay != lastUpdatedDay) {
+            // Nếu đã qua ngày mới, reset điểm và cập nhật ngày
+            viewModelScope.launch {
+                repository.setDownloadCount(5)
+            }
+            viewModelScope.launch {
+                repository.setLastDay(System.currentTimeMillis())
+            }
+            Log.d(TAG, "Reset Points")
+        }
+    }
+
+    fun addPoints(
+        points: Int,
+        currentPoints: Int
+    ) {
+        val newPoints = currentPoints + points
+        viewModelScope.launch {
+            repository.setDownloadCount(newPoints)
+        }
+    }
+
+    fun deductPoints(
+        points: Int,
+        currentPoints: Int
+    ): Boolean {
+        if (currentPoints >= points) {
+            viewModelScope.launch {
+                repository.setDownloadCount(currentPoints - points)
+            }
+            return true
+        }
+        return false
+    }
 
     companion object {
         private const val TAG = "DownloadViewModel"

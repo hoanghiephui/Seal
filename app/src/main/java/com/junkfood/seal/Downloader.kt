@@ -303,7 +303,7 @@ object Downloader {
     }
 
     private fun downloadError(url: String, errorReport: String) {
-        mutableErrorState.update { ErrorState.DownloadError(url, errorReport) }
+        mutableErrorState.update { ErrorState.DownloadError(url, errorReport.replace("com.yausername.youtubedl_android.YoutubeDLException: ", "")) }
     }
 
 

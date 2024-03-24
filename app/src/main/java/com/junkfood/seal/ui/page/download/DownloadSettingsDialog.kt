@@ -137,6 +137,7 @@ fun DownloadSettingDialog(
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     onDownloadConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
+    lastDownloadCount: Int
 ) {
 //    val audio by remember { mutableStateOf(PreferenceUtil.getValue(EXTRACT_AUDIO)) }
 
@@ -499,7 +500,7 @@ fun DownloadSettingDialog(
                                     titleStyle.copy(color = MaterialTheme.colorScheme.primary)
                                         .toSpanStyle()
                                 ) {
-                                    append("5 ")
+                                    append("$lastDownloadCount ")
                                 }
                                 append("downloads left today")
                             }

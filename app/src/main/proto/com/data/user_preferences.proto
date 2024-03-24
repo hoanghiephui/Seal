@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.data";
+option java_multiple_files = true;
+
+message UserPreferences {
+    reserved 2;
+    int32 download_count = 1;
+    int64 last_day = 3;
+
+    bool make_pro = 4;
+}

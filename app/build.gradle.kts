@@ -11,6 +11,7 @@ plugins {
     kotlin("kapt")
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization")
+    alias(libs.plugins.protobuf)
 }
 apply(plugin = "dagger.hilt.android.plugin")
 
@@ -84,10 +85,10 @@ android {
 
 
     defaultConfig {
-        applicationId = "com.junkfood.seal"
+        applicationId = "com.hubtik.video"
         minSdk = 21
         targetSdk = 34
-        versionCode = 11130
+        versionCode = 16
 
         if (splitApks) {
             splits {
@@ -118,6 +119,7 @@ android {
                     abiFilters.add(it)
                 }
             }
+        resValue("string", "APPLOVIN_SDK_KEY", "\"" + getLocalProperties()?.getProperty("keyApplovin")+ "\"")
     }
     val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
 
@@ -137,6 +139,13 @@ android {
 
             }
         }
+        /*beforeVariants {
+            android.sourceSets.register(it.name) {
+                val buildDir = layout.buildDirectory.get().asFile
+                java.srcDir(buildDir.resolve("generated/source/proto/${it.name}/java"))
+                kotlin.srcDir(buildDir.resolve("generated/source/proto/${it.name}/kotlin"))
+            }
+        }*/
     }
 
     buildTypes {
@@ -165,7 +174,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "Seal-${defaultConfig.versionName}-${name}.apk"
+                "Download-${defaultConfig.versionName}-${name}.apk"
         }
     }
 
@@ -190,6 +199,25 @@ android {
 
 kotlin {
     jvmToolchain(11)
+}
+
+// Setup protobuf configuration, generating lite Java and Kotlin classes
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                register("java") {
+                    option("lite")
+                }
+                register("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -246,6 +274,8 @@ dependencies {
     //UI debugging library for Jetpack Compose
     implementation(libs.androidx.compose.ui.tooling)
     implementation("com.github.mukeshsolanki:MarkdownView-Android:2.0.0")
+    implementation(libs.protobuf.kotlin.lite)
+    implementation(libs.androidx.dataStore.core)
 }
 
 class RoomSchemaArgProvider(
@@ -258,3 +288,13 @@ class RoomSchemaArgProvider(
         return listOf("room.schemaLocation=${schemaDir.path}")
     }
 }
+
+fun getLocalProperties(): Properties? =
+    try {
+        Properties().apply {
+            load(rootProject.file("local.properties").inputStream())
+        }
+    } catch (e: Exception) {
+        println("Cannot load local.properties $e")
+        null
+    }

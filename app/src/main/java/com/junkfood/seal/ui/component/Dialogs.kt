@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.SignalCellularConnectedNoInternet4Bar
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
@@ -51,14 +51,15 @@ private val ButtonsCrossAxisSpacing = 12.dp
 @Composable
 fun HelpDialog(
     text: String,
+    title: String = stringResource(id = R.string.how_does_it_work),
     onDismissRequest: () -> Unit = {},
     dismissButton: @Composable (() -> Unit)? = null,
     confirmButton: @Composable () -> Unit = { ConfirmButton(text = stringResource(id = R.string.got_it)) { onDismissRequest() } },
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(id = R.string.how_does_it_work)) },
-        icon = { Icon(Icons.Outlined.HelpOutline, null) },
+        title = { Text(text = title) },
+        icon = { Icon(Icons.AutoMirrored.Outlined.HelpOutline, null) },
         text = { Text(text = text) },
         confirmButton = confirmButton,
         dismissButton = dismissButton,
@@ -271,7 +272,7 @@ fun SealDialogVariant(
     tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
     properties: DialogProperties = DialogProperties()
 ) {
-    AlertDialog(
+    BasicAlertDialog(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         properties = properties

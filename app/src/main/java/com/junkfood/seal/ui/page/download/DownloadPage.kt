@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -25,7 +27,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,6 +68,7 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
@@ -77,6 +79,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,19 +113,23 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.junkfood.seal.App
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
-import com.junkfood.seal.SupportModel
+import com.junkfood.seal.model.MainActivityUiState
+import com.junkfood.seal.model.SupportModel
 import com.junkfood.seal.ui.common.AsyncImageImpl
 import com.junkfood.seal.ui.common.HapticFeedback.longPressHapticFeedback
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.component.ClearButton
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
+import com.junkfood.seal.ui.component.HelpDialog
 import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.VideoCard
+import com.junkfood.seal.ui.page.settings.about.ytdlpUrl
 import com.junkfood.seal.ui.theme.PreviewThemeLight
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.CELLULAR_DOWNLOAD
@@ -139,6 +146,8 @@ import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.isTikTokLink
 import com.junkfood.seal.util.isYouTubeLink
 import com.junkfood.seal.util.matchUrlFromClipboard
+import com.junkfood.seal.util.openAppSettings
+import com.junkfood.seal.util.permissionWriteStore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -168,6 +177,14 @@ fun DownloadPage(
     val videoInfo by downloadViewModel.videoInfoFlow.collectAsStateWithLifecycle()
     val errorState by Downloader.errorState.collectAsStateWithLifecycle()
     val processCount by Downloader.processCount.collectAsStateWithLifecycle()
+    val userState by downloadViewModel.uiState.collectAsStateWithLifecycle()
+    var lastDownloadCount  by rememberSaveable { mutableIntStateOf(0) }
+    LaunchedEffect(key1 = userState) {
+        if (userState is MainActivityUiState.Success) {
+            downloadViewModel.resetPointsIfDaily((userState as MainActivityUiState.Success).userData.lastDay)
+            lastDownloadCount = (userState as MainActivityUiState.Success).userData.downloadCount
+        }
+    }
 
     var showNotificationDialog by remember { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -204,27 +221,46 @@ fun DownloadPage(
             downloadViewModel.startDownloadVideo()
         }
     }
-
+    var permissionRequested: Boolean by rememberSaveable { mutableStateOf(false) }
     val storagePermission = rememberPermissionState(
-        permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ) { b: Boolean ->
-        if (b) {
+        permission = permissionWriteStore
+    )
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { wasGranted ->
+        if (wasGranted) {
             checkNetworkOrDownload()
-        } else {
-            ToastUtil.makeToast(R.string.permission_denied)
         }
     }
 
     val checkPermissionOrDownload = {
-        if (Build.VERSION.SDK_INT > 29 || storagePermission.status == PermissionStatus.Granted) {
-            checkNetworkOrDownload()
-        } else {
-            storagePermission.launchPermissionRequest()
+        when(storagePermission.status) {
+            PermissionStatus.Granted -> {
+                checkNetworkOrDownload()
+            }
+            else -> {
+                if (storagePermission.status.shouldShowRationale) {
+                    permissionRequested = true
+                } else {
+                    launcher.launch(permissionWriteStore)
+                }
+            }
         }
     }
     val sheetState =
         rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
+    if (permissionRequested) {
+        HelpDialog(
+            title = stringResource(id = R.string.permission_denied),
+            text = stringResource(id = R.string.permission_write_setting),
+            onDismissRequest = { permissionRequested = false }, dismissButton = null
+        ) {
+            TextButton(onClick = {
+                permissionRequested = false
+                context.openAppSettings()
+            }) {
+                Text(text = stringResource(id = R.string.go_to_setting))
+            }
+        }
+    }
 
     val downloadCallback: () -> Unit = {
         if (viewState.url.isYouTubeLink()) {
@@ -361,7 +397,8 @@ fun DownloadPage(
                     showDownloadDialog = false
                 }
             },
-            isTiktok = viewState.url.isTikTokLink()
+            isTiktok = viewState.url.isTikTokLink(),
+            lastDownloadCount = lastDownloadCount
         )
         if (isDownloaded) scope.launch {
             showDownloadCompleteDialog = true
@@ -385,6 +422,7 @@ fun DownloadPage(
                     showDownloadCompleteDialog = false
                     isDownloaded = false
                     Downloader.updateState(Downloader.State.Idle)
+                    downloadViewModel.deductPoints(points = 1, currentPoints = lastDownloadCount)
                 }
             },
             taskState = taskState,

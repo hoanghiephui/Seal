@@ -459,4 +459,7 @@
     <string name="feature_foryou_onboarding_guidance_subtitle">It is designed to help you easily download video/audio in various formats, from many free sources.</string>
     <string name="get_plus">Get Plus</string>
     <string name="supported_site">Supported sites</string>
+    <string name="permission_write_desc">You need to grant permission to save the file to continue using the feature.</string>
+    <string name="permission_write_setting">You have denied permission to write the file. Please access settings for usage rights.</string>
+    <string name="go_to_setting">Go to setting</string>
 </resources>

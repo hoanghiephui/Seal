@@ -102,6 +102,7 @@ import com.junkfood.seal.util.UpdateUtil
 import com.junkfood.seal.util.YT_DLP
 import com.junkfood.seal.util.YT_DLP_NIGHTLY
 import com.junkfood.seal.util.YT_DLP_UPDATE
+import com.junkfood.seal.util.permissionWriteStore
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -155,10 +156,10 @@ fun GeneralDownloadPreferences(
     }
 
     val storagePermission =
-        rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        rememberPermissionState(permission = permissionWriteStore)
 
     val isPermissionGranted =
-        Build.VERSION.SDK_INT > 29 || storagePermission.status == PermissionStatus.Granted
+        storagePermission.status == PermissionStatus.Granted
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(),

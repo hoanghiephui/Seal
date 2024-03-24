@@ -144,6 +144,7 @@ class QuickDownloadActivity : ComponentActivity() {
                             }
                             this@QuickDownloadActivity.finish()
                         },
+                        lastDownloadCount = 5
                     )
                 }
             }

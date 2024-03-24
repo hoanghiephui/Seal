@@ -1,4 +1,4 @@
-package com.junkfood.seal
+package com.junkfood.seal.model
 
 data class SupportModel(
     val urlIcon: String,

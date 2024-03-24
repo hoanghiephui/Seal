@@ -13,11 +13,11 @@ androidxNavigation = "2.7.7"
 androidxFoundation = "1.6.0-beta03"
 androidxComposeMaterial3 = "1.2.0-beta01"
 androidxComposeAnimation = "1.5.0-beta01"
-
+protobufPlugin = "0.9.4"
 androidxEspresso = "3.5.1"
 androidxHiltNavigationCompose = "1.2.0"
-
-
+protobuf = "3.25.2"
+androidxDataStore = "1.0.0"
 androidxTestExt = "1.1.5"
 
 
@@ -115,6 +115,9 @@ youtubedl-android-aria2c = { group = "com.github.yausername.youtubedl-android", 
 #youtubedl-android-aria2c = { group = "com.github.JunkFood02.youtubedl-android", name = "aria2c", version.ref = "youtubedlAndroid" }
 
 mmkv = { group = "com.tencent", name = "mmkv", version.ref = "mmkv" }
+protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+androidx-dataStore-core = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -125,6 +128,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-gradlePlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 
 [bundles]
 accompanist = [

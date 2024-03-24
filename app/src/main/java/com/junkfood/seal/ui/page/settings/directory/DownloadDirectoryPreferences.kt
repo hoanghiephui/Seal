@@ -110,6 +110,7 @@ import com.junkfood.seal.util.SDCARD_DOWNLOAD
 import com.junkfood.seal.util.SDCARD_URI
 import com.junkfood.seal.util.SUBDIRECTORY_EXTRACTOR
 import com.junkfood.seal.util.SUBDIRECTORY_PLAYLIST_TITLE
+import com.junkfood.seal.util.permissionWriteStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -180,7 +181,7 @@ fun DownloadDirectoryPreferences(onBackPressed: () -> Unit) {
     var showOutputTemplateDialog by remember { mutableStateOf(false) }
 
     val storagePermission =
-        rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        rememberPermissionState(permission = permissionWriteStore)
     val showDirectoryAlert =
         Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()
                 && (!audioDirectoryText.isValidDirectory() || !videoDirectoryText.isValidDirectory() || !customCommandDirectory.isValidDirectory())
@@ -222,7 +223,7 @@ fun DownloadDirectoryPreferences(onBackPressed: () -> Unit) {
 
     fun openDirectoryChooser(directory: Directory = Directory.VIDEO) {
         editingDirectory = directory
-        if (Build.VERSION.SDK_INT > 29 || storagePermission.status == PermissionStatus.Granted)
+        if (storagePermission.status == PermissionStatus.Granted)
             launcher.launch(null)
         else storagePermission.launchPermissionRequest()
     }

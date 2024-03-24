@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
+import android.provider.Settings
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.annotation.CheckResult
@@ -20,7 +22,7 @@ import java.io.File
 const val AUDIO_REGEX = "(mp3|aac|opus|m4a)$"
 const val THUMBNAIL_REGEX = "\\.(jpg|png)$"
 const val SUBTITLE_REGEX = "\\.(lrc|vtt|srt|ass|json3|srv.|ttml)$"
-private const val PRIVATE_DIRECTORY_SUFFIX = ".Seal"
+private const val PRIVATE_DIRECTORY_SUFFIX = ".VidSave"
 
 object FileUtil {
     fun openFileFromResult(downloadResult: Result<List<String>>) {
@@ -240,4 +242,22 @@ object FileUtil {
 
 
     private const val TAG = "FileUtil"
+}
+
+fun Context.openAppSettings() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    with(intent) {
+        data = Uri.fromParts("package", packageName, null)
+        addCategory(Intent.CATEGORY_DEFAULT)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+    }
+    startActivity(intent)
+}
+
+val permissionWriteStore = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    android.Manifest.permission.READ_MEDIA_VIDEO
+} else {
+    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 }
