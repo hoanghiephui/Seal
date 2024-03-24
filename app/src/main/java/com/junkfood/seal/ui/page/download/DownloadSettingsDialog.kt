@@ -276,6 +276,7 @@ fun DownloadSettingDialog(
                             selected = withoutWaterMark, onClick = {
                                 withoutWaterMark = true
                                 WITHOUT_WATERMARK.updateBoolean(true)
+                                FORMAT_SELECTION.updateBoolean(false)
                             },
                             label = stringResource(id = R.string.video_without_watermark)
                         )

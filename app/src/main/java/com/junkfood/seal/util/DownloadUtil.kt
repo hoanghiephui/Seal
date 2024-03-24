@@ -169,6 +169,7 @@ object DownloadUtil {
             }
             if (withoutWatermark) {
                 addOption("-f 0")
+                Log.d("AAA", "AA $withoutWatermark")
             }
         }
         addOption("--dump-json")
