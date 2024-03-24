@@ -1,4 +1,3 @@
-# Supported sites
  - **17live**
  - **17live:clip**
  - **1News**: 1news.co.nz article videos
