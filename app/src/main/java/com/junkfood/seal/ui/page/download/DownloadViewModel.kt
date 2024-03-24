@@ -8,8 +8,10 @@ import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.Downloader.State
 import com.junkfood.seal.Downloader.manageDownloadError
+import com.junkfood.seal.Downloader.notSupportError
 import com.junkfood.seal.Downloader.updatePlaylistResult
 import com.junkfood.seal.R
+import com.junkfood.seal.SupportModel
 import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DownloadUtil
 import com.junkfood.seal.util.FORMAT_SELECTION
@@ -66,7 +68,7 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
             return
         }
         if(url.isYouTubeLink()) {
-            showErrorMessage(R.string.paste_youtube_fail_msg)
+            ToastUtil.makeToast(R.string.paste_youtube_fail_msg)
             return
         }
         if (PLAYLIST.getBoolean()) {
@@ -158,6 +160,17 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
     fun onShareIntentConsumed() {
         mutableViewStateFlow.update { it.copy(isUrlSharingTriggered = false) }
     }
+
+    fun onNotSupportError(url: String) {
+        notSupportError(url = url, errorReport = context.getString(R.string.paste_youtube_fail_msg))
+    }
+
+    val itemsSupport get() = listOf(
+        SupportModel("https://cdn-icons-png.flaticon.com/128/5968/5968764.png", 0xFFEFF4FB, "Facebook"),
+        SupportModel("https://cdn-icons-png.flaticon.com/128/3669/3669950.png", 0xFFD3D3D3, "Tiktok"),
+        SupportModel("https://cdn-icons-png.flaticon.com/128/3955/3955024.png", 0xFFFBEFF7, "Instagram"),
+        SupportModel("https://cdn-icons-png.flaticon.com/128/3670/3670151.png", 0xFFEFFBF0, "Twitter"),
+    )
 
     companion object {
         private const val TAG = "DownloadViewModel"

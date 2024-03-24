@@ -188,7 +188,7 @@ private fun AdsView() {
                 titleStyle.copy(color = MaterialTheme.colorScheme.primary)
                     .toSpanStyle()
             ) {
-                append("Wallet+")
+                append("VidSave+")
             }
         }
 
@@ -203,7 +203,7 @@ private fun AdsView() {
             modifier = Modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
-            text = "Wallet+ is a paid service that gives you access to all features for the price of a cup of coffee.",
+            text = "VidSave+ is a paid service that gives you access to all features for the price of a cup of coffee.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -216,7 +216,7 @@ private fun AdsView() {
 
             },
         ) {
-            Text("Buy Wallet+")
+            Text("Buy VidSave+")
         }
     }
 }

@@ -15,10 +15,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +30,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,8 +50,11 @@ import androidx.compose.material.icons.outlined.Subscriptions
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -77,10 +88,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -98,10 +113,13 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.junkfood.seal.App
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
+import com.junkfood.seal.SupportModel
+import com.junkfood.seal.ui.common.AsyncImageImpl
 import com.junkfood.seal.ui.common.HapticFeedback.longPressHapticFeedback
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.component.ClearButton
+import com.junkfood.seal.ui.component.FilledButtonWithIcon
 import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.VideoCard
@@ -119,6 +137,7 @@ import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
 import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.isTikTokLink
+import com.junkfood.seal.util.isYouTubeLink
 import com.junkfood.seal.util.matchUrlFromClipboard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -137,6 +156,7 @@ fun DownloadPage(
     navigateToFormatPage: () -> Unit = {},
     onNavigateToTaskList: () -> Unit = {},
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
+    onNavigateToSupportedSite: () -> Unit = {},
     downloadViewModel: DownloadViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -207,17 +227,21 @@ fun DownloadPage(
 
 
     val downloadCallback: () -> Unit = {
-        if (NOTIFICATION.getBoolean() && notificationPermission?.status?.isGranted == false) {
-            showNotificationDialog = true
-        }
-        if (CONFIGURE.getBoolean()) {
-            showDownloadDialog = true
-            if (!useDialog) scope.launch {
-                delay(50)
-                sheetState.show()
-            }
+        if (viewState.url.isYouTubeLink()) {
+            downloadViewModel.onNotSupportError(viewState.url)
         } else {
-            checkPermissionOrDownload()
+            if (NOTIFICATION.getBoolean() && notificationPermission?.status?.isGranted == false) {
+                showNotificationDialog = true
+            }
+            if (CONFIGURE.getBoolean()) {
+                showDownloadDialog = true
+                if (!useDialog) scope.launch {
+                    delay(50)
+                    sheetState.show()
+                }
+            } else {
+                checkPermissionOrDownload()
+            }
         }
         keyboardController?.hide()
     }
@@ -311,7 +335,15 @@ fun DownloadPage(
                 Downloader.cancelDownload()
             },
             onVideoCardClicked = { Downloader.openDownloadResult() },
-            onUrlChanged = { url -> downloadViewModel.updateUrl(url) }) {}
+            onUrlChanged = { url ->
+                Downloader.clearErrorState()
+                downloadViewModel.updateUrl(url)
+            }
+        ) {
+            SiteSupport(downloadViewModel.itemsSupport) {
+                onNavigateToSupportedSite.invoke()
+            }
+        }
 
 
         DownloadSettingDialog(
@@ -341,11 +373,12 @@ fun DownloadPage(
             showDialog = showDownloadCompleteDialog,
             sheetState = sheetState,
             onShare = {
-                FileUtil.createIntentForSharingFile("${Downloader.filePathDownloaded}")?.runCatching {
-                    context.startActivity(
-                        Intent.createChooser(this, shareTitle)
-                    )
-                }
+                FileUtil.createIntentForSharingFile("${Downloader.filePathDownloaded}")
+                    ?.runCatching {
+                        context.startActivity(
+                            Intent.createChooser(this, shareTitle)
+                        )
+                    }
             },
             onDismissRequest = {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -469,12 +502,6 @@ fun DownloadPageImpl(
                 }
             }
         })
-    }, floatingActionButton = {
-        FABs(
-            modifier = with(receiver = Modifier) { if (showDownloadProgress) this else this.imePadding() },
-            downloadCallback = downloadCallback,
-            pasteCallback = pasteCallback
-        )
     }) {
         Column(
             modifier = Modifier
@@ -528,6 +555,29 @@ fun DownloadPageImpl(
                         onDone = downloadCallback,
                         showProgressIndicator = downloaderState is Downloader.State.FetchingInfo
                     ) { url -> onUrlChanged(url) }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButtonWithIcon(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            onClick = pasteCallback,
+                            icon = Icons.Outlined.ContentPaste,
+                            text = stringResource(R.string.paste)
+                        )
+
+                        FilledButtonWithIcon(
+                            onClick = downloadCallback,
+                            icon = Icons.Outlined.FileDownload,
+                            text = stringResource(R.string.download),
+                            enabled = viewState.url.isNotBlank()
+                        )
+                    }
+
                     AnimatedVisibility(
                         modifier = Modifier.fillMaxWidth(),
                         enter = expandVertically() + fadeIn(),
@@ -546,7 +596,11 @@ fun DownloadPageImpl(
                 AnimatedVisibility(visible = errorState != Downloader.ErrorState.None) {
                     ErrorMessage(
                         title = errorState.title,
-                        errorReport = errorState.report
+                        errorReport = errorState.report,
+                        showButton = errorState != Downloader.ErrorState.VerifyError(
+                            viewState.url,
+                            stringResource(id = R.string.paste_youtube_fail_msg)
+                        )
                     ) {
                         view.longPressHapticFeedback()
                         clipboardManager.setText(AnnotatedString(App.getVersionReport() + "\nURL: ${errorState.url}\n${errorState.report}"))
@@ -694,6 +748,7 @@ fun ErrorMessage(
     modifier: Modifier = Modifier,
     title: String,
     errorReport: String,
+    showButton: Boolean,
     onButtonClicked: () -> Unit = {}
 ) {
     val view = LocalView.current
@@ -748,19 +803,19 @@ fun ErrorMessage(
                     isExpanded = true
                 }
             )
+            if (showButton) {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
 
-
-            Row(modifier = Modifier.align(Alignment.End)) {
-                OutlinedButton(
-                    onClick = onButtonClicked,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) {
-                    Text(text = stringResource(id = R.string.copy_error_report))
+                Row(modifier = Modifier.align(Alignment.End)) {
+                    OutlinedButton(
+                        onClick = onButtonClicked,
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    ) {
+                        Text(text = stringResource(id = R.string.copy_error_report))
+                    }
                 }
             }
-
         }
 
     }
@@ -776,6 +831,7 @@ private fun ErrorPreview() {
                     ErrorMessage(
                         title = stringResource(id = R.string.download_error_msg),
                         errorReport = ERROR_REPORT_SAMPLE,
+                        showButton = true
                     ) {}
                 }
             }
@@ -821,7 +877,7 @@ fun FABs(
 @Preview
 fun DownloadPagePreview() {
     PreviewThemeLight {
-        Column() {
+        Column {
             DownloadPageImpl(
                 downloaderState = Downloader.State.DownloadingVideo,
                 taskState = Downloader.DownloadTaskItem(),
@@ -835,6 +891,102 @@ fun DownloadPagePreview() {
                 showDownloadProgress = true,
                 showVideoCard = false
             ) {}
+        }
+    }
+}
+
+@Composable
+private fun SiteSupport(
+    items: List<SupportModel>,
+    navigateToSupportedSite: () -> Unit
+) {
+    var showMore by remember {
+        mutableStateOf(false)
+    }
+    ElevatedCard(
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
+    ) {
+        AnimatedVisibility(visible = !showMore) {
+            Column {
+                Text(
+                    text = stringResource(R.string.feature_foryou_onboarding_guidance_title),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.feature_foryou_onboarding_guidance_subtitle),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, start = 24.dp, end = 24.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    contentPadding = PaddingValues(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .height(120.dp)
+                        .testTag("forYou:feed"),
+                ) {
+                    onboarding(items)
+                }
+                Button(modifier = Modifier
+                    .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                    .fillMaxWidth(), onClick = navigateToSupportedSite) {
+                    Text(text = "View all")
+                }
+            }
+
+        }
+    }
+}
+
+private fun LazyGridScope.onboarding(
+    items: List<SupportModel>
+) {
+    items(items) {
+        ElevatedCard(
+            shape = MaterialTheme.shapes.small,
+            colors = CardDefaults.cardColors(containerColor = Color(it.color)),
+            modifier = Modifier
+                .wrapContentWidth(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AsyncImageImpl(
+                    modifier = Modifier
+                        .padding()
+                        .size(40.dp)
+                        .aspectRatio(4f / 4f, matchHeightConstraintsFirst = true)
+                        .clip(MaterialTheme.shapes.small),
+                    model = it.urlIcon,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    isPreview = false
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                    text = it.name,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
         }
     }
 }

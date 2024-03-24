@@ -118,10 +118,9 @@ fun connectWithBlank(s1: String, s2: String): String {
 }
 
 fun String.isYouTubeLink(): Boolean {
-    if (DEBUG.getBoolean()) return false
-    val pattern = Pattern.compile("(?:https?://)?(?:www\\.)?(?:youtube\\.com(?:/\\S+)?|youtu\\.be)(?:[/?]\\S*)?")
-    val matcher = pattern.matcher(this)
-    return matcher.matches()
+    //if (DEBUG.getBoolean()) return false
+    val pattern = Pattern.compile("^(?:https?://)?(?:www\\.)?(?:(?:music\\.)?youtube\\.com/watch\\?v=\\S+|youtu\\.be/\\S+)")
+    return pattern.matcher(this).matches()
 }
 
 fun String.isTikTokLink(): Boolean {

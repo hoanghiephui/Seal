@@ -5,12 +5,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,8 +25,10 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.DownloadDone
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.NewLabel
+import androidx.compose.material.icons.outlined.ProductionQuantityLimits
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.AlertDialog
@@ -48,9 +52,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.R
@@ -75,6 +82,7 @@ import com.junkfood.seal.ui.page.settings.format.FormatSortingDialog
 import com.junkfood.seal.ui.page.settings.format.VideoFormatDialog
 import com.junkfood.seal.ui.page.settings.format.VideoQualityDialog
 import com.junkfood.seal.ui.page.settings.network.CookiesQuickSettingsDialog
+import com.junkfood.seal.ui.theme.bold
 import com.junkfood.seal.util.AUDIO_CONVERSION_FORMAT
 import com.junkfood.seal.util.AUDIO_CONVERT
 import com.junkfood.seal.util.CONVERT_M4A
@@ -262,6 +270,9 @@ fun DownloadSettingDialog(
             if (!isQuickDownload) {
                 DrawerSheetSubtitle(text = stringResource(id = R.string.format_selection))
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    if (!isTiktok && withoutWaterMark) {
+                        withoutWaterMark = false
+                    }
                     SingleChoiceChip(
                         selected = (!formatSelection || playlist) && !withoutWaterMark, onClick = {
                             formatSelection = false
@@ -474,11 +485,42 @@ fun DownloadSettingDialog(
                 onDismissRequest = onDismissRequest,
                 content = {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        Icon(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            imageVector = Icons.Outlined.DoneAll,
-                            contentDescription = null
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_pro),
+                                contentDescription = null
+                            )
+                            val titleStyle = MaterialTheme.typography.bodySmall.bold()
+                            val annotatedString = buildAnnotatedString {
+                                withStyle(
+                                    titleStyle.copy(color = MaterialTheme.colorScheme.primary)
+                                        .toSpanStyle()
+                                ) {
+                                    append("5 ")
+                                }
+                                append("downloads left today")
+                            }
+                            Text(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp),
+                                text = annotatedString,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            ButtonChip(
+                                onClick = {
+
+                                },
+                                label = stringResource(R.string.get_plus),
+                                icon = Icons.Outlined.ProductionQuantityLimits,
+                                iconDescription = stringResource(R.string.get_plus)
+                            )
+                        }
+
                         Text(
                             text = stringResource(R.string.settings_before_download),
                             style = MaterialTheme.typography.headlineSmall,

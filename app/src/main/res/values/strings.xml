@@ -454,4 +454,9 @@
     <string name="video_without_watermark">Without watermark</string>
     <string name="download_complete">Download completed</string>
     <string name="player">Play</string>
+
+    <string name="feature_foryou_onboarding_guidance_title">A feature-rich audio/video downloader</string>
+    <string name="feature_foryou_onboarding_guidance_subtitle">It is designed to help you easily download video/audio in various formats, from many free sources.</string>
+    <string name="get_plus">Get Plus</string>
+    <string name="supported_site">Supported sites</string>
 </resources>

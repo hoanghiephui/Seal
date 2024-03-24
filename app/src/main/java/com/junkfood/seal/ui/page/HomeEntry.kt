@@ -47,6 +47,7 @@ import com.junkfood.seal.ui.page.download.DownloadPage
 import com.junkfood.seal.ui.page.download.DownloadViewModel
 import com.junkfood.seal.ui.page.download.FormatPage
 import com.junkfood.seal.ui.page.download.PlaylistSelectionPage
+import com.junkfood.seal.ui.page.download.SupportedSite
 import com.junkfood.seal.ui.page.settings.SettingsPage
 import com.junkfood.seal.ui.page.settings.about.AboutPage
 import com.junkfood.seal.ui.page.settings.about.CreditsPage
@@ -165,7 +166,8 @@ fun HomeEntry(
                         cookiesViewModel.updateUrl(it)
                         navController.navigate(Route.COOKIE_GENERATOR_WEBVIEW)
                     },
-                    downloadViewModel = downloadViewModel
+                    downloadViewModel = downloadViewModel,
+                    onNavigateToSupportedSite = { navController.navigate(Route.SUPPORTED_SITE_ROUTER) }
                 )
             }
             animatedComposable(Route.DOWNLOADS) { VideoListPage { onBackPressed() } }
@@ -188,6 +190,7 @@ fun HomeEntry(
 //            animatedComposable(Route.DOWNLOAD_QUEUE) { DownloadQueuePage { onBackPressed() } }
             slideInVerticallyComposable(Route.PLAYLIST) { PlaylistSelectionPage { onBackPressed() } }
             slideInVerticallyComposable(Route.FORMAT_SELECTION) { FormatPage(downloadViewModel) { onBackPressed() } }
+            slideInVerticallyComposable(Route.SUPPORTED_SITE_ROUTER) { SupportedSite { onBackPressed() } }
             settingsGraph(
                 navController = navController,
                 cookiesViewModel = cookiesViewModel,

@@ -245,7 +245,7 @@ dependencies {
 
     //UI debugging library for Jetpack Compose
     implementation(libs.androidx.compose.ui.tooling)
-
+    implementation("com.github.mukeshsolanki:MarkdownView-Android:2.0.0")
 }
 
 class RoomSchemaArgProvider(

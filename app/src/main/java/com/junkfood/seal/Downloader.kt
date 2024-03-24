@@ -66,6 +66,8 @@ object Downloader {
 
         data class FetchInfoError(override val url: String, override val report: String) :
             ErrorState(url = url, report = report)
+        data class VerifyError(override val url: String, override val report: String) :
+            ErrorState(url = url, report = report)
 
         data object None : ErrorState()
 
@@ -73,6 +75,7 @@ object Downloader {
             @Composable get() = when (this) {
                 is DownloadError -> stringResource(id = R.string.download_error_msg)
                 is FetchInfoError -> stringResource(id = R.string.fetch_info_error_msg)
+                is VerifyError -> stringResource(id = R.string.status_error)
                 None -> ""
             }
     }
@@ -696,6 +699,10 @@ object Downloader {
 
     fun onProcessStarted() = mutableProcessCount.update { it + 1 }
     fun String.toNotificationId(): Int = this.hashCode()
+
+    fun notSupportError(url: String, errorReport: String) {
+        mutableErrorState.update { ErrorState.VerifyError(url, errorReport) }
+    }
 }
 
 
