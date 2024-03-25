@@ -13,7 +13,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.applovin.mediation.ads.MaxRewardedAd
 import com.junkfood.seal.App.Companion.context
+import com.junkfood.seal.ui.ads.AdMaxRewardedLoader
+import com.junkfood.seal.ui.ads.AdRewardedCallback
 import com.junkfood.seal.ui.common.LocalDarkTheme
 import com.junkfood.seal.ui.common.LocalDynamicColorSwitch
 import com.junkfood.seal.ui.common.SettingsProvider
@@ -28,9 +31,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AdRewardedCallback {
     private val downloadViewModel: DownloadViewModel by viewModels()
-
+    private val adMaxRewardedLoader = AdMaxRewardedLoader(this)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +63,10 @@ class MainActivity : AppCompatActivity() {
                     HomeEntry(
                         downloadViewModel = downloadViewModel,
                         cookiesViewModel = cookiesViewModel,
-                        isUrlShared = isUrlSharingTriggered
+                        isUrlShared = isUrlSharingTriggered,
+                        onViewAds = {
+                            adMaxRewardedLoader.createRewardedAd(this, "a83e3b56eab2bf56")
+                        }
                     )
                 }
             }
@@ -108,6 +114,21 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onLoaded(rewardedAd: MaxRewardedAd) {
+
+    }
+
+    override fun onAdRewardLoadFail() {
+
+    }
+
+    override fun onUserRewarded(amount: Int) {
+        downloadViewModel.addPoints(5, 0)
+    }
+
+    override fun onShowFail() {
+
+    }
 }
 
 

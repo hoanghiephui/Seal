@@ -161,6 +161,7 @@ fun DownloadPage(
     onNavigateToTaskList: () -> Unit = {},
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     onNavigateToSupportedSite: () -> Unit = {},
+    onViewAds: () -> Unit,
     downloadViewModel: DownloadViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -174,10 +175,12 @@ fun DownloadPage(
     val processCount by Downloader.processCount.collectAsStateWithLifecycle()
     val userState by downloadViewModel.uiState.collectAsStateWithLifecycle()
     var lastDownloadCount  by rememberSaveable { mutableIntStateOf(0) }
+    var isPlusMode  by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = userState) {
         if (userState is MainActivityUiState.Success) {
             downloadViewModel.resetPointsIfDaily((userState as MainActivityUiState.Success).userData.lastDay)
             lastDownloadCount = (userState as MainActivityUiState.Success).userData.downloadCount
+            isPlusMode = (userState as MainActivityUiState.Success).userData.makePro
         }
     }
 
@@ -389,7 +392,10 @@ fun DownloadPage(
                 }
             },
             isTiktok = viewState.url.isTikTokLink(),
-            lastDownloadCount = lastDownloadCount
+            lastDownloadCount = lastDownloadCount,
+            isPlusMode = isPlusMode,
+            onViewAds = onViewAds,
+            onMakePlus = {}
         )
         if (isDownloaded) scope.launch {
             showDownloadCompleteDialog = true

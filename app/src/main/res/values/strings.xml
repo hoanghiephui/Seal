@@ -462,4 +462,8 @@
     <string name="permission_write_desc">You need to grant permission to save the file to continue using the feature.</string>
     <string name="permission_write_setting">You have denied permission to write the file. Please access settings for usage rights.</string>
     <string name="go_to_setting">Go to setting</string>
+    <string name="add_points">The download limit has been reached. To add more downloads, you need to exchange points.</string>
+    <string name="package_basic">GoPush Basic</string>
+    <string name="with_sub">with Subscriptions</string>
+    <string name="with_ads">Rewarded Ads</string>
 </resources>

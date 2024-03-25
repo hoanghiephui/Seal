@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.DownloadDone
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.NewLabel
 import androidx.compose.material.icons.outlined.ProductionQuantityLimits
@@ -69,6 +67,7 @@ import com.junkfood.seal.ui.component.DismissButton
 import com.junkfood.seal.ui.component.DrawerSheetSubtitle
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
+import com.junkfood.seal.ui.component.PlusAndAdsDialog
 import com.junkfood.seal.ui.component.SealModalBottomSheet
 import com.junkfood.seal.ui.component.SegmentedButtonValues
 import com.junkfood.seal.ui.component.SingleChoiceChip
@@ -137,7 +136,10 @@ fun DownloadSettingDialog(
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     onDownloadConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
-    lastDownloadCount: Int
+    lastDownloadCount: Int,
+    isPlusMode: Boolean,
+    onMakePlus: () -> Unit = {},
+    onViewAds: () -> Unit = {},
 ) {
 //    val audio by remember { mutableStateOf(PreferenceUtil.getValue(EXTRACT_AUDIO)) }
 
@@ -183,6 +185,7 @@ fun DownloadSettingDialog(
     var showTemplateSelectionDialog by remember { mutableStateOf(false) }
     var showTemplateCreatorDialog by remember { mutableStateOf(false) }
     var showTemplateEditorDialog by remember { mutableStateOf(false) }
+    var showGetPointDialog by remember { mutableStateOf(false) }
 
     var showCookiesDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -218,28 +221,38 @@ fun DownloadSettingDialog(
     }
 
     val downloadButtonCallback = {
-        updatePreferences()
-        onDismissRequest()
-        onDownloadConfirm()
+        if (!isPlusMode && lastDownloadCount == 0) {
+            showGetPointDialog = true
+            onDismissRequest()
+        } else {
+            updatePreferences()
+            onDismissRequest()
+            onDownloadConfirm()
+        }
+
+    }
+    if (showGetPointDialog) {
+        PlusAndAdsDialog(
+            onDismissRequest = {
+                showGetPointDialog = false
+            },
+            onMakePlus = onMakePlus,
+            onViewAds = onViewAds
+        )
     }
 
     val sheetContent: @Composable () -> Unit = {
         Column {
-            Text(
+            /*Text(
                 text = stringResource(R.string.settings_before_download_text),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-//                    .clickable { }
-            )
+            )*/
             DrawerSheetSubtitle(text = stringResource(id = R.string.download_type))
-            Row(
-                modifier = Modifier
-//                    .horizontalScroll(rememberScrollState())
-
-            ) {
+            Row(modifier = Modifier) {
 
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                     SingleChoiceSegmentedButton(
@@ -486,40 +499,42 @@ fun DownloadSettingDialog(
                 onDismissRequest = onDismissRequest,
                 content = {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_pro),
-                                contentDescription = null
-                            )
-                            val titleStyle = MaterialTheme.typography.bodySmall.bold()
-                            val annotatedString = buildAnnotatedString {
-                                withStyle(
-                                    titleStyle.copy(color = MaterialTheme.colorScheme.primary)
-                                        .toSpanStyle()
-                                ) {
-                                    append("$lastDownloadCount ")
+                        AnimatedVisibility(visible = !isPlusMode) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_pro),
+                                    contentDescription = null
+                                )
+                                val titleStyle = MaterialTheme.typography.bodySmall.bold()
+                                val annotatedString = buildAnnotatedString {
+                                    withStyle(
+                                        titleStyle.copy(color = MaterialTheme.colorScheme.primary)
+                                            .toSpanStyle()
+                                    ) {
+                                        append("$lastDownloadCount ")
+                                    }
+                                    append("downloads left today")
                                 }
-                                append("downloads left today")
-                            }
-                            Text(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 8.dp),
-                                text = annotatedString,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            ButtonChip(
-                                onClick = {
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp),
+                                    text = annotatedString,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                ButtonChip(
+                                    onClick = {
 
-                                },
-                                label = stringResource(R.string.get_plus),
-                                icon = Icons.Outlined.ProductionQuantityLimits,
-                                iconDescription = stringResource(R.string.get_plus)
-                            )
+                                    },
+                                    label = stringResource(R.string.get_plus),
+                                    icon = Icons.Outlined.ProductionQuantityLimits,
+                                    iconDescription = stringResource(R.string.get_plus)
+                                )
+                            }
                         }
 
                         Text(

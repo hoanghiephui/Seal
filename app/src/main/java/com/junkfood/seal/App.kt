@@ -14,6 +14,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.content.getSystemService
+import com.applovin.sdk.AppLovinMediationProvider
+import com.applovin.sdk.AppLovinSdk
 import com.google.android.material.color.DynamicColors
 import com.junkfood.seal.ui.page.settings.directory.Directory
 import com.junkfood.seal.util.AUDIO_DIRECTORY
@@ -45,9 +47,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 @HiltAndroidApp
 class App : Application() {
+    @Inject
+    lateinit var appLovinSdk: AppLovinSdk
     override fun onCreate() {
         super.onCreate()
         MMKV.initialize(this)
@@ -62,7 +67,9 @@ class App : Application() {
 
         clipboard = getSystemService()!!
         connectivityManager = getSystemService()!!
-
+        if (SHOW_ADS) {
+            appLovinSdk.mediationProvider = AppLovinMediationProvider.MAX
+        }
         applicationScope.launch((Dispatchers.IO)) {
             try {
                 YoutubeDL.init(this@App)
@@ -206,3 +213,4 @@ class App : Application() {
         lateinit var context: Context
     }
 }
+const val SHOW_ADS = true

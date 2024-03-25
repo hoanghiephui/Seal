@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.AssignmentReturn
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AssignmentReturn
 import androidx.compose.material.icons.outlined.BookmarkAdd
@@ -156,7 +158,7 @@ fun TemplateListPage(onBackPressed: () -> Unit, onNavigateToEditPage: (Int) -> U
                     showHelpDialog = true
                 }) {
                     Icon(
-                        imageVector = Icons.Outlined.HelpOutline,
+                        imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
                         contentDescription = stringResource(
                             id = R.string.how_does_it_work
                         )
@@ -199,7 +201,7 @@ fun TemplateListPage(onBackPressed: () -> Unit, onNavigateToEditPage: (Int) -> U
                             })
                             DropdownMenuItem(leadingIcon = {
                                 Icon(
-                                    Icons.Outlined.AssignmentReturn, null
+                                    Icons.AutoMirrored.Outlined.AssignmentReturn, null
                                 )
                             }, text = {
                                 Text(stringResource(R.string.import_from_clipboard))

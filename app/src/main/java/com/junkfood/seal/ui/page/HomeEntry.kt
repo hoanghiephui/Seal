@@ -87,7 +87,8 @@ private const val TAG = "HomeEntry"
 fun HomeEntry(
     downloadViewModel: DownloadViewModel,
     cookiesViewModel: CookiesViewModel,
-    isUrlShared: Boolean
+    isUrlShared: Boolean,
+    onViewAds: () -> Unit
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -168,7 +169,8 @@ fun HomeEntry(
                         navController.navigate(Route.COOKIE_GENERATOR_WEBVIEW)
                     },
                     downloadViewModel = downloadViewModel,
-                    onNavigateToSupportedSite = { navController.navigate(Route.SUPPORTED_SITE_ROUTER) }
+                    onNavigateToSupportedSite = { navController.navigate(Route.SUPPORTED_SITE_ROUTER) },
+                    onViewAds = onViewAds
                 )
             }
             animatedComposable(Route.DOWNLOADS) { VideoListPage { onBackPressed() } }
