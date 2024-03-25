@@ -170,6 +170,7 @@ object DownloadUtil {
             if (withoutWatermark) {
                 addOption("-f 0")
             }
+            addOption("--force-overwrites")
         }
         addOption("--dump-json")
         addOption("-R", "1")
@@ -544,6 +545,7 @@ object DownloadUtil {
                 if (withoutWatermark) {
                     addOption("-f 0")
                 }
+                addOption("--force-overwrites")
                 if (useDownloadArchive) {
                     val archiveFile = context.getArchiveFile()
                     val archiveFileContent = archiveFile.readText()
