@@ -1,5 +1,10 @@
 package com.junkfood.seal.util
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_AUDIO
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -256,8 +261,10 @@ fun Context.openAppSettings() {
     startActivity(intent)
 }
 
-val permissionWriteStore = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    android.Manifest.permission.READ_MEDIA_VIDEO
+val permissionWriteStore = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    listOf(READ_MEDIA_AUDIO, READ_MEDIA_VIDEO, READ_MEDIA_VISUAL_USER_SELECTED)
+} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    listOf(READ_MEDIA_AUDIO, READ_MEDIA_VIDEO)
 } else {
-    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    listOf(READ_EXTERNAL_STORAGE)
 }

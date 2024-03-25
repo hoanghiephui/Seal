@@ -72,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.junkfood.seal.App
 import com.junkfood.seal.R
@@ -181,7 +182,7 @@ fun DownloadDirectoryPreferences(onBackPressed: () -> Unit) {
     var showOutputTemplateDialog by remember { mutableStateOf(false) }
 
     val storagePermission =
-        rememberPermissionState(permission = permissionWriteStore)
+        rememberMultiplePermissionsState(permissions = permissionWriteStore)
     val showDirectoryAlert =
         Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()
                 && (!audioDirectoryText.isValidDirectory() || !videoDirectoryText.isValidDirectory() || !customCommandDirectory.isValidDirectory())
@@ -223,9 +224,9 @@ fun DownloadDirectoryPreferences(onBackPressed: () -> Unit) {
 
     fun openDirectoryChooser(directory: Directory = Directory.VIDEO) {
         editingDirectory = directory
-        if (storagePermission.status == PermissionStatus.Granted)
+        if (storagePermission.allPermissionsGranted)
             launcher.launch(null)
-        else storagePermission.launchPermissionRequest()
+        else storagePermission.launchMultiplePermissionRequest()
     }
 
     Scaffold(

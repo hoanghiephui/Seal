@@ -87,14 +87,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -111,6 +107,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.junkfood.seal.App
@@ -128,7 +125,6 @@ import com.junkfood.seal.ui.component.HelpDialog
 import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.VideoCard
-import com.junkfood.seal.ui.page.settings.about.ytdlpUrl
 import com.junkfood.seal.ui.theme.PreviewThemeLight
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.CELLULAR_DOWNLOAD
@@ -221,26 +217,23 @@ fun DownloadPage(
         }
     }
     var permissionRequested: Boolean by rememberSaveable { mutableStateOf(false) }
-    val storagePermission = rememberPermissionState(
-        permission = permissionWriteStore
+    val storagePermission = rememberMultiplePermissionsState(
+        permissions = permissionWriteStore
     )
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { wasGranted ->
-        if (wasGranted) {
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { wasGranted ->
+        if (wasGranted.all { it.value }) {
             checkNetworkOrDownload()
         }
     }
 
     val checkPermissionOrDownload = {
-        when(storagePermission.status) {
-            PermissionStatus.Granted -> {
-                checkNetworkOrDownload()
-            }
-            else -> {
-                if (storagePermission.status.shouldShowRationale) {
-                    permissionRequested = true
-                } else {
-                    launcher.launch(permissionWriteStore)
-                }
+        if (storagePermission.allPermissionsGranted ) {
+            checkNetworkOrDownload()
+        } else {
+            if (storagePermission.shouldShowRationale) {
+                permissionRequested = true
+            } else {
+                launcher.launch(permissionWriteStore.toTypedArray())
             }
         }
     }
@@ -546,7 +539,6 @@ fun DownloadPageImpl(
                 .verticalScroll(rememberScrollState())
         ) {
             TitleWithProgressIndicator(
-                showProgressIndicator = downloaderState is Downloader.State.FetchingInfo,
                 isDownloadingPlaylist = downloaderState is Downloader.State.DownloadingPlaylist,
                 showDownloadText = showCancelButton,
                 currentIndex = downloaderState.run { if (this is Downloader.State.DownloadingPlaylist) currentItem else 0 },
@@ -753,7 +745,6 @@ fun InputUrl(
 
 @Composable
 fun TitleWithProgressIndicator(
-    showProgressIndicator: Boolean = true,
     showDownloadText: Boolean = true,
     isDownloadingPlaylist: Boolean = true,
     currentIndex: Int = 1,
@@ -940,49 +931,43 @@ private fun SiteSupport(
     items: List<SupportModel>,
     navigateToSupportedSite: () -> Unit
 ) {
-    var showMore by remember {
-        mutableStateOf(false)
-    }
     ElevatedCard(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
     ) {
-        AnimatedVisibility(visible = !showMore) {
-            Column {
-                Text(
-                    text = stringResource(R.string.feature_foryou_onboarding_guidance_title),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = stringResource(R.string.feature_foryou_onboarding_guidance_subtitle),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, start = 24.dp, end = 24.dp),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    contentPadding = PaddingValues(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier
-                        .height(120.dp)
-                        .testTag("forYou:feed"),
-                ) {
-                    onboarding(items)
-                }
-                Button(modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
-                    .fillMaxWidth(), onClick = navigateToSupportedSite) {
-                    Text(text = "View all")
-                }
+        Column {
+            Text(
+                text = stringResource(R.string.feature_foryou_onboarding_guidance_title),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = stringResource(R.string.feature_foryou_onboarding_guidance_subtitle),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 24.dp, end = 24.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                contentPadding = PaddingValues(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier
+                    .height(120.dp)
+                    .testTag("forYou:feed"),
+            ) {
+                onboarding(items)
             }
-
+            Button(modifier = Modifier
+                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                .fillMaxWidth(), onClick = navigateToSupportedSite) {
+                Text(text = "View all")
+            }
         }
     }
 }

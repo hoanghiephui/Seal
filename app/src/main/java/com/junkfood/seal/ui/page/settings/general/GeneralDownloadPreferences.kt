@@ -67,6 +67,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.junkfood.seal.App
 import com.junkfood.seal.R
@@ -156,10 +157,10 @@ fun GeneralDownloadPreferences(
     }
 
     val storagePermission =
-        rememberPermissionState(permission = permissionWriteStore)
+        rememberMultiplePermissionsState(permissions = permissionWriteStore)
 
     val isPermissionGranted =
-        storagePermission.status == PermissionStatus.Granted
+        storagePermission.allPermissionsGranted
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(),
