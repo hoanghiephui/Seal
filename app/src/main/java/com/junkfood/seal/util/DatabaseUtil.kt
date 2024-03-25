@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 
 object DatabaseUtil {
-    private const val DATABASE_NAME = "app_database"
+    private const val DATABASE_NAME = "vidsave_app_database"
     private val db = Room.databaseBuilder(
         context, AppDatabase::class.java, DATABASE_NAME
     ).build()

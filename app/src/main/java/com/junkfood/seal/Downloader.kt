@@ -91,8 +91,8 @@ object Downloader {
         fun toKey() = makeKey(url, template.name)
         sealed class State {
             data class Error(val errorReport: String) : State()
-            object Completed : State()
-            object Canceled : State()
+            data object Completed : State()
+            data object Canceled : State()
             data class Running(val progress: Float) : State()
         }
 
