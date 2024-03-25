@@ -10,6 +10,7 @@ import com.junkfood.seal.App
 import com.junkfood.seal.App.Companion.applicationScope
 import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.App.Companion.isFDroidBuild
+import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.R
 import com.junkfood.seal.database.objects.CommandTemplate
 import com.junkfood.seal.ui.theme.DEFAULT_SEED_COLOR
@@ -174,6 +175,8 @@ private val BooleanPreferenceDefaults = mapOf(
     YT_DLP_UPDATE to true,
     NOTIFICATION to true,
     EMBED_METADATA to true,
+    YT_DLP_NIGHTLY to true,
+    DEBUG to BuildConfig.DEBUG
 )
 
 private val IntPreferenceDefaults = mapOf(

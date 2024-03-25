@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.webkit.CookieManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -210,15 +211,16 @@ fun HomeEntry(
                 withContext(Dispatchers.IO) {
                     val res = UpdateUtil.updateYtDlp()
                     if (res == YoutubeDL.UpdateStatus.DONE) {
-                        ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP.getString()})")
+                        //ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP.getString()})")
+                        Log.d(TAG,context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP.getString()})")
                     }
                 }
             }.onFailure {
                 it.printStackTrace()
             }
         }
-        LaunchedEffect(Unit) {
-            if (!PreferenceUtil.isNetworkAvailableForDownload() || !PreferenceUtil.isAutoUpdateEnabled()
+        LaunchedEffect(Unit) {//TODO implement auto update
+            /*if (!PreferenceUtil.isNetworkAvailableForDownload() || !PreferenceUtil.isAutoUpdateEnabled()
             )
                 return@LaunchedEffect
             launch(Dispatchers.IO) {
@@ -230,7 +232,7 @@ fun HomeEntry(
                 }.onFailure {
                     it.printStackTrace()
                 }
-            }
+            }*/
         }
 
         if (showUpdateDialog) {

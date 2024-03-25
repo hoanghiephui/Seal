@@ -584,10 +584,25 @@ fun DownloadPageImpl(
                         showProgressIndicator = downloaderState is Downloader.State.FetchingInfo
                     ) { url -> onUrlChanged(url) }
 
+                    AnimatedVisibility(
+                        modifier = Modifier.fillMaxWidth(),
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut(),
+                        visible = progressText.isNotEmpty() && showOutput
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(bottom = 12.dp),
+                            text = progressText,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = 0.dp),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -606,20 +621,6 @@ fun DownloadPageImpl(
                         )
                     }
 
-                    AnimatedVisibility(
-                        modifier = Modifier.fillMaxWidth(),
-                        enter = expandVertically() + fadeIn(),
-                        exit = shrinkVertically() + fadeOut(),
-                        visible = progressText.isNotEmpty() && showOutput
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(bottom = 12.dp),
-                            text = progressText,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
                 }
                 AnimatedVisibility(visible = errorState != Downloader.ErrorState.None) {
                     ErrorMessage(
@@ -779,7 +780,7 @@ fun ErrorMessage(
         color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.large,
         modifier = Modifier
-            .padding(vertical = 16.dp)
+            .padding(top = 16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -933,7 +934,7 @@ private fun SiteSupport(
 ) {
     ElevatedCard(
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
     ) {
         Column {

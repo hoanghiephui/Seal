@@ -200,7 +200,7 @@ fun SettingsPage(
                     }
                 }
             }
-            item {
+            /*item {
                 SettingItem(
                     title = stringResource(id = R.string.custom_command),
                     description = stringResource(id = R.string.custom_command_desc),
@@ -210,7 +210,7 @@ fun SettingsPage(
                         launchSingleTop = true
                     }
                 }
-            }
+            }*/
             item {
                 SettingItem(
                     title = stringResource(id = R.string.look_and_feel),
