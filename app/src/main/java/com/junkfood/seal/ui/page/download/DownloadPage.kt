@@ -62,7 +62,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
@@ -263,6 +262,7 @@ fun DownloadPage(
     }
 
     val downloadCallback: () -> Unit = {
+        keyboardController?.hide()
         if (viewState.url.isYouTubeLink()) {
             downloadViewModel.onNotSupportError(viewState.url)
         } else {
@@ -279,7 +279,6 @@ fun DownloadPage(
                 checkPermissionOrDownload()
             }
         }
-        keyboardController?.hide()
     }
 
     if (showNotificationDialog) {
@@ -335,7 +334,6 @@ fun DownloadPage(
             !PreferenceUtil.getValue(DISABLE_PREVIEW)
         )
     }
-
 
     Box(
         modifier = Modifier
@@ -679,8 +677,6 @@ fun InputUrl(
     onCancel: () -> Unit,
     onValueChange: (String) -> Unit
 ) {
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     Box(contentAlignment = Alignment.Center) {
         OutlinedTextField(
@@ -691,16 +687,15 @@ fun InputUrl(
             label = { Text(stringResource(R.string.video_url)) },
             modifier = Modifier
                 .padding(0f.dp, 16f.dp)
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+                .fillMaxWidth(),
+
             textStyle = MaterialTheme.typography.bodyLarge,
             maxLines = 3,
             trailingIcon = {
                 if (url.isNotEmpty()) ClearButton { onValueChange("") }
 //            else PasteUrlButton { onPaste() }
             }, keyboardActions = KeyboardActions(onDone = {
-                softwareKeyboardController?.hide()
-                focusManager.moveFocus(FocusDirection.Down)
+
                 onDone()
             }),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
@@ -715,7 +710,6 @@ fun InputUrl(
             }
         }
     }
-
     AnimatedVisibility(visible = showDownloadProgress) {
         Row(
             Modifier.padding(0.dp, 12.dp),
@@ -799,11 +793,13 @@ fun ErrorMessage(
         Column(
             modifier = Modifier
                 .animateContentSize()
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(horizontal = 12.dp, vertical = 16.dp)
         ) {
             Row(
-                modifier = modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     Icons.Outlined.Error,
@@ -823,7 +819,7 @@ fun ErrorMessage(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             var isExpanded by remember { mutableStateOf(false) }
 
@@ -832,23 +828,29 @@ fun ErrorMessage(
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = if (isExpanded) Int.MAX_VALUE else 8,
-                modifier = Modifier.clickable(
-                    enabled = !isExpanded, onClickLabel = stringResource(
-                        id = R.string.expand
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable(
+                        enabled = !isExpanded, onClickLabel = stringResource(
+                            id = R.string.expand
+                        ), onClick = {
+                            view.slightHapticFeedback()
+                            isExpanded = true
+                        }
                     )
-                ) {
-                    view.slightHapticFeedback()
-                    isExpanded = true
+                    .padding(4.dp),
+                onTextLayout = {
+                    isExpanded = !it.hasVisualOverflow
                 }
             )
             if (showButton) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
 
                 Row(modifier = Modifier.align(Alignment.End)) {
-                    OutlinedButton(
+                    TextButton(
                         onClick = onButtonClicked,
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                     ) {
                         Text(text = stringResource(id = R.string.copy_error_report))
                     }
