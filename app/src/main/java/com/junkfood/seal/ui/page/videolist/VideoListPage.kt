@@ -139,7 +139,7 @@ private const val TAG = "VideoListPage"
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun VideoListPage(
-    viewModel: VideoListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), onBackPressed: () -> Unit
+    viewModel: VideoListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), onNavigateBack: () -> Unit
 ) {
     val viewState by viewModel.stateFlow.collectAsStateWithLifecycle()
     val fullVideoList by viewModel.videoListFlow.collectAsStateWithLifecycle(emptyList())
@@ -302,7 +302,7 @@ fun VideoListPage(
                 },
                 navigationIcon = {
                     BackButton {
-                        onBackPressed()
+                        onNavigateBack()
                     }
                 }, actions = {
                     Row {

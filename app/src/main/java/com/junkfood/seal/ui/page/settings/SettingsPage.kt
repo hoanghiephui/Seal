@@ -17,18 +17,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Aod
 import androidx.compose.material.icons.rounded.AudioFile
+import androidx.compose.material.icons.rounded.EnergySavingsLeaf
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.SignalCellular4Bar
 import androidx.compose.material.icons.rounded.SignalWifi4Bar
-import androidx.compose.material.icons.rounded.VideoFile
-import androidx.compose.material.icons.outlined.Terminal
-import androidx.compose.material.icons.rounded.EnergySavingsLeaf
 import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.VideoFile
+import androidx.compose.material.icons.rounded.ViewComfy
 import androidx.compose.material.icons.rounded.VolunteerActivism
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -43,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import com.junkfood.seal.App
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.Route
@@ -62,7 +60,7 @@ import com.junkfood.seal.util.SHOW_SPONSOR_MSG
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage(
-    navController: NavController, onBackPressed: () -> Unit
+    onNavigateBack: () -> Unit, onNavigateTo: (String) -> Unit
 ) {
     val context = LocalContext.current
     val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -113,7 +111,7 @@ fun SettingsPage(
         topBar = {
             SmallTopAppBar(
                 titleText = stringResource(id = R.string.settings),
-                navigationIcon = { BackButton(onBackPressed) },
+                navigationIcon = { BackButton(onNavigateBack) },
                 scrollBehavior = scrollBehavior
             )
         }) {
@@ -149,7 +147,7 @@ fun SettingsPage(
                         icon = Icons.Rounded.VolunteerActivism,
                         description = stringResource(id = R.string.sponsor_desc)
                     ) {
-                        navController.navigate(Route.DONATE)
+                        onNavigateTo(Route.DONATE)
                     }
                 }
             item {
@@ -160,9 +158,7 @@ fun SettingsPage(
                     ),
                     icon = Icons.Rounded.SettingsApplications
                 ) {
-                    navController.navigate(Route.GENERAL_DOWNLOAD_PREFERENCES) {
-                        launchSingleTop = true
-                    }
+                    onNavigateTo(Route.GENERAL_DOWNLOAD_PREFERENCES)
                 }
             }
             item {
@@ -173,9 +169,7 @@ fun SettingsPage(
                     ),
                     icon = Icons.Rounded.Folder
                 ) {
-                    navController.navigate(Route.DOWNLOAD_DIRECTORY) {
-                        launchSingleTop = true
-                    }
+                    onNavigateTo(Route.DOWNLOAD_DIRECTORY)
                 }
             }
             item {
@@ -184,9 +178,7 @@ fun SettingsPage(
                     description = stringResource(id = R.string.format_settings_desc),
                     icon = if (EXTRACT_AUDIO.getBoolean()) Icons.Rounded.AudioFile else Icons.Rounded.VideoFile
                 ) {
-                    navController.navigate(Route.DOWNLOAD_FORMAT) {
-                        launchSingleTop = true
-                    }
+                    onNavigateTo(Route.DOWNLOAD_FORMAT)
                 }
             }
             item {
@@ -195,9 +187,7 @@ fun SettingsPage(
                     description = stringResource(id = R.string.network_settings_desc),
                     icon = if (App.connectivityManager.isActiveNetworkMetered) Icons.Rounded.SignalCellular4Bar else Icons.Rounded.SignalWifi4Bar
                 ) {
-                    navController.navigate(Route.NETWORK_PREFERENCES) {
-                        launchSingleTop = true
-                    }
+                    onNavigateTo(Route.NETWORK_PREFERENCES)
                 }
             }
             /*item {
@@ -206,9 +196,7 @@ fun SettingsPage(
                     description = stringResource(id = R.string.custom_command_desc),
                     icon = Icons.Rounded.Terminal
                 ) {
-                    navController.navigate(Route.TEMPLATE) {
-                        launchSingleTop = true
-                    }
+                    onNavigateTo(Route.TEMPLATE)
                 }
             }*/
             item {
@@ -219,7 +207,18 @@ fun SettingsPage(
                     ),
                     icon = Icons.Rounded.Palette
                 ) {
-                    navController.navigate(Route.APPEARANCE) { launchSingleTop = true }
+                    onNavigateTo(Route.APPEARANCE)
+                }
+            }
+            item {
+                SettingItem(
+                    title = stringResource(id = R.string.interface_and_interaction),
+                    description = stringResource(
+                        id = R.string.settings_before_download
+                    ),
+                    icon = Icons.Rounded.ViewComfy
+                ) {
+                    onNavigateTo(Route.INTERACTION)
                 }
             }
             /*item {
@@ -229,7 +228,7 @@ fun SettingsPage(
                         id = R.string.about_page
                     ), icon = Icons.Rounded.Info
                 ) {
-                    navController.navigate(Route.ABOUT) { launchSingleTop = true }
+                    onNavigateTo(Route.ABOUT)
                 }
             }*/
         }
