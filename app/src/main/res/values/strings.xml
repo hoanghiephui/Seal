@@ -9,8 +9,8 @@
     <string name="url_empty">The link cannot be empty</string>
     <string name="extract_audio_summary">Download and save audio, instead of video</string>
     <string name="create_thumbnail_summary">Save video thumbnail as a file</string>
-    <string name="yt_dlp_up_to_date">Using the latest version of yt-dlp</string>
-    <string name="yt_dlp_update_fail">Could not install the latest yt-dlp version. Please make sure you are connected to the Internet.</string>
+    <string name="yt_dlp_up_to_date">Using the latest version of dlp</string>
+    <string name="yt_dlp_update_fail">Could not install the latest dlp version. Please make sure you are connected to the Internet.</string>
     <string name="fetching_info">Fetching video info…</string>
     <string name="permission_denied">Permission denied</string>
     <string name="download_success_msg">Download finished</string>
@@ -23,9 +23,9 @@
     <string name="task_running">An existing download task is already running</string>
     <string name="paste_msg">Paste URL from clipboard</string>
     <string name="paste_fail_msg">Could not match the URL in the clipboard</string>
-    <string name="ytdlp_version">Yt-dlp version</string>
-    <string name="ytdlp_update">Click to install the latest yt-dlp version</string>
-    <string name="ytdlp_update_action">Update yt-dlp</string>
+    <string name="ytdlp_version">dlp version</string>
+    <string name="ytdlp_update">Click to install the latest dlp version</string>
+    <string name="ytdlp_update_action">Update dlp</string>
     <string name="delete_info">Remove?</string>
     <string name="delete_info_msg">Remove \"%1$s\" from your download history for good?
     </string>
@@ -50,7 +50,7 @@
     <string name="credits">Credits</string>
     <string name="credits_desc">Credits and libre software</string>
     <string name="custom_command">Custom command</string>
-    <string name="custom_command_desc">Run yt-dlp command with custom template</string>
+    <string name="custom_command_desc">Run dlp command with custom template</string>
     <string name="custom_command_template">Command template</string>
     <string name="edit">Edit</string>
     <string name="start_execute">Start executing command</string>
@@ -70,7 +70,7 @@
     <string name="error_copied">Error report copied to clipboard</string>
     <string name="thumbnail">Thumbnail</string>
     <string name="paste">Paste</string>
-    <string name="yt_dlp_docs">Yt-dlp usage references</string>
+    <string name="yt_dlp_docs">dlp usage references</string>
     <string name="edit_template_desc">Output path and URL will be added by the app.</string>
     <string name="convert_audio_format">Convert audio format</string>
     <string name="not_convert">Unconverted</string>
@@ -95,7 +95,7 @@
     </string>
     <string name="download_history_desc">Check and manage in-app downloads, including videos and audio files.</string>
     <string name="check_download_settings_desc">Take a look at the download settings and make sure
-        you have the latest version of yt-dlp before using it.
+        you have the latest version of dlp before using it.
     </string>
     <string name="download_playlist">Download playlist</string>
     <string name="download_playlist_desc">Download multiple videos from a playlist</string>
@@ -248,7 +248,7 @@
     <string name="download_queue" translatable="false">Download queue</string>
     <string name="unavailable">Unavailable</string>
     <string name="format_settings_desc">File format, video quality, subtitles</string>
-    <string name="general_settings_desc">Yt-dlp version, notification, playlist</string>
+    <string name="general_settings_desc">Notification, playlist</string>
     <string name="network_settings_desc">Rate limit, downloader, cookies</string>
     <string name="disable_preview">Disable preview</string>
     <string name="disable_preview_desc">No display of thumbnails during download</string>
@@ -271,7 +271,7 @@
     <string name="custom_command_enabled_hint">Some options are unavailable when using custom command</string>
     <string name="how_does_it_work">How does it work?</string>
     <string name="cookies_usage_msg">Downloading from some sites requires account authentication information. Click \"Generate new cookies\", enter the URL of the website and then log in with your account in the browser page, the app will generate it for you.</string>
-    <string name="custom_command_usage_msg">yt-dlp is a powerful command-line tool for downloading videos. Seal makes it easier to use yt-dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, Seal allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
+    <string name="custom_command_usage_msg">dlp is a powerful command-line tool for downloading videos. Seal makes it easier to use dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, Seal allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
     <string name="telegram_channel">Telegram channel</string>
     <string name="matrix_space">Matrix space</string>
     <string name="sdcard_directory">SD card folder</string>
@@ -316,7 +316,7 @@
     <string name="audio_quality">Audio quality</string>
     <string name="audio_quality_desc">Limit audio bitrate when multiple qualities are present</string>
     <string name="format_sorting">Format sorting</string>
-    <string name="format_sorting_desc">Sorting formats with the -S option of yt-dlp</string>
+    <string name="format_sorting_desc">Sorting formats with the -S option of dlp</string>
     <string name="import_from_preferences">Import</string>
     <string name="title">Title</string>
     <string name="rename">Rename</string>
@@ -468,4 +468,5 @@
     <string name="with_ads">Rewarded Ads</string>
     <string name="add_point_success">You have been granted an additional 5 downloads.</string>
     <string name="add_point_fail">Sorry, it\'s not possible to watch ads for rewards at the moment. Please try again later!</string>
+    <string name="noted">Please respect the copyright owner\'s rights and refrain from reposting videos without obtaining permission</string>
 </resources>

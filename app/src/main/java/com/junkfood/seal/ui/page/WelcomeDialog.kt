@@ -12,12 +12,14 @@ import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material.icons.outlined.Subscriptions
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,7 +38,7 @@ import com.junkfood.seal.util.WELCOME_DIALOG
 @Composable
 fun WelcomeDialog(onClick: () -> Unit) {
     var showWelcomeDialog by rememberSaveable {
-        mutableStateOf(WELCOME_DIALOG.getInt())
+        mutableIntStateOf(WELCOME_DIALOG.getInt())
     }
     var disableDialog by remember { mutableStateOf(false) }
     val onDismissRequest = {
@@ -61,6 +63,10 @@ fun WelcomeDialog(onClick: () -> Unit) {
         }, title = { Text(stringResource(R.string.user_guide)) }, text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 IconDescription(
+                    icon = Icons.Outlined.Warning,
+                    description = stringResource(R.string.noted)
+                )
+                IconDescription(
                     icon = Icons.Outlined.ContentPaste,
                     description = stringResource(R.string.paste_desc)
                 )
@@ -75,10 +81,6 @@ fun WelcomeDialog(onClick: () -> Unit) {
                 IconDescription(
                     icon = Icons.Outlined.Downloading,
                     description = stringResource(R.string.battery_settings_desc)
-                )
-                IconDescription(
-                    icon = Icons.Outlined.SettingsSuggest,
-                    description = stringResource(R.string.check_download_settings_desc)
                 )
                 if ((showWelcomeDialog > 1))
                     CheckBoxItem(

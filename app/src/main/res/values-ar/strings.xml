@@ -13,7 +13,7 @@
     <string name="download_start_msg">تحميل \"%1$s\"</string>
     <string name="paste_msg">ألصق الرابط الموجود في الحافظة</string>
     <string name="paste_fail_msg">تعذر مطابقة الرابط الموجود في الحافظة</string>
-    <string name="ytdlp_version">إصدار Yt-dlp</string>
+    <string name="ytdlp_version">إصدار dlp</string>
     <string name="delete_info">إزالة من السجل؟</string>
     <string name="delete_info_msg">هل تريد إزالة \"%1$s\" من سجل التنزيلات بشكل دائم؟</string>
     <string name="confirm">نعم</string>
@@ -43,7 +43,7 @@
     <string name="settings_before_download_text">خصص هذا التحميل</string>
     <string name="thumbnail">صورة مصغرة للفيديو</string>
     <string name="paste">لصق</string>
-    <string name="yt_dlp_docs">مراجع استخدام yt-dlp</string>
+    <string name="yt_dlp_docs">مراجع استخدام dlp</string>
     <string name="convert_to">التحويل إلى %1$s</string>
     <string name="format">الصيغ</string>
     <string name="convert_audio_format">تحويل صيغة الصوت</string>
@@ -82,19 +82,19 @@
     <string name="video_directory">مجلد الفيديو</string>
     <string name="settings">الإعدادات</string>
     <string name="download">تحميل</string>
-    <string name="yt_dlp_up_to_date">أنت على أحدث إصدار من yt-dlp</string>
-    <string name="yt_dlp_update_fail">تعذر تثبيت أحدث إصدار من yt-dlp. يرجى التحقق من اتصالك بالإنترنت.</string>
+    <string name="yt_dlp_up_to_date">أنت على أحدث إصدار من dlp</string>
+    <string name="yt_dlp_update_fail">تعذر تثبيت أحدث إصدار من dlp. يرجى التحقق من اتصالك بالإنترنت.</string>
     <string name="permission_denied">تم رفض الإذن</string>
     <string name="download_error_msg">تعذر تحميل الملف</string>
     <string name="fetch_info_error_msg">فشل جلب معلومات الفيديو</string>
     <string name="language_settings">تعيين لغة العرض</string>
     <string name="task_running">هناك مهمة تنزيل جارية بالفعل</string>
-    <string name="ytdlp_update">انقر هنا لتثبيت آخر إصدار من yt-dlp</string>
+    <string name="ytdlp_update">انقر هنا لتثبيت آخر إصدار من dlp</string>
     <string name="link_copied">تم نسخ الرابط إلى الحافظة</string>
     <string name="audio">الصوت</string>
     <string name="back">رجوع</string>
     <string name="readme_desc">انظُر لمستودع برمجيات GitHub و إقرأني</string>
-    <string name="custom_command_desc">استعمِل yt-dlp بأوامرك المخصصة</string>
+    <string name="custom_command_desc">استعمِل dlp بأوامرك المخصصة</string>
     <string name="credits">شكر وتقدير</string>
     <string name="credits_desc">شكر وتقدير والبرمجيات الحرة</string>
     <string name="custom_command">الأوامر المخصصة</string>
@@ -113,7 +113,7 @@
     <string name="close">إغلاق</string>
     <string name="defaults">اِفتراضي</string>
     <string name="download_history_desc">التحقق من التنزيلات داخل التطبيق وإدارتها، بما في ذلك ملفات الفيديو والصوت.</string>
-    <string name="check_download_settings_desc">ألق نظرة على إعدادات التنزيل وتأكد من أن لديك أحدث إصدار من yt-dlp قبل استخدامه.</string>
+    <string name="check_download_settings_desc">ألق نظرة على إعدادات التنزيل وتأكد من أن لديك أحدث إصدار من dlp قبل استخدامه.</string>
     <string name="video_url">رابط الفيديو</string>
     <string name="concurrent_download">تنزيل متعدد الأجزاء</string>
     <string name="subdirectory_desc">احفظ الملفات في مجلدات بأسماء الحقول المعنية</string>
@@ -200,7 +200,7 @@
     <string name="selected_item_count">%1$d محدد</string>
     <string name="unavailable">غير متوفر</string>
     <string name="format_settings_desc">صيغة الملف، دقة الفيديو، التَرْجمات</string>
-    <string name="general_settings_desc">إصدار Yt-dlp، إشعار، قائمة تشغيل</string>
+    <string name="general_settings_desc">إصدار dlp، إشعار، قائمة تشغيل</string>
     <string name="network_settings_desc">حدود المعدل، مدير التنزيلات، ملفات تعريف الارتباط</string>
     <string name="disable_preview">تعطيل المعاينة</string>
     <string name="disable_preview_desc">عدم عرض الصور المصغرة أثناء التنزيل</string>
@@ -269,7 +269,7 @@
     <string name="lowest_bitrate">أدنى معدل بت</string>
     <string name="audio_quality_desc">حدد معدل بت الصوت في حال تواجد العديد من الدقات</string>
     <string name="format_sorting">فرز الصيغ</string>
-    <string name="format_sorting_desc">فرز الصيغ باستخدام الخيار S- من yt-dlp</string>
+    <string name="format_sorting_desc">فرز الصيغ باستخدام الخيار S- من dlp</string>
     <string name="minute">دقيقة</string>
     <string name="import_from_preferences">استيراد</string>
     <string name="title">العنوان</string>
@@ -306,7 +306,7 @@
     <string name="new_task">مهمة تحميل جديدة</string>
     <string name="start">بدأ</string>
     <string name="edit_template">تعديل \"%1$s\"</string>
-    <string name="ytdlp_update_action">قم بتحديث yt-dlp</string>
+    <string name="ytdlp_update_action">قم بتحديث dlp</string>
     <string name="proxy">بروكسي</string>
     <string name="disable">ألغاء التفعيل</string>
     <string name="legacy">قديم</string>
@@ -340,9 +340,9 @@
         <item quantity="many">%d عنصرًا</item>
         <item quantity="other">%d عنصر</item>
     </plurals>
-    <string name="custom_command_usage_msg">yt-dlp هي أداة سطر أوامر قوية لتنزيل مقاطع الفيديو. يجعل Seal استخدام yt-dlp أسهل من خلال توفير واجهة مستخدم بديهية، وإعدادات مسبقة للأوامر الشائعة، وميزات إضافية أخرى.
+    <string name="custom_command_usage_msg">dlp هي أداة سطر أوامر قوية لتنزيل مقاطع الفيديو. يجعل Seal استخدام dlp أسهل من خلال توفير واجهة مستخدم بديهية، وإعدادات مسبقة للأوامر الشائعة، وميزات إضافية أخرى.
 \n
-\nبالنسبة للاستخدام المتقدم لـ yt-dlp، يسمح لك Seal بإنشاء قوالب أوامر مخصصة وحفظها وتنفيذها مباشرة، تمامًا كما هو الحال في الطرفية.
+\nبالنسبة للاستخدام المتقدم لـ dlp، يسمح لك Seal بإنشاء قوالب أوامر مخصصة وحفظها وتنفيذها مباشرة، تمامًا كما هو الحال في الطرفية.
 \n
 \nعند استخدام الأوامر المخصصة، ستتم تعطيل معظم خيارات واجهة المستخدم والميزات.</string>
     <string name="clear_download_archive">هل تريد مسح أرشيف التحميل؟</string>

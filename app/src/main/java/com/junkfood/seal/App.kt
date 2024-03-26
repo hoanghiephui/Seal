@@ -204,7 +204,7 @@ class App : Application() {
             return StringBuilder().append("App version: $versionName ($versionCode)\n")
                 .append("Device information: Android $release (API ${Build.VERSION.SDK_INT})\n")
                 .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n")
-                .append("Yt-dlp version: ${YT_DLP.getString()}\n").toString()
+                .append("dlp version: ${YT_DLP.getString()}\n").toString()
         }
 
         fun isFDroidBuild(): Boolean = packageInfo.versionName.contains("F-Droid")
