@@ -111,6 +111,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.junkfood.seal.App
+import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
 import com.junkfood.seal.model.MainActivityUiState
@@ -119,6 +120,7 @@ import com.junkfood.seal.ui.common.AsyncImageImpl
 import com.junkfood.seal.ui.common.HapticFeedback.longPressHapticFeedback
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.LocalWindowWidthState
+import com.junkfood.seal.ui.component.AdViewState
 import com.junkfood.seal.ui.component.ClearButton
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
 import com.junkfood.seal.ui.component.HelpDialog
@@ -180,10 +182,11 @@ fun DownloadPage(
         if (userState is MainActivityUiState.Success) {
             downloadViewModel.resetPointsIfDaily((userState as MainActivityUiState.Success).userData.lastDay)
             lastDownloadCount = (userState as MainActivityUiState.Success).userData.downloadCount
+            downloadViewModel.currentPoints = lastDownloadCount
             isPlusMode = (userState as MainActivityUiState.Success).userData.makePro
         }
     }
-
+    val nativeAd by downloadViewModel.adState
     var showNotificationDialog by remember { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS) { isGranted: Boolean ->
@@ -193,6 +196,9 @@ fun DownloadPage(
             }
         }
     } else null
+    LaunchedEffect(key1 = BuildConfig.HOME_NATIVE) {
+        downloadViewModel.loadAds(context, BuildConfig.HOME_NATIVE)
+    }
 
     val clipboardManager = LocalClipboardManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -368,7 +374,8 @@ fun DownloadPage(
             onUrlChanged = { url ->
                 Downloader.clearErrorState()
                 downloadViewModel.updateUrl(url)
-            }
+            },
+            nativeAd = nativeAd
         ) {
             SiteSupport(downloadViewModel.itemsSupport) {
                 onNavigateToSupportedSite.invoke()
@@ -454,6 +461,7 @@ fun DownloadPageImpl(
     onVideoCardClicked: () -> Unit = {},
     onUrlChanged: (String) -> Unit = {},
     isPreview: Boolean = false,
+    nativeAd: AdViewState,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -486,7 +494,7 @@ fun DownloadPageImpl(
             }
 
         }, actions = {
-            BadgedBox(badge = {
+            /*BadgedBox(badge = {
                 if (processCount > 0)
                     Badge(
                         modifier = Modifier.offset(
@@ -515,7 +523,7 @@ fun DownloadPageImpl(
                         )
                     }
                 }
-            }
+            }*/
             TooltipBox(state = rememberTooltipState(),
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {
@@ -574,7 +582,8 @@ fun DownloadPageImpl(
                                 duration = duration,
                                 onClick = onVideoCardClicked,
                                 isPreview = isPreview,
-                                isAds = showAdsCard
+                                isAds = showAdsCard,
+                                nativeAd = nativeAd
                             )
 
                         }
@@ -927,7 +936,8 @@ fun DownloadPagePreview() {
                 processCount = 99,
                 isPreview = true,
                 showDownloadProgress = true,
-                showVideoCard = false
+                showVideoCard = false,
+                nativeAd = AdViewState.Default
             ) {}
         }
     }
@@ -940,7 +950,9 @@ private fun SiteSupport(
 ) {
     ElevatedCard(
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
     ) {
         Column {

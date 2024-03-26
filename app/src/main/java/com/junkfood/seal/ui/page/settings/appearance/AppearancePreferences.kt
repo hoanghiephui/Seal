@@ -60,6 +60,7 @@ import com.junkfood.seal.ui.common.LocalDynamicColorSwitch
 import com.junkfood.seal.ui.common.LocalPaletteStyleIndex
 import com.junkfood.seal.ui.common.LocalSeedColor
 import com.junkfood.seal.ui.common.Route
+import com.junkfood.seal.ui.component.AdViewState
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.LargeTopAppBar
 import com.junkfood.seal.ui.component.PreferenceItem
@@ -139,7 +140,7 @@ fun AppearancePreferences(
             ) {
 
                 VideoCard(
-                    modifier = Modifier.padding(18.dp), thumbnailUrl = image
+                    modifier = Modifier.padding(18.dp), thumbnailUrl = image, nativeAd = AdViewState.Default
                 )
                 val pageCount = colorList.size + 1
 

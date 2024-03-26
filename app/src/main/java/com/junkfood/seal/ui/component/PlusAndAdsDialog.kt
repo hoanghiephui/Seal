@@ -41,12 +41,14 @@ fun PlusAndAdsDialog(
                 shape = TopButtonShape
             ) {
                 onMakePlus()
+                onDismissRequest.invoke()
             }
             SealDialogButtonVariant(
                 text = stringResource(id = R.string.with_ads),
                 shape = BottomButtonShape
             ) {
                 onViewAds()
+                onDismissRequest.invoke()
             }
         },
     )

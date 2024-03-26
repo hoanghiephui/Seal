@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
+import com.junkfood.seal.ui.component.AdViewState
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.SealModalBottomSheet
@@ -57,7 +58,8 @@ fun DownloadCompleteDialog(
                 duration = duration,
                 onClick = onVideoCardClicked,
                 isPreview = false,
-                isAds = false
+                isAds = false,
+                nativeAd = AdViewState.Default
             )
         }
     }

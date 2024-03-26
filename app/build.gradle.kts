@@ -120,6 +120,7 @@ android {
                 }
             }
         resValue("string", "APPLOVIN_SDK_KEY", "\"" + getLocalProperties()?.getProperty("keyApplovin")+ "\"")
+        buildConfigField("String", "HOME_NATIVE", "\"" + getLocalProperties()?.getProperty("homeNative") + "\"")
     }
     val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
 
@@ -280,6 +281,8 @@ dependencies {
     implementation(libs.exoplayer)
     implementation(libs.play.services.ads.identifier)
     implementation(libs.applovin.sdk)
+    implementation("com.airbnb.android:lottie:6.3.0")
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
 }
 
 class RoomSchemaArgProvider(

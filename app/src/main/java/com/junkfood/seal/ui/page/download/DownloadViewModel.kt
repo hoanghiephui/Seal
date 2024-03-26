@@ -1,8 +1,15 @@
 package com.junkfood.seal.ui.page.download
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.applovin.sdk.AppLovinSdk
 import com.junkfood.seal.App.Companion.applicationScope
 import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.Downloader
@@ -11,9 +18,12 @@ import com.junkfood.seal.Downloader.manageDownloadError
 import com.junkfood.seal.Downloader.notSupportError
 import com.junkfood.seal.Downloader.updatePlaylistResult
 import com.junkfood.seal.R
+import com.junkfood.seal.SHOW_ADS
 import com.junkfood.seal.model.MainActivityUiState
 import com.junkfood.seal.model.SupportModel
 import com.junkfood.seal.repository.OfflineFirstRepository
+import com.junkfood.seal.ui.component.AdViewState
+import com.junkfood.seal.ui.component.MaxTemplateNativeAdViewComposableLoader
 import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DownloadUtil
 import com.junkfood.seal.util.FORMAT_SELECTION
@@ -40,7 +50,8 @@ import javax.inject.Inject
 
 // TODO: Refactoring for introducing multitasking and download queue management
 class DownloadViewModel @Inject constructor(
-    private val repository: OfflineFirstRepository
+    private val repository: OfflineFirstRepository,
+    private val appLovinSdk: AppLovinSdk
 ) : ViewModel() {
     val uiState: StateFlow<MainActivityUiState> = repository.userData.map {
         MainActivityUiState.Success(it)
@@ -52,8 +63,12 @@ class DownloadViewModel @Inject constructor(
 
     private val mutableViewStateFlow = MutableStateFlow(ViewState())
     val viewStateFlow = mutableViewStateFlow.asStateFlow()
-
+    var currentPoints by mutableIntStateOf(0)
     val videoInfoFlow = MutableStateFlow(VideoInfo())
+    private val nativeAdLoader: MaxTemplateNativeAdViewComposableLoader by lazy {
+        MaxTemplateNativeAdViewComposableLoader()
+    }
+    val adState: androidx.compose.runtime.State<AdViewState> get() = nativeAdLoader.nativeAdView
 
     data class ViewState(
         val showPlaylistSelectionDialog: Boolean = false,
@@ -245,6 +260,25 @@ class DownloadViewModel @Inject constructor(
             return true
         }
         return false
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        nativeAdLoader.destroy()
+    }
+
+    fun loadAds(
+        context: Context,
+        adUnitIdentifier: String
+    ) {
+        // Initialize ad with ad loader.
+        if (SHOW_ADS) {
+            appLovinSdk.initializeSdk {
+                nativeAdLoader.loadAd(context, adUnitIdentifier)
+                Log.d("Applovin", "loadAds")
+            }
+        }
+
     }
 
     companion object {

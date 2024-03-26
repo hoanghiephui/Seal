@@ -25,6 +25,7 @@ import com.junkfood.seal.ui.page.download.DownloadViewModel
 import com.junkfood.seal.ui.page.settings.network.CookiesViewModel
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.PreferenceUtil
+import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.matchUrlFromSharedText
 import com.junkfood.seal.util.setLanguage
 import dagger.hilt.android.AndroidEntryPoint
@@ -115,19 +116,22 @@ class MainActivity : AppCompatActivity(), AdRewardedCallback {
     }
 
     override fun onLoaded(rewardedAd: MaxRewardedAd) {
-
+        if (rewardedAd.isReady) {
+            rewardedAd.showAd()
+        }
     }
 
     override fun onAdRewardLoadFail() {
-
+        ToastUtil.makeToast(R.string.add_point_fail)
     }
 
     override fun onUserRewarded(amount: Int) {
-        downloadViewModel.addPoints(5, 0)
+        downloadViewModel.addPoints(5, downloadViewModel.currentPoints)
+        ToastUtil.makeToast(R.string.add_point_success)
     }
 
     override fun onShowFail() {
-
+        ToastUtil.makeToast(R.string.add_point_fail)
     }
 }
 

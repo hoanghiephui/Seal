@@ -466,4 +466,6 @@
     <string name="package_basic">GoPush Basic</string>
     <string name="with_sub">with Subscriptions</string>
     <string name="with_ads">Rewarded Ads</string>
+    <string name="add_point_success">You have been granted an additional 5 downloads.</string>
+    <string name="add_point_fail">Sorry, it\'s not possible to watch ads for rewards at the moment. Please try again later!</string>
 </resources>

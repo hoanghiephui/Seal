@@ -7,6 +7,7 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.MaxReward
 import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.junkfood.seal.util.dialogLoading
 
 class AdMaxRewardedLoader(private val callback: AdRewardedCallback) {
 
@@ -16,7 +17,7 @@ class AdMaxRewardedLoader(private val callback: AdRewardedCallback) {
         activity: Activity,
         adUnitId: String
     ) {
-        //dialog = dialogLoading(activity)
+        dialog = dialogLoading(activity)
         rewardedAd = MaxRewardedAd.getInstance(adUnitId, activity)
         rewardedAd.setListener(object : MaxRewardedAdListener {
             override fun onAdLoaded(ad: MaxAd) {

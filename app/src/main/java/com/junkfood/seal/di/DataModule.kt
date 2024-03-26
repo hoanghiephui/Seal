@@ -14,16 +14,16 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataModule {
+interface DataModule {
     @Binds
-    internal abstract fun bindsUserDataRepository(
+    fun bindsUserDataRepository(
         userDataRepository: OfflineFirstRepositoryImpl,
     ): OfflineFirstRepository
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppModule {
+object AppModule {
     @Provides
     @Singleton
     fun provideApplovin(

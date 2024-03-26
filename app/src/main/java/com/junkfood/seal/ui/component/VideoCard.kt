@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.Button
@@ -59,7 +58,8 @@ fun VideoCard(
     fileSizeApprox: Double = 1024 * 1024 * 69.0,
     duration: Int = 359,
     isPreview: Boolean = false,
-    isAds: Boolean = false
+    isAds: Boolean = false,
+    nativeAd: AdViewState,
 ) {
     ElevatedCard(
         modifier = modifier
@@ -163,7 +163,7 @@ fun VideoCard(
                         )
                 }
             } else {
-                AdsView()
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM)
             }
         }
 
@@ -171,7 +171,7 @@ fun VideoCard(
 }
 
 @Composable
-private fun AdsView() {
+fun AdsView() {
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -226,7 +226,10 @@ private fun AdsView() {
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 fun VideoCardPreview() {
     SealTheme {
-        VideoCard(isPreview = true)
+        VideoCard(
+            isPreview = true,
+            nativeAd = AdViewState.Default
+        )
     }
 }
 
@@ -237,7 +240,8 @@ fun AdsCardPreview() {
     SealTheme {
         VideoCard(
             isPreview = true,
-            isAds = true
+            isAds = true,
+            nativeAd = AdViewState.Default
         )
     }
 }

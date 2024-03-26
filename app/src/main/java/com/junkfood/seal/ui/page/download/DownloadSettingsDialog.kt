@@ -528,7 +528,8 @@ fun DownloadSettingDialog(
                                 )
                                 ButtonChip(
                                     onClick = {
-
+                                        showGetPointDialog = true
+                                        onDismissRequest()
                                     },
                                     label = stringResource(R.string.get_plus),
                                     icon = Icons.Outlined.ProductionQuantityLimits,
