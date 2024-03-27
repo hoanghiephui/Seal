@@ -1,11 +1,14 @@
 package com.junkfood.seal.ui.component
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.AsyncImageImpl
+import com.junkfood.seal.ui.common.motion.materialSharedAxisYIn
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.ui.theme.bold
 import com.junkfood.seal.util.toDurationText
@@ -66,8 +70,12 @@ fun VideoCard(
             .fillMaxWidth(),
         onClick = onClick, shape = MaterialTheme.shapes.small
     ) {
-        Crossfade(targetState = isAds, label = "video") {
-            if (!it) {
+        AnimatedContent(targetState = isAds, label = "", transitionSpec = {
+            (materialSharedAxisYIn(initialOffsetX = { it / 4 })).togetherWith(
+                fadeOut(tween(durationMillis = 80))
+            )
+        }) { type ->
+            if (!type) {
                 Column {
                     Box(Modifier.fillMaxWidth()) {
                         AsyncImageImpl(
@@ -166,7 +174,6 @@ fun VideoCard(
                 MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM)
             }
         }
-
     }
 }
 
@@ -188,7 +195,7 @@ fun AdsView() {
                 titleStyle.copy(color = MaterialTheme.colorScheme.primary)
                     .toSpanStyle()
             ) {
-                append("VidSave+")
+                append("GoPush+")
             }
         }
 
@@ -203,7 +210,7 @@ fun AdsView() {
             modifier = Modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
-            text = "VidSave+ is a paid service that gives you access to all features for the price of a cup of coffee.",
+            text = stringResource(id = R.string.sub_desc),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -216,7 +223,7 @@ fun AdsView() {
 
             },
         ) {
-            Text("Buy VidSave+")
+            Text("Buy GoPush+")
         }
     }
 }

@@ -133,7 +133,7 @@
     <string name="permission_issue_desc">Directories outside Download/ and Documents/ are not supported</string>
     <string name="battery_configuration">Battery configuration</string>
     <string name="battery_configuration_desc">Ignore battery optimization for this app to download in the background</string>
-    <string name="service_title">Seal is downloading…</string>
+    <string name="service_title">GoPush is downloading…</string>
     <string name="unknown_error">Unknown error</string>
     <string name="translate">Translate</string>
     <string name="translate_desc">Help translate this app on Hosted Weblate</string>
@@ -271,7 +271,7 @@
     <string name="custom_command_enabled_hint">Some options are unavailable when using custom command</string>
     <string name="how_does_it_work">How does it work?</string>
     <string name="cookies_usage_msg">Downloading from some sites requires account authentication information. Click \"Generate new cookies\", enter the URL of the website and then log in with your account in the browser page, the app will generate it for you.</string>
-    <string name="custom_command_usage_msg">dlp is a powerful command-line tool for downloading videos. Seal makes it easier to use dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, Seal allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
+    <string name="custom_command_usage_msg">dlp is a powerful command-line tool for downloading videos. GoPush makes it easier to use dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, GoPush allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
     <string name="telegram_channel">Telegram channel</string>
     <string name="matrix_space">Matrix space</string>
     <string name="sdcard_directory">SD card folder</string>
@@ -327,7 +327,7 @@
     <string name="temporary_directory_desc">Store temporary files in the internal directory</string>
     <string name="sponsor">Sponsor</string>
     <string name="sponsor_desc">Support this app by sponsoring on GitHub</string>
-    <string name="sponsor_msg">Seal will be always free and open source for everyone. If you like it, please consider sponsoring me on GitHub!</string>
+    <string name="sponsor_msg">GoPush will be always free and open source for everyone. If you like it, please consider sponsoring me on GitHub!</string>
     <string name="feedback">Feedback</string>
     <string name="sponsors">Sponsors</string>
     <string name="audio_format">Audio format</string>
@@ -338,7 +338,7 @@
     <string name="clip_video_desc">Make video clips in the format selection page</string>
     <string name="embed_thumbnail" translatable="false">Embed thumbnail</string>
     <string name="embed_thumbnail_desc" translatable="false">Embed thumbnails into videos</string>
-    <string name="auto_update_disabled_msg">Auto-update is not available for %1$s builds. If you don\'t have %1$s installed on your device, or would like to preview upcoming new features in Seal, please consider %2$s.</string>
+    <string name="auto_update_disabled_msg">Auto-update is not available for %1$s builds. If you don\'t have %1$s installed on your device, or would like to preview upcoming new features in GoPush, please consider %2$s.</string>
     <string name="switch_to_github_builds">switching to GitHub builds</string>
     <string name="okay">Okay</string>
     <string name="got_it">Got it</string>
@@ -469,4 +469,53 @@
     <string name="add_point_success">You have been granted an additional 5 downloads.</string>
     <string name="add_point_fail">Sorry, it\'s not possible to watch ads for rewards at the moment. Please try again later!</string>
     <string name="noted">Please respect the copyright owner\'s rights and refrain from reposting videos without obtaining permission</string>
+    <string name="sub_desc">GoPush+ is a paid service that gives you access to all features.</string>
+
+    <string name="update_content">GM free souls! Another update is here. There are a number of new features and some extensive UI improvements throughout the app.</string>
+    <string name="update_now">Upgrade now</string>
+    <string name="downloading">Downloading update…</string>
+    <string name="update_done">Update downloaded successfully</string>
+    <string name="install_now">Install now</string>
+
+    <!-- Billing -->
+    <string name="error_executed">An error occurred</string>
+    <string name="error_unknown">An unknown error has occurred</string>
+    <string name="common_reload">Reload</string>
+    <string name="error_no_data">No data</string>
+    <string name="error_billing">Failed to retrieve purchase information</string>
+    <string name="billing_plus_title">Wallet+</string>
+    <string name="billing_plus_description">@string/sub_desc</string>
+    <string name="billing_plus_purchase_button">Subscribe for %1$s</string>
+    <string name="billing_plus_verify_button">Restore purchase</string>
+    <string name="billing_plus_consume_button">Consume Purchase</string>
+    <string name="billing_plus_toast_require_plus">This feature is only available with Wallet+</string>
+    <string name="billing_plus_toast_purchased">Purchased</string>
+    <string name="billing_plus_toast_purchased_error">Purchase failed</string>
+    <string name="billing_plus_toast_consumed">Consumed</string>
+    <string name="billing_plus_toast_consumed_error">Consumption failed</string>
+    <string name="billing_plus_toast_verify">Purchase restored</string>
+    <string name="billing_plus_toast_verify_error">Purchase information not found</string>
+    <string name="billing_plus_item_hide_ads">Hide ads</string>
+    <string name="billing_plus_item_hide_ads_description">Hide all in-app ads and enjoy smooth and comfortable freedom. </string>
+    <string name="billing_plus_item_download">No download limit</string>
+    <string name="billing_plus_item_download_description">Download videos endlessly without limits or annoying advertisements.</string>
+    <string name="billing_plus_item_metadata">Premium for a month</string>
+    <string name="billing_plus_item_metadata_description">The subscription is billed monthly, and you have the flexibility to cancel it at any time. </string>
+    <string name="billing_plus_item_edit_lyrics">Lyrics editing function</string>
+    <string name="billing_plus_item_edit_lyrics_description">Enter lyrics in LRC format to enjoy music with synchronized lyrics. </string>
+    <string name="billing_plus_item_scan">Song scan</string>
+    <string name="billing_plus_item_scan_description">You can now scan and register songs that the app cannot recognize. </string>
+    <string name="billing_plus_item_folder">Browse folder</string>
+    <string name="billing_plus_item_folder_description">You can now play by folder. This feature will be available in the future. </string>
+    <string name="billing_plus_item_widget">Home widget</string>
+    <string name="billing_plus_item_widget_description">You can add a widget to your home screen and play music from the widget. </string>
+    <string name="billing_plus_item_material_you">Material You</string>
+    <string name="billing_plus_item_material_you_description">Custom themes by Material You will be available in all versions. </string>
+    <string name="billing_plus_item_accent_color">Accent color</string>
+    <string name="billing_plus_item_accent_color_description">You will be able to freely set the accent color of the app. </string>
+    <string name="billing_plus_item_feature">Add new features</string>
+    <string name="billing_plus_item_feature_description">Be the first to try new features as they are added. </string>
+    <string name="billing_plus_item_support">Priority support</string>
+    <string name="billing_plus_item_support_description">Wallet+ users receive priority support. </string>
+    <string name="billing_policy">** The monthly subscription package will automatically renew according to Google\'s payment policy. Alternatively, you can set up cancellation in the payment and subscription management section of Google Play.</string>
 </resources>

@@ -140,12 +140,12 @@ fun SettingsPage(
                     }
                 }
             }
-            if (!showBatteryHint && showSponsorMessage > 30)
+            if (true)
                 item {
                     PreferencesHintCard(
-                        title = stringResource(id = R.string.sponsor),
+                        title = "GoPush+",
                         icon = Icons.Rounded.VolunteerActivism,
-                        description = stringResource(id = R.string.sponsor_desc)
+                        description = stringResource(id = R.string.sub_desc)
                     ) {
                         onNavigateTo(Route.DONATE)
                     }

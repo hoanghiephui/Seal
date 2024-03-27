@@ -15,12 +15,14 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.applovin.mediation.ads.MaxRewardedAd
 import com.junkfood.seal.App.Companion.context
+import com.junkfood.seal.QuickDownloadActivity.Companion.KEY_MAKE
 import com.junkfood.seal.ui.ads.AdMaxRewardedLoader
 import com.junkfood.seal.ui.ads.AdRewardedCallback
 import com.junkfood.seal.ui.common.LocalDarkTheme
 import com.junkfood.seal.ui.common.LocalDynamicColorSwitch
 import com.junkfood.seal.ui.common.SettingsProvider
 import com.junkfood.seal.ui.page.HomeEntry
+import com.junkfood.seal.ui.page.billing.BillingPlusViewModel
 import com.junkfood.seal.ui.page.download.DownloadViewModel
 import com.junkfood.seal.ui.page.settings.network.CookiesViewModel
 import com.junkfood.seal.ui.theme.SealTheme
@@ -34,6 +36,7 @@ import kotlinx.coroutines.runBlocking
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), AdRewardedCallback {
     private val downloadViewModel: DownloadViewModel by viewModels()
+    private val billingViewModel by viewModels<BillingPlusViewModel>()
     private val adMaxRewardedLoader = AdMaxRewardedLoader(this)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity(), AdRewardedCallback {
                 setLanguage(PreferenceUtil.getLocaleFromPreference())
             }
         }
+        billingViewModel.onVerify(this)
         context = this.baseContext
         setContent {
             val cookiesViewModel: CookiesViewModel = viewModel()
@@ -66,7 +70,7 @@ class MainActivity : AppCompatActivity(), AdRewardedCallback {
                         cookiesViewModel = cookiesViewModel,
                         isUrlShared = isUrlSharingTriggered,
                         onViewAds = {
-                            adMaxRewardedLoader.createRewardedAd(this, "a83e3b56eab2bf56")
+                            adMaxRewardedLoader.createRewardedAd(this, BuildConfig.HOME_REWARDED)
                         }
                     )
                 }
@@ -104,6 +108,9 @@ class MainActivity : AppCompatActivity(), AdRewardedCallback {
                                 }
                             }
                     }
+            } else -> {
+                val dataReceived = intent.getStringExtra(KEY_MAKE)
+                downloadViewModel.makeUp(dataReceived)
             }
         }
 

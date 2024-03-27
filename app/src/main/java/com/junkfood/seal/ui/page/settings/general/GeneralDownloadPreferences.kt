@@ -304,7 +304,7 @@ fun GeneralDownloadPreferences(
                             PreferenceUtil.updateValue(THUMBNAIL, thumbnailSwitch)
                         })
                 }
-                item {
+                /*item {
                     PreferenceSwitch(
                         title = stringResource(R.string.print_details),
                         description = stringResource(R.string.print_details_desc),
@@ -316,9 +316,9 @@ fun GeneralDownloadPreferences(
                         },
                         isChecked = displayErrorReport
                     )
-                }
+                }*/
 
-                item {
+                /*item {
                     PreferenceSubtitle(text = stringResource(id = R.string.privacy))
                 }
 
@@ -353,9 +353,9 @@ fun GeneralDownloadPreferences(
                             )
                         }
                     )
-                }
+                }*/
 
-                item {
+                /*item {
                     PreferenceSubtitle(text = stringResource(R.string.advanced_settings))
                 }
                 item {
@@ -372,7 +372,7 @@ fun GeneralDownloadPreferences(
                         description = stringResource(R.string.download_playlist_desc),
                         isChecked = downloadPlaylist
                     )
-                }
+                }*/
 
                 item {
                     PreferenceSwitchWithDivider(
@@ -396,7 +396,7 @@ fun GeneralDownloadPreferences(
                     )
                 }
 
-                item {
+                /*item {
                     PreferenceSwitchWithDivider(title = stringResource(R.string.sponsorblock),
                         description = stringResource(
                             R.string.sponsorblock_desc
@@ -413,7 +413,7 @@ fun GeneralDownloadPreferences(
 
                 if (downloadSubtitle) item {
                     PreferenceInfo(text = stringResource(id = R.string.subtitle_sponsorblock))
-                }
+                }*/
             }
         })
     if (showSponsorBlockDialog) {

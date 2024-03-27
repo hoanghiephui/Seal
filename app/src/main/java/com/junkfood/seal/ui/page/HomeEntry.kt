@@ -27,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.junkfood.seal.QuickDownloadActivity
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.common.Route
@@ -41,6 +43,8 @@ import com.junkfood.seal.ui.common.animatedComposableVariant
 import com.junkfood.seal.ui.common.arg
 import com.junkfood.seal.ui.common.id
 import com.junkfood.seal.ui.common.slideInVerticallyComposable
+import com.junkfood.seal.ui.component.PlusAndAdsDialog
+import com.junkfood.seal.ui.page.billing.BillingPage
 import com.junkfood.seal.ui.page.command.TaskListPage
 import com.junkfood.seal.ui.page.command.TaskLogPage
 import com.junkfood.seal.ui.page.download.DownloadPage
@@ -96,6 +100,8 @@ fun HomeEntry(
     var currentDownloadStatus by remember { mutableStateOf(UpdateUtil.DownloadStatus.NotYet as UpdateUtil.DownloadStatus) }
     val scope = rememberCoroutineScope()
     var updateJob: Job? = null
+    val makeUp by downloadViewModel.makeUpStateFlow.collectAsStateWithLifecycle()
+    var showGetPointDialog by remember { mutableStateOf(false) }
     var latestRelease by remember { mutableStateOf(UpdateUtil.LatestRelease()) }
     val settings =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -119,6 +125,21 @@ fun HomeEntry(
                     UpdateUtil.installLatestApk()
             }
         }
+    }
+    if (makeUp.isNotBlank()) {
+        showGetPointDialog = true
+    }
+    if (showGetPointDialog) {
+        PlusAndAdsDialog(
+            onDismissRequest = {
+                showGetPointDialog = false
+                downloadViewModel.makeUp("")
+            },
+            onMakePlus = {
+                navController.navigate(Route.DONATE)
+            },
+            onViewAds = onViewAds
+        )
     }
 
     val onNavigateBack: () -> Unit = {
@@ -170,7 +191,8 @@ fun HomeEntry(
                     },
                     downloadViewModel = downloadViewModel,
                     onNavigateToSupportedSite = { navController.navigate(Route.SUPPORTED_SITE_ROUTER) },
-                    onViewAds = onViewAds
+                    onViewAds = onViewAds,
+                    onMakePlus = { navController.navigate(Route.DONATE) }
                 )
             }
             animatedComposable(Route.DOWNLOADS) { VideoListPage { onNavigateBack() } }
@@ -308,7 +330,7 @@ fun NavGraphBuilder.settingsGraph(
                 onNavigateToUpdatePage = { onNavigateTo(Route.AUTO_UPDATE) },
                 onNavigateToDonatePage = { onNavigateTo(Route.DONATE) })
         }
-        animatedComposable(Route.DONATE) { DonatePage(onNavigateBack) }
+        animatedComposable(Route.DONATE) { BillingPage(onNavigateBack) }
         animatedComposable(Route.CREDITS) { CreditsPage(onNavigateBack) }
         animatedComposable(Route.AUTO_UPDATE) { UpdatePage(onNavigateBack) }
         animatedComposable(Route.APPEARANCE) {

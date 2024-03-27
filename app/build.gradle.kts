@@ -122,6 +122,7 @@ android {
         resValue("string", "APPLOVIN_SDK_KEY", "\"" + getLocalProperties()?.getProperty("keyApplovin")+ "\"")
         buildConfigField("String", "HOME_NATIVE", "\"" + getLocalProperties()?.getProperty("homeNative") + "\"")
         buildConfigField("String", "HOME_REWARDED", "\"" + getLocalProperties()?.getProperty("homeRewarded") + "\"")
+        buildConfigField("String", "PREMIUM_MONTH", "\"" + getLocalProperties()?.getProperty("monthSub") + "\"")
     }
     val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
 
@@ -141,13 +142,6 @@ android {
 
             }
         }
-        /*beforeVariants {
-            android.sourceSets.register(it.name) {
-                val buildDir = layout.buildDirectory.get().asFile
-                java.srcDir(buildDir.resolve("generated/source/proto/${it.name}/java"))
-                kotlin.srcDir(buildDir.resolve("generated/source/proto/${it.name}/kotlin"))
-            }
-        }*/
     }
 
     buildTypes {
@@ -156,8 +150,8 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            if (keystorePropertiesFile.exists())
-                signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("debug")
+
         }
         debug {
             if (keystorePropertiesFile.exists())
@@ -201,7 +195,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 // Setup protobuf configuration, generating lite Java and Kotlin classes
@@ -226,6 +220,7 @@ protobuf {
 dependencies {
 
     implementation(project(":color"))
+    implementation(project(":billing"))
 
     //Core libs for the app
     implementation(libs.bundles.core)
@@ -284,6 +279,8 @@ dependencies {
     implementation(libs.applovin.sdk)
     implementation("com.airbnb.android:lottie:6.3.0")
     implementation("com.airbnb.android:lottie-compose:6.3.0")
+    implementation("com.android.billingclient:billing:6.2.0")
+    implementation("com.android.billingclient:billing-ktx:6.2.0")
 }
 
 class RoomSchemaArgProvider(

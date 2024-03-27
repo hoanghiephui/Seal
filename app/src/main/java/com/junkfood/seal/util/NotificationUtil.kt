@@ -33,7 +33,7 @@ object NotificationUtil {
     private const val PROGRESS_INITIAL = 0
     private const val CHANNEL_ID = "download_notification"
     private const val SERVICE_CHANNEL_ID = "download_service"
-    private const val NOTIFICATION_GROUP_ID = "seal.download.notification"
+    private const val NOTIFICATION_GROUP_ID = "gopush.download.notification"
     private const val DEFAULT_NOTIFICATION_ID = 100
     const val SERVICE_NOTIFICATION_ID = 123
     private lateinit var serviceNotification: Notification

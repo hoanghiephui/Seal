@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,9 +47,6 @@ import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Subscriptions
-import androidx.compose.material.icons.outlined.Terminal
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -105,11 +101,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.junkfood.seal.App
 import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.Downloader
@@ -164,6 +158,7 @@ fun DownloadPage(
     onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     onNavigateToSupportedSite: () -> Unit = {},
     onViewAds: () -> Unit,
+    onMakePlus: () -> Unit,
     downloadViewModel: DownloadViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -402,7 +397,7 @@ fun DownloadPage(
             lastDownloadCount = lastDownloadCount,
             isPlusMode = isPlusMode,
             onViewAds = onViewAds,
-            onMakePlus = {}
+            onMakePlus = onMakePlus
         )
         if (isDownloaded) scope.launch {
             showDownloadCompleteDialog = true
@@ -569,24 +564,21 @@ fun DownloadPageImpl(
                     AnimatedVisibility(
                         visible = showDownloadProgress && showVideoCard || showAdsCard
                     ) {
-                        Box {
-                            VideoCard(
-                                modifier = Modifier,
-                                title = title,
-                                author = uploader,
-                                thumbnailUrl = thumbnailUrl,
-                                progress = progress,
-                                showCancelButton = downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo,
-                                onCancel = cancelCallback,
-                                fileSizeApprox = fileSizeApprox,
-                                duration = duration,
-                                onClick = onVideoCardClicked,
-                                isPreview = isPreview,
-                                isAds = showAdsCard,
-                                nativeAd = nativeAd
-                            )
-
-                        }
+                        VideoCard(
+                            modifier = Modifier,
+                            title = title,
+                            author = uploader,
+                            thumbnailUrl = thumbnailUrl,
+                            progress = progress,
+                            showCancelButton = downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo,
+                            onCancel = cancelCallback,
+                            fileSizeApprox = fileSizeApprox,
+                            duration = duration,
+                            onClick = onVideoCardClicked,
+                            isPreview = isPreview,
+                            isAds = showAdsCard,
+                            nativeAd = nativeAd
+                        )
                     }
                     InputUrl(
                         url = viewState.url,

@@ -69,7 +69,8 @@ class DownloadViewModel @Inject constructor(
         MaxTemplateNativeAdViewComposableLoader()
     }
     val adState: androidx.compose.runtime.State<AdViewState> get() = nativeAdLoader.nativeAdView
-
+    private val _makeUpStateFlow = MutableStateFlow("")
+    val makeUpStateFlow = _makeUpStateFlow.asStateFlow()
     data class ViewState(
         val showPlaylistSelectionDialog: Boolean = false,
         val url: String = "",
@@ -279,6 +280,14 @@ class DownloadViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun makeUp(type: String?) {
+        if (type != null) {
+            _makeUpStateFlow.update {
+                type
+            }
+        }
     }
 
     companion object {

@@ -433,7 +433,7 @@ fun DownloadSettingDialog(
 
             }
 
-            DrawerSheetSubtitle(
+            /*DrawerSheetSubtitle(
                 text = stringResource(
                     R.string.additional_settings
                 )
@@ -486,7 +486,7 @@ fun DownloadSettingDialog(
                         updatePreferences()
                     }, label = stringResource(R.string.create_thumbnail)
                 )
-            }
+            }*/
 
 
         }
@@ -528,8 +528,12 @@ fun DownloadSettingDialog(
                                 )
                                 ButtonChip(
                                     onClick = {
-                                        showGetPointDialog = true
-                                        onDismissRequest()
+                                        if (!isQuickDownload) {
+                                            showGetPointDialog = true
+                                            onDismissRequest()
+                                        } else {
+                                            onMakePlus.invoke()
+                                        }
                                     },
                                     label = stringResource(R.string.get_plus),
                                     icon = Icons.Outlined.ProductionQuantityLimits,
