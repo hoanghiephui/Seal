@@ -104,6 +104,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.play.core.ktx.AppUpdateResult
 import com.junkfood.seal.App
 import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.Downloader
@@ -114,9 +115,11 @@ import com.junkfood.seal.ui.common.AsyncImageImpl
 import com.junkfood.seal.ui.common.HapticFeedback.longPressHapticFeedback
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.LocalWindowWidthState
+import com.junkfood.seal.ui.common.intState
 import com.junkfood.seal.ui.component.AdViewState
 import com.junkfood.seal.ui.component.ClearButton
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
+import com.junkfood.seal.ui.component.HeaderUpdate
 import com.junkfood.seal.ui.component.HelpDialog
 import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
@@ -133,6 +136,9 @@ import com.junkfood.seal.util.NOTIFICATION
 import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
+import com.junkfood.seal.util.PreferenceUtil.updateInt
+import com.junkfood.seal.util.SHOW_REVIEW
+import com.junkfood.seal.util.SHOW_SPONSOR_MSG
 import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.isTikTokLink
 import com.junkfood.seal.util.isYouTubeLink
@@ -141,6 +147,7 @@ import com.junkfood.seal.util.openAppSettings
 import com.junkfood.seal.util.permissionWriteStore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -194,7 +201,7 @@ fun DownloadPage(
     LaunchedEffect(key1 = BuildConfig.HOME_NATIVE) {
         downloadViewModel.loadAds(context, BuildConfig.HOME_NATIVE)
     }
-
+    val updateState = rememberInAppUpdateState()
     val clipboardManager = LocalClipboardManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val useDialog = LocalWindowWidthState.current != WindowWidthSizeClass.Compact
@@ -204,6 +211,7 @@ fun DownloadPage(
     var isStartDownload by remember { mutableStateOf(false) }
     var isDownloaded by remember { mutableStateOf(false) }
     var showDownloadCompleteDialog by rememberSaveable { mutableStateOf(false) }
+    var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = downloaderState, key2 = isStartDownload) {
         showAds = if (isStartDownload) {
             downloaderState !is Downloader.State.DownloadingVideo
@@ -211,6 +219,7 @@ fun DownloadPage(
             true
         }
     }
+    val showReview by SHOW_REVIEW.intState
     val checkNetworkOrDownload = {
         if (!PreferenceUtil.isNetworkAvailableForDownload()) {
             showMeteredNetworkDialog = true
@@ -300,7 +309,16 @@ fun DownloadPage(
                 showMeteredNetworkDialog = false
             })
     }
-
+    LaunchedEffect(key1 = updateState) {
+        if (updateState.appUpdateResult !is AppUpdateResult.NotAvailable) {
+            showUpdateDialog = true
+            delay(50)
+            sheetState.show()
+        }
+        if (BuildConfig.DEBUG) {
+            ToastUtil.makeToast("Update Status: ${updateState.appUpdateResult}")
+        }
+    }
 
     DisposableEffect(viewState.showPlaylistSelectionDialog) {
         if (!playlistInfo.entries.isNullOrEmpty() && viewState.showPlaylistSelectionDialog) navigateToPlaylistPage()
@@ -422,11 +440,25 @@ fun DownloadPage(
                     isDownloaded = false
                     Downloader.updateState(Downloader.State.Idle)
                     downloadViewModel.deductPoints(points = 1, currentPoints = lastDownloadCount)
+                    SHOW_REVIEW.updateInt(showReview + 1)
                 }
             },
             taskState = taskState,
             onVideoCardClicked = {
                 Downloader.openDownloadResult()
+            }
+        )
+
+        HeaderUpdate(
+            showDialog = showUpdateDialog,
+            sheetState = sheetState,
+            updateState = updateState,
+            context = context,
+            rememberCoroutineScope = scope,
+            onDismissRequest = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    showUpdateDialog = false
+                }
             }
         )
     }

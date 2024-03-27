@@ -221,6 +221,7 @@ dependencies {
 
     implementation(project(":color"))
     implementation(project(":billing"))
+    implementation(project(":in-app-update"))
 
     //Core libs for the app
     implementation(libs.bundles.core)

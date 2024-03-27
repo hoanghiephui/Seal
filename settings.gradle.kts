@@ -20,3 +20,5 @@ rootProject.name = "Seal"
 include (":app")
 include(":color")
 include(":billing")
+include(":in-app-update")
+project(":in-app-update").projectDir = File("In-App-Update/inappupdatecompose")

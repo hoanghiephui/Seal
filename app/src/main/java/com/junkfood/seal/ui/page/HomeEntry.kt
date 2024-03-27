@@ -1,14 +1,7 @@
 package com.junkfood.seal.ui.page
 
-import android.Manifest
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import android.util.Log
 import android.webkit.CookieManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +13,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.junkfood.seal.QuickDownloadActivity
+import com.android.billing.findActivity
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.common.Route
@@ -42,6 +33,7 @@ import com.junkfood.seal.ui.common.animatedComposable
 import com.junkfood.seal.ui.common.animatedComposableVariant
 import com.junkfood.seal.ui.common.arg
 import com.junkfood.seal.ui.common.id
+import com.junkfood.seal.ui.common.intState
 import com.junkfood.seal.ui.common.slideInVerticallyComposable
 import com.junkfood.seal.ui.component.PlusAndAdsDialog
 import com.junkfood.seal.ui.page.billing.BillingPage
@@ -55,7 +47,6 @@ import com.junkfood.seal.ui.page.download.SupportedSite
 import com.junkfood.seal.ui.page.settings.SettingsPage
 import com.junkfood.seal.ui.page.settings.about.AboutPage
 import com.junkfood.seal.ui.page.settings.about.CreditsPage
-import com.junkfood.seal.ui.page.settings.about.DonatePage
 import com.junkfood.seal.ui.page.settings.about.UpdatePage
 import com.junkfood.seal.ui.page.settings.appearance.AppearancePreferences
 import com.junkfood.seal.ui.page.settings.appearance.DarkThemePreferences
@@ -72,18 +63,18 @@ import com.junkfood.seal.ui.page.settings.network.CookiesViewModel
 import com.junkfood.seal.ui.page.settings.network.NetworkPreferences
 import com.junkfood.seal.ui.page.settings.network.WebViewPage
 import com.junkfood.seal.ui.page.videolist.VideoListPage
-import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.getString
-import com.junkfood.seal.util.ToastUtil
+import com.junkfood.seal.util.PreferenceUtil.updateInt
+import com.junkfood.seal.util.SHOW_REVIEW
+import com.junkfood.seal.util.SHOW_SPONSOR_MSG
 import com.junkfood.seal.util.UpdateUtil
 import com.junkfood.seal.util.YT_DLP
 import com.junkfood.seal.util.YT_DLP_UPDATE
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import se.warting.inappupdate.compose.review.rememberInAppReviewManager
 
 private const val TAG = "HomeEntry"
 
@@ -96,36 +87,10 @@ fun HomeEntry(
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
-    var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
-    var currentDownloadStatus by remember { mutableStateOf(UpdateUtil.DownloadStatus.NotYet as UpdateUtil.DownloadStatus) }
-    val scope = rememberCoroutineScope()
-    var updateJob: Job? = null
+    val showReview by SHOW_REVIEW.intState
     val makeUp by downloadViewModel.makeUpStateFlow.collectAsStateWithLifecycle()
     var showGetPointDialog by remember { mutableStateOf(false) }
-    var latestRelease by remember { mutableStateOf(UpdateUtil.LatestRelease()) }
-    val settings =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            UpdateUtil.installLatestApk()
-        }
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { result ->
-        if (result) {
-            UpdateUtil.installLatestApk()
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (!context.packageManager.canRequestPackageInstalls())
-                    settings.launch(
-                        Intent(
-                            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse("package:${context.packageName}"),
-                        )
-                    )
-                else
-                    UpdateUtil.installLatestApk()
-            }
-        }
-    }
+    val inAppReviewManager = rememberInAppReviewManager()
     if (makeUp.isNotBlank()) {
         showGetPointDialog = true
     }
@@ -247,52 +212,11 @@ fun HomeEntry(
                 it.printStackTrace()
             }
         }
-        LaunchedEffect(Unit) {//TODO implement auto update
-            /*if (!PreferenceUtil.isNetworkAvailableForDownload() || !PreferenceUtil.isAutoUpdateEnabled()
-            )
-                return@LaunchedEffect
-            launch(Dispatchers.IO) {
-                runCatching {
-                    UpdateUtil.checkForUpdate()?.let {
-                        latestRelease = it
-                        showUpdateDialog = true
-                    }
-                }.onFailure {
-                    it.printStackTrace()
-                }
-            }*/
-        }
-
-        if (showUpdateDialog) {
-            UpdateDialogImpl(
-                onDismissRequest = {
-                    showUpdateDialog = false
-                    updateJob?.cancel()
-                },
-                title = latestRelease.name.toString(),
-                onConfirmUpdate = {
-                    updateJob = scope.launch(Dispatchers.IO) {
-                        runCatching {
-                            UpdateUtil.downloadApk(latestRelease = latestRelease)
-                                .collect { downloadStatus ->
-                                    currentDownloadStatus = downloadStatus
-                                    if (downloadStatus is UpdateUtil.DownloadStatus.Finished) {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            launcher.launch(Manifest.permission.REQUEST_INSTALL_PACKAGES)
-                                        }
-                                    }
-                                }
-                        }.onFailure {
-                            it.printStackTrace()
-                            currentDownloadStatus = UpdateUtil.DownloadStatus.NotYet
-                            ToastUtil.makeToastSuspend(context.getString(R.string.app_update_failed))
-                            return@launch
-                        }
-                    }
-                },
-                releaseNote = latestRelease.body.toString(),
-                downloadStatus = currentDownloadStatus
-            )
+        if (showReview == 10) {
+            inAppReviewManager.launchReviewFlow(activity = context.findActivity(), onReviewRequestSuccess = {
+            }, onReviewRequestFail = {
+                SHOW_REVIEW.updateInt(0)
+            })
         }
     }
 }
