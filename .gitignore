@@ -16,3 +16,5 @@
 .cxx
 local.properties
 /keystore.properties
+/.idea/gradle.xml
+/.idea/compiler.xml
