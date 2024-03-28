@@ -138,7 +138,6 @@ import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateInt
 import com.junkfood.seal.util.SHOW_REVIEW
-import com.junkfood.seal.util.SHOW_SPONSOR_MSG
 import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.isTikTokLink
 import com.junkfood.seal.util.isYouTubeLink
@@ -310,7 +309,10 @@ fun DownloadPage(
             })
     }
     LaunchedEffect(key1 = updateState) {
-        if (updateState.appUpdateResult !is AppUpdateResult.NotAvailable) {
+        if (updateState.appUpdateResult is AppUpdateResult.InProgress
+            || updateState.appUpdateResult is AppUpdateResult.Available
+            || updateState.appUpdateResult is AppUpdateResult.Downloaded
+        ) {
             showUpdateDialog = true
             delay(50)
             sheetState.show()

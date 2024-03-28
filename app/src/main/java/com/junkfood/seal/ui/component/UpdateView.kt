@@ -8,6 +8,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,17 +54,17 @@ fun HeaderUpdate(
     onDismissRequest: () -> Unit
 ) {
     val sheetContent: @Composable () -> Unit = {
-        Column {
-            AnimatedContent(
-                targetState = updateState.appUpdateResult,
-                label = "",
-                transitionSpec = {
-                    (materialSharedAxisYIn(initialOffsetX = { it / 4 })).togetherWith(
-                        fadeOut(tween(durationMillis = 80))
-                    )
-                }) { result ->
-                when (result) {
-                    is AppUpdateResult.Available -> {
+        AnimatedContent(
+            targetState = updateState.appUpdateResult,
+            label = "",
+            transitionSpec = {
+                (materialSharedAxisYIn(initialOffsetX = { it / 4 })).togetherWith(
+                    fadeOut(tween(durationMillis = 80))
+                )
+            }) { result ->
+            when (result) {
+                is AppUpdateResult.Available -> {
+                    Column {
                         Text(
                             text = stringResource(id = R.string.update_content),
                             modifier = Modifier
@@ -88,8 +89,10 @@ fun HeaderUpdate(
 
                         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
                     }
+                }
 
-                    is AppUpdateResult.InProgress -> {
+                is AppUpdateResult.InProgress -> {
+                    Column {
                         val updateProgress: Long =
                             if (result.installState.totalBytesToDownload() == 0L) {
                                 0L
@@ -127,7 +130,10 @@ fun HeaderUpdate(
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 
-                    is AppUpdateResult.Downloaded -> {
+                }
+
+                is AppUpdateResult.Downloaded -> {
+                    Column {
                         Spacer(modifier = Modifier.height(30.dp))
                         Text(
                             text = stringResource(id = R.string.update_done),
@@ -150,38 +156,41 @@ fun HeaderUpdate(
                             Text(stringResource(R.string.install_now))
                         }
                     }
+                }
 
-                    else -> {
-                        onDismissRequest.invoke()
-                    }
+                else -> {
+                    onDismissRequest.invoke()
                 }
             }
         }
-
     }
 
     if (showDialog) {
         SealModalBottomSheet(
             sheetState = sheetState,
-            horizontalPadding = PaddingValues(horizontal = 20.dp),
+            horizontalPadding = PaddingValues(horizontal = 10.dp),
             onDismissRequest = onDismissRequest,
             content = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Icon(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        imageVector = Icons.Outlined.Update,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = "Software update",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(vertical = 16.dp),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Update,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = "Software update",
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier
+                                .padding(16.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
                     sheetContent()
                 }
             })
