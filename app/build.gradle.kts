@@ -122,6 +122,7 @@ android {
         resValue("string", "APPLOVIN_SDK_KEY", "\"" + getLocalProperties()?.getProperty("keyApplovin")+ "\"")
         buildConfigField("String", "HOME_NATIVE", "\"" + getLocalProperties()?.getProperty("homeNative") + "\"")
         buildConfigField("String", "HOME_REWARDED", "\"" + getLocalProperties()?.getProperty("homeRewarded") + "\"")
+        buildConfigField("String", "DOWNLOAD_LIST", "\"" + getLocalProperties()?.getProperty("downloadList") + "\"")
         buildConfigField("String", "PREMIUM_MONTH", "\"" + getLocalProperties()?.getProperty("monthSub") + "\"")
     }
     val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)

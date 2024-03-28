@@ -39,6 +39,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -77,8 +78,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.App
+import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.R
 import com.junkfood.seal.database.backup.BackupUtil
 import com.junkfood.seal.database.backup.BackupUtil.BackupDestination.Clipboard
@@ -89,11 +92,13 @@ import com.junkfood.seal.database.objects.DownloadedVideoInfo
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.common.SVGImage
+import com.junkfood.seal.ui.component.AdType
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.CheckBoxItem
 import com.junkfood.seal.ui.component.ConfirmButton
 import com.junkfood.seal.ui.component.DismissButton
 import com.junkfood.seal.ui.component.LargeTopAppBar
+import com.junkfood.seal.ui.component.MaxTemplateNativeAdViewComposable
 import com.junkfood.seal.ui.component.MediaListItem
 import com.junkfood.seal.ui.component.SealDialog
 import com.junkfood.seal.ui.component.SealSearchBar
@@ -139,7 +144,8 @@ private const val TAG = "VideoListPage"
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun VideoListPage(
-    viewModel: VideoListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), onNavigateBack: () -> Unit
+    viewModel: VideoListViewModel = hiltViewModel()
+    , onNavigateBack: () -> Unit
 ) {
     val viewState by viewModel.stateFlow.collectAsStateWithLifecycle()
     val fullVideoList by viewModel.videoListFlow.collectAsStateWithLifecycle(emptyList())
@@ -165,7 +171,10 @@ fun VideoListPage(
     val fileSizeMap by viewModel.fileSizeMapFlow.collectAsStateWithLifecycle(initialValue = emptyMap())
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val hostState = remember { SnackbarHostState() }
-
+    val adsState by viewModel.adState
+    LaunchedEffect(key1 =  BuildConfig.DOWNLOAD_LIST) {
+        viewModel.loadAds(context, BuildConfig.DOWNLOAD_LIST)
+    }
 
     var currentVideoInfo by remember {
         mutableStateOf(DownloadedVideoInfo())
@@ -432,7 +441,7 @@ fun VideoListPage(
             SnackbarHost(hostState = hostState)
         }
     ) { innerPadding ->
-        if (fullVideoList.isEmpty())
+        if (fullVideoList.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -452,6 +461,7 @@ fun VideoListPage(
                     )
                 }
             }
+        }
 
         val cellCount = when (LocalWindowWidthState.current) {
             WindowWidthSizeClass.Expanded -> 2
@@ -484,6 +494,16 @@ fun VideoListPage(
                     }
                 }
 
+            }
+            item {
+                ElevatedCard(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .fillMaxWidth(),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState)
+                }
             }
             items(
                 items = videoList,
@@ -532,14 +552,6 @@ fun VideoListPage(
                     }
                 }
             }
-            /*for (info in videoList) {
-
-                item(
-                    key = info.id,
-                    contentType = { info.videoPath.contains(AUDIO_REGEX) }) {
-
-                }
-            }*/
 
         }
 

@@ -2,13 +2,18 @@ package com.junkfood.seal.ui.page.videolist
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.applovin.sdk.AppLovinSdk
 import com.junkfood.seal.R
+import com.junkfood.seal.SHOW_ADS
 import com.junkfood.seal.database.backup.BackupUtil
 import com.junkfood.seal.database.backup.BackupUtil.decodeToBackup
 import com.junkfood.seal.database.objects.DownloadedVideoInfo
+import com.junkfood.seal.ui.component.AdViewState
+import com.junkfood.seal.ui.component.MaxTemplateNativeAdViewComposableLoader
 import com.junkfood.seal.util.DatabaseUtil
 import com.junkfood.seal.util.FileUtil.getFileSize
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,12 +32,17 @@ import javax.inject.Inject
 private const val TAG = "VideoListViewModel"
 
 @HiltViewModel
-class VideoListViewModel @Inject constructor() : ViewModel() {
+class VideoListViewModel @Inject constructor(
+    private val appLovinSdk: AppLovinSdk
+) : ViewModel() {
 
     private val mutableStateFlow = MutableStateFlow(VideoListViewState())
     val stateFlow = mutableStateFlow.asStateFlow()
     private val viewState get() = stateFlow.value
-
+    private val nativeAdLoader: MaxTemplateNativeAdViewComposableLoader by lazy {
+        MaxTemplateNativeAdViewComposableLoader()
+    }
+    val adState: androidx.compose.runtime.State<AdViewState> get() = nativeAdLoader.nativeAdView
     private val _mediaInfoFlow = DatabaseUtil.getDownloadHistoryFlow()
 
     val videoListFlow: Flow<List<DownloadedVideoInfo>> =
@@ -149,6 +159,20 @@ class VideoListViewModel @Inject constructor() : ViewModel() {
                 )
             )
         }
+    }
+
+    fun loadAds(
+        context: Context,
+        adUnitIdentifier: String
+    ) {
+        // Initialize ad with ad loader.
+        if (SHOW_ADS) {
+            appLovinSdk.initializeSdk {
+                nativeAdLoader.loadAd(context, adUnitIdentifier)
+                Log.d("Applovin", "loadAds")
+            }
+        }
+
     }
 
     data class VideoListViewState(
