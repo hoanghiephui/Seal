@@ -41,7 +41,7 @@ object NotificationUtil {
     //    private var builder =
 //        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
     private val commandNotificationBuilder =
-        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_notify)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNotificationChannel() {
@@ -85,7 +85,7 @@ object NotificationUtil {
                 }
         }
 
-        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(title)
             .setProgress(PROGRESS_MAX, progress, progress <= 0)
             .setOngoing(true)
@@ -115,7 +115,7 @@ object NotificationUtil {
 
         val builder =
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_seal)
+                .setSmallIcon(R.drawable.ic_notify)
                 .setContentText(text)
                 .setOngoing(false)
                 .setAutoCancel(true)
@@ -132,7 +132,7 @@ object NotificationUtil {
 //        notificationManager.cancel(notificationId)
         val builder =
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_seal)
+                .setSmallIcon(R.drawable.ic_notify)
                 .setContentText(text)
                 .setProgress(0, 0, false)
                 .setAutoCancel(true)
@@ -145,7 +145,7 @@ object NotificationUtil {
 
     fun makeServiceNotification(intent: PendingIntent): Notification {
         serviceNotification = NotificationCompat.Builder(context, SERVICE_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_stat_seal)
+            .setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(context.getString(R.string.service_title))
             .setOngoing(true)
             .setContentIntent(intent)
@@ -184,7 +184,7 @@ object NotificationUtil {
             intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(title)
             .setContentText(error)
             .setOngoing(false)
@@ -220,7 +220,7 @@ object NotificationUtil {
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_notify)
             .setContentTitle("[${templateName}_${taskUrl}] " + context.getString(R.string.execute_command_notification))
             .setContentText(text)
             .setOngoing(true)

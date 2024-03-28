@@ -109,7 +109,7 @@ fun AsyncImageImpl(
     isPreview: Boolean = false
 ) {
     if (isPreview) Image(
-        painter = painterResource(R.drawable.sample),
+        painter = painterResource(R.drawable.ic_placeholder_default),
         contentDescription = contentDescription,
         modifier = modifier,
         alignment = alignment,

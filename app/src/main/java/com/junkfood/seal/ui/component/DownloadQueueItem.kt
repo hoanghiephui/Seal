@@ -79,7 +79,7 @@ fun PlaylistPreview() {
 fun PlaylistItem(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
-    imageModel: Any = R.drawable.sample,
+    imageModel: Any = R.drawable.ic_placeholder_default,
     title: String = "sample title ".repeat(5),
     author: String? = "author sample ".repeat(5),
     onClick: () -> Unit = {},

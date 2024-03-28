@@ -54,7 +54,7 @@ sealed class Version(
 
 val currentVersion: Version = Version.Beta(
     versionMajor = 1,
-    versionMinor = 12,
+    versionMinor = 19,
     versionPatch = 0,
     versionBuild = 2
 )
@@ -88,7 +88,7 @@ android {
         applicationId = "com.hubtik.video"
         minSdk = 21
         targetSdk = 34
-        versionCode = 16
+        versionCode = 19
 
         if (splitApks) {
             splits {

@@ -77,10 +77,10 @@ fun WelcomeDialog(onClick: () -> Unit) {
                     icon = Icons.Outlined.Subscriptions,
                     description = stringResource(R.string.download_history_desc)
                 )
-                IconDescription(
+                /*IconDescription(
                     icon = Icons.Outlined.Downloading,
                     description = stringResource(R.string.battery_settings_desc)
-                )
+                )*/
                 if ((showWelcomeDialog > 1))
                     CheckBoxItem(
                         text = stringResource(id = R.string.close_never_show_again),

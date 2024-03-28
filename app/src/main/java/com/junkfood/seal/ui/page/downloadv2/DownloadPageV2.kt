@@ -489,7 +489,7 @@ fun NextTask() {
         ) {
             Row {
                 Image(
-                    painter = painterResource(id = R.drawable.sample2),
+                    painter = painterResource(id = R.drawable.ic_placeholder_default),
                     contentDescription = null,
                     modifier = Modifier
                         .aspectRatio(16f / 9f)

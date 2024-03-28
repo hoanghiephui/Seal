@@ -106,7 +106,7 @@ fun AppearancePreferences(
     val image by remember {
         mutableIntStateOf(
             listOf(
-                R.drawable.sample, R.drawable.sample1, R.drawable.sample2, R.drawable.sample3
+                R.drawable.ic_placeholder_default, R.drawable.ic_placeholder_default, R.drawable.ic_placeholder_default, R.drawable.ic_placeholder_default
             ).random()
         )
     }
