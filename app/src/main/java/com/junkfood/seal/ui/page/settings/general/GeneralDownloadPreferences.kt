@@ -72,6 +72,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.junkfood.seal.App
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.booleanState
+import com.junkfood.seal.ui.common.intState
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.ConfirmButton
 import com.junkfood.seal.ui.component.DismissButton
@@ -96,6 +97,7 @@ import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.getString
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
+import com.junkfood.seal.util.PreferenceUtil.updateInt
 import com.junkfood.seal.util.SPONSORBLOCK
 import com.junkfood.seal.util.SUBTITLE
 import com.junkfood.seal.util.THUMBNAIL
@@ -103,8 +105,10 @@ import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.UpdateUtil
 import com.junkfood.seal.util.YT_DLP
 import com.junkfood.seal.util.YT_DLP_NIGHTLY
+import com.junkfood.seal.util.YT_DLP_STABLE
 import com.junkfood.seal.util.YT_DLP_UPDATE
 import com.junkfood.seal.util.permissionWriteStore
+import com.junkfood.seal.util.YT_DLP_UPDATE_CHANNEL
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -422,14 +426,14 @@ fun GeneralDownloadPreferences(
         }
     }
     if (showYtdlpDialog) {
-        var ytdlpNightly by YT_DLP_NIGHTLY.booleanState
+        var ytdlpUpdateChannel by YT_DLP_UPDATE_CHANNEL.intState
         var ytdlpAutoUpdate by YT_DLP_UPDATE.booleanState
         SealDialog(
             onDismissRequest = { showYtdlpDialog = false },
             confirmButton = {
                 ConfirmButton {
-                    YT_DLP_NIGHTLY.updateBoolean(ytdlpNightly)
                     YT_DLP_UPDATE.updateBoolean(ytdlpAutoUpdate)
+                    YT_DLP_UPDATE_CHANNEL.updateInt(ytdlpUpdateChannel)
                     showYtdlpDialog = false
                 }
             },
@@ -450,7 +454,7 @@ fun GeneralDownloadPreferences(
                                 .padding(horizontal = 24.dp)
                                 .padding(top = 16.dp, bottom = 8.dp),
                             color = MaterialTheme.colorScheme.run {
-                                if (ytdlpNightly) tertiary else primary
+                                if (ytdlpUpdateChannel == YT_DLP_NIGHTLY) tertiary else primary
                             },
                             style = MaterialTheme.typography.labelLarge
                         )
@@ -458,20 +462,20 @@ fun GeneralDownloadPreferences(
                     item {
                         DialogSingleChoiceItem(
                             text = "yt-dlp",
-                            selected = !ytdlpNightly,
+                            selected = ytdlpUpdateChannel == YT_DLP_STABLE,
                             label = "Stable"
                         ) {
-                            ytdlpNightly = false
+                            ytdlpUpdateChannel = YT_DLP_STABLE
                         }
                     }
                     item {
                         DialogSingleChoiceItem(
                             text = "yt-dlp-nightly-builds",
-                            selected = ytdlpNightly,
+                            selected = ytdlpUpdateChannel == YT_DLP_NIGHTLY,
                             label = "Nightly",
                             labelContainerColor = MaterialTheme.colorScheme.tertiary
                         ) {
-                            ytdlpNightly = true
+                            ytdlpUpdateChannel = YT_DLP_NIGHTLY
                         }
                     }
                     item {
