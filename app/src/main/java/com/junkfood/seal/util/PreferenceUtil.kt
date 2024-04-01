@@ -179,7 +179,6 @@ private val BooleanPreferenceDefaults = mapOf(
     YT_DLP_UPDATE to true,
     NOTIFICATION to true,
     EMBED_METADATA to true,
-    YT_DLP_NIGHTLY to true,
     DEBUG to BuildConfig.DEBUG
 )
 

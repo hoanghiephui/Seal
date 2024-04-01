@@ -13,7 +13,12 @@ androidxNavigation = "2.7.7"
 androidxFoundation = "1.6.0-beta03"
 androidxComposeMaterial3 = "1.2.0-beta01"
 androidxComposeAnimation = "1.5.0-beta01"
+billing = "6.2.0"
+billingKtx = "6.2.0"
+coreSplashscreen = "1.0.1"
 exoplayer = "2.19.1"
+lottie = "6.3.0"
+lottieCompose = "6.3.0"
 markdownviewAndroid = "2.0.0"
 playServicesAdsIdentifier = "18.0.1"
 protobufPlugin = "0.9.4"
@@ -50,6 +55,7 @@ android-material = { group = "com.google.android.material", name = "material", v
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 
@@ -74,7 +80,11 @@ androidx-compose-material = { group = "androidx.compose.material", name = "mater
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 
+billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billingKtx" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 markdown-android = { module = "com.github.mukeshsolanki:MarkdownView-Android", version.ref = "markdownviewAndroid" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 

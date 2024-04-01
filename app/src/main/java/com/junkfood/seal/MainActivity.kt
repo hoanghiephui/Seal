@@ -4,18 +4,26 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.applovin.mediation.ads.MaxRewardedAd
 import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.QuickDownloadActivity.Companion.KEY_MAKE
+import com.junkfood.seal.model.MainActivityUiState
 import com.junkfood.seal.ui.ads.AdMaxRewardedLoader
 import com.junkfood.seal.ui.ads.AdRewardedCallback
 import com.junkfood.seal.ui.common.LocalDarkTheme
@@ -31,16 +39,42 @@ import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.matchUrlFromSharedText
 import com.junkfood.seal.util.setLanguage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), AdRewardedCallback {
+class MainActivity : ComponentActivity(), AdRewardedCallback {
     private val downloadViewModel: DownloadViewModel by viewModels()
     private val billingViewModel by viewModels<BillingPlusViewModel>()
     private val adMaxRewardedLoader = AdMaxRewardedLoader(this)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        var uiState: MainActivityUiState by mutableStateOf(MainActivityUiState.Loading)
+
+        // Update the uiState
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                downloadViewModel.uiState
+                    .onEach {
+                        uiState = it
+                    }
+                    .collect()
+            }
+        }
+
+        // Keep the splash screen on-screen until the UI state is loaded. This condition is
+        // evaluated each time the app needs to be redrawn so it should be fast to avoid blocking
+        // the UI.
+        splashScreen.setKeepOnScreenCondition {
+            when (uiState) {
+                MainActivityUiState.Loading -> true
+                is MainActivityUiState.Success -> false
+            }
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, insets ->
             v.setPadding(0, 0, 0, 0)

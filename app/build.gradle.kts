@@ -15,50 +15,6 @@ plugins {
 }
 apply(plugin = "dagger.hilt.android.plugin")
 
-sealed class Version(
-    open val versionMajor: Int,
-    val versionMinor: Int,
-    val versionPatch: Int,
-    val versionBuild: Int = 0
-) {
-    abstract fun toVersionName(): String
-    class Alpha(versionMajor: Int, versionMinor: Int, versionPatch: Int, versionBuild: Int) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-alpha.$versionBuild"
-    }
-
-    class Beta(versionMajor: Int, versionMinor: Int, versionPatch: Int, versionBuild: Int) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-beta.$versionBuild"
-    }
-
-    class Stable(versionMajor: Int, versionMinor: Int, versionPatch: Int) :
-        Version(versionMajor, versionMinor, versionPatch) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}"
-    }
-
-    class ReleaseCandidate(
-        versionMajor: Int,
-        versionMinor: Int,
-        versionPatch: Int,
-        versionBuild: Int
-    ) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-rc.$versionBuild"
-    }
-}
-
-val currentVersion: Version = Version.ReleaseCandidate(
-    versionMajor = 1,
-    versionMinor = 19,
-    versionPatch = 0,
-    versionBuild = 1
-)
-
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 
 val splitApks = !project.hasProperty("noSplits")
@@ -101,10 +57,7 @@ android {
             }
         }
 
-        versionName = currentVersion.toVersionName().run {
-            if (!splitApks) "$this-(F-Droid)"
-            else this
-        }
+        versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -279,10 +232,11 @@ dependencies {
     implementation(libs.exoplayer)
     implementation(libs.play.services.ads.identifier)
     implementation(libs.applovin.sdk)
-    implementation("com.airbnb.android:lottie:6.3.0")
-    implementation("com.airbnb.android:lottie-compose:6.3.0")
-    implementation("com.android.billingclient:billing:6.2.0")
-    implementation("com.android.billingclient:billing-ktx:6.2.0")
+    implementation(libs.lottie)
+    implementation(libs.lottie.compose)
+    implementation(libs.billing)
+    implementation(libs.billing.ktx)
+    implementation(libs.androidx.core.splashscreen)
 }
 
 class RoomSchemaArgProvider(
