@@ -42,9 +42,9 @@ android {
 
     defaultConfig {
         applicationId = "com.hubtik.video"
-        minSdk = 21
+        minSdk = 27
         targetSdk = 34
-        versionCode = 19
+        versionCode = 22
 
         if (splitApks) {
             splits {
@@ -57,7 +57,7 @@ android {
             }
         }
 
-        versionName = "1.1"
+        versionName = "0.1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
