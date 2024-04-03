@@ -78,17 +78,18 @@ fun VideoCard(
             if (!type) {
                 Column {
                     Box(Modifier.fillMaxWidth()) {
-                        AsyncImageImpl(
+                        Crossfade(targetState = thumbnailUrl, label = "") {AsyncImageImpl(
                             modifier = Modifier
                                 .padding()
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f, matchHeightConstraintsFirst = true)
                                 .clip(MaterialTheme.shapes.small),
-                            model = thumbnailUrl,
+                            model = it,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            isPreview = isPreview
-                        )
+                            isPreview = isPreview)
+                }
+
                         Surface(
                             modifier = Modifier
                                 .padding(4.dp)
