@@ -634,10 +634,10 @@ fun OutputTemplateDialog(
                     }
                 }
 
-                LinkButton(
+                /*LinkButton(
                     link = ytdlpOutputTemplateReference,
                     modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                )*/
             }
         })
 
