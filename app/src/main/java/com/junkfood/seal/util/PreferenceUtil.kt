@@ -34,8 +34,8 @@ const val CUSTOM_COMMAND = "custom_command"
 const val CONCURRENT = "concurrent_fragments"
 const val EXTRACT_AUDIO = "extract_audio"
 const val THUMBNAIL = "create_thumbnail"
-const val YT_DLP = "yt-dlp_init"
-const val YT_DLP_UPDATE = "yt-dlp_auto_update"
+const val YT_DLP_VERSION = "yt-dlp_init"
+const val YT_DLP_AUTO_UPDATE = "yt-dlp_update"
 const val DEBUG = "debug"
 const val CONFIGURE = "configure"
 const val DARK_THEME_VALUE = "dark_theme_value"
@@ -103,6 +103,7 @@ const val EMBED_METADATA = "embed_metadata"
 const val RESTRICT_FILENAMES = "restrict_filenames"
 const val AV1_HARDWARE_ACCELERATED = "av1_hardware_accelerated"
 const val FORCE_IPV4 = "force_ipv4"
+const val MERGE_OUTPUT_MKV = "merge_to_mkv"
 const val SHOW_REVIEW = "show_review"
 
 const val MERGE_MULTI_AUDIO_STREAM = "multi_audio_stream"
@@ -110,6 +111,8 @@ const val MERGE_MULTI_AUDIO_STREAM = "multi_audio_stream"
 const val DOWNLOAD_TYPE_INITIALIZATION = "download_type_init"
 
 const val YT_DLP_UPDATE_CHANNEL = "yt-dlp_update_channel"
+const val YT_DLP_UPDATE_TIME = "yt-dlp_last_update"
+const val YT_DLP_UPDATE_INTERVAL = 86_400_000L // 24 hours
 
 const val NOT_SPECIFIED = 0
 const val DEFAULT = NOT_SPECIFIED
@@ -176,7 +179,7 @@ private val BooleanPreferenceDefaults = mapOf(
     FORMAT_SELECTION to false,
     CONFIGURE to true,
     CELLULAR_DOWNLOAD to false,
-    YT_DLP_UPDATE to true,
+    YT_DLP_AUTO_UPDATE to true,
     NOTIFICATION to true,
     EMBED_METADATA to true,
     DEBUG to BuildConfig.DEBUG
@@ -213,9 +216,13 @@ object PreferenceUtil {
     fun String.getBoolean(default: Boolean = BooleanPreferenceDefaults.getOrElse(this) { false }): Boolean =
         kv.decodeBool(this, default)
 
+    fun String.getLong(default: Long = 0L) = kv.decodeLong(this, default)
+
     fun String.updateString(newString: String) = kv.encode(this, newString)
 
     fun String.updateInt(newInt: Int) = kv.encode(this, newInt)
+
+    fun String.updateLong(newLong: Long) = kv.encode(this, newLong)
 
     fun String.updateBoolean(newValue: Boolean) = kv.encode(this, newValue)
     fun updateValue(key: String, b: Boolean) = key.updateBoolean(b)

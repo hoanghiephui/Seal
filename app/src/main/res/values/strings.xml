@@ -36,7 +36,7 @@
     <string name="link_copied">Link copied to clipboard</string>
     <string name="open_url">Open link</string>
     <string name="remove">Remove</string>
-    <string name="delete_file">Delete</string>
+    <string name="delete_file">Delete file</string>
     <string name="about">About</string>
     <string name="about_page">Version, feedback, auto update</string>
     <string name="back">Back</string>
@@ -445,6 +445,9 @@
     <string name="download_history_imported">Imported %1$s to download history</string>
     <string name="redownload">Redownload</string>
     <string name="download_archive_error">The video has been downloaded. If this is not the expected behavior, please check your download archive.</string>
+    <string name="remux_container_mkv">Remux video container</string>
+    <string name="remux_container_mkv_desc">Remux videos into MKV container for better compatibility</string>
+    <string name="cookies_in_database">%1$d cookies from %2$d websites in total</string>
     <plurals name="item_count">
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>

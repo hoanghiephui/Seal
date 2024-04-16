@@ -54,6 +54,7 @@ object Downloader {
         data object DownloadingVideo : State()
         data object FetchingInfo : State()
         data object Idle : State()
+        data object Updating : State()
         data object Downloaded : State()
     }
 
@@ -579,7 +580,7 @@ object Downloader {
                     else return@launch
                 }
 
-                NotificationUtil.updateServiceNotification(
+                NotificationUtil.updateServiceNotificationForPlaylist(
                     index = i + 1, itemCount = itemCount
                 )
 

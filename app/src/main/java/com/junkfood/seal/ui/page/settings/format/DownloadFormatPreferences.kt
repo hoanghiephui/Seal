@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.AudioFile
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Crop
 import androidx.compose.material.icons.outlined.HighQuality
+import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.SpatialAudioOff
@@ -50,10 +51,12 @@ import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DownloadUtil
 import com.junkfood.seal.util.DownloadUtil.toFormatSorter
 import com.junkfood.seal.util.EMBED_METADATA
+import com.junkfood.seal.util.EMBED_SUBTITLE
 import com.junkfood.seal.util.EXTRACT_AUDIO
 import com.junkfood.seal.util.FORMAT_SELECTION
 import com.junkfood.seal.util.FORMAT_SORTING
 import com.junkfood.seal.util.MERGE_MULTI_AUDIO_STREAM
+import com.junkfood.seal.util.MERGE_OUTPUT_MKV
 import com.junkfood.seal.util.PreferenceStrings
 import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getString
@@ -79,11 +82,9 @@ fun DownloadFormatPreferences(onNavigateBack: () -> Unit, navigateToSubtitlePage
     var isArtworkCroppingEnabled by remember {
         mutableStateOf(PreferenceUtil.getValue(CROP_ARTWORK))
     }
-    var embedSubtitle by remember {
-        mutableStateOf(
-            PreferenceUtil.getValue(SUBTITLE)
-        )
-    }
+    val downloadSubtitle by SUBTITLE.booleanState
+    val embedSubtitle by EMBED_SUBTITLE.booleanState
+    var remuxToMkv by MERGE_OUTPUT_MKV.booleanState
     var embedMetadata by EMBED_METADATA.booleanState
 
     var showAudioFormatDialog by remember { mutableStateOf(false) }
@@ -234,6 +235,27 @@ fun DownloadFormatPreferences(onNavigateBack: () -> Unit, navigateToSubtitlePage
                                         EMBED_THUMBNAIL.updateBoolean(embedThumbnail)
                                     }
                                 }*/
+
+                item {
+                    PreferenceSwitch(
+                        title = stringResource(id = R.string.remux_container_mkv),
+                        description = stringResource(
+                            id = R.string.remux_container_mkv_desc
+                        ),
+                        isChecked = (downloadSubtitle && embedSubtitle) || remuxToMkv,
+                        icon = Icons.Outlined.Movie,
+                        enabled = !(downloadSubtitle && embedSubtitle) && !isCustomCommandEnabled && !audioSwitch,
+                        onClick = {
+                            remuxToMkv = !remuxToMkv
+                            MERGE_OUTPUT_MKV.updateBoolean(remuxToMkv)
+                        },
+                    )
+                }
+                if (downloadSubtitle && embedSubtitle) {
+                    item {
+                        PreferenceInfo(text = stringResource(id = R.string.embed_subtitles_mkv_msg))
+                    }
+                }
 
                 item {
                     PreferenceSubtitle(text = stringResource(id = R.string.advanced_settings))

@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.R
 import com.junkfood.seal.database.objects.DownloadedVideoInfo
+import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.component.FilledTonalButtonWithIcon
 import com.junkfood.seal.ui.component.LongTapTextButton
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
@@ -60,6 +62,7 @@ fun VideoDetailDrawer(
     onDelete: () -> Unit = {},
 ) {
     val uriHandler = LocalUriHandler.current
+    val view = LocalView.current
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
     BackHandler(sheetState.targetValue == ModalBottomSheetValue.Expanded) {
@@ -90,6 +93,7 @@ fun VideoDetailDrawer(
             onReDownload = onReDownload,
             onDismissRequest = onDismissRequest,
             onDelete = {
+                view.slightHapticFeedback()
                 onDismissRequest()
                 onDelete()
             }, onOpenLink = {
@@ -97,6 +101,7 @@ fun VideoDetailDrawer(
                 onDismissRequest()
                 uriHandler.openUri(videoUrl)
             }, onShareFile = {
+                view.slightHapticFeedback()
                 FileUtil.createIntentForSharingFile(videoPath)?.runCatching {
                     context.startActivity(
                         Intent.createChooser(this, shareTitle)
@@ -135,7 +140,7 @@ fun VideoDetailDrawerImpl(
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    SealModalBottomSheetM2(drawerState = sheetState,
+    SealModalBottomSheetM2(sheetState = sheetState,
         horizontalPadding = PaddingValues(horizontal = 20.dp),
         sheetContent = {
             Column(

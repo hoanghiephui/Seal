@@ -103,10 +103,10 @@ import com.junkfood.seal.util.SUBTITLE
 import com.junkfood.seal.util.THUMBNAIL
 import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.UpdateUtil
-import com.junkfood.seal.util.YT_DLP
+import com.junkfood.seal.util.YT_DLP_VERSION
 import com.junkfood.seal.util.YT_DLP_NIGHTLY
 import com.junkfood.seal.util.YT_DLP_STABLE
-import com.junkfood.seal.util.YT_DLP_UPDATE
+import com.junkfood.seal.util.YT_DLP_AUTO_UPDATE
 import com.junkfood.seal.util.permissionWriteStore
 import com.junkfood.seal.util.YT_DLP_UPDATE_CHANNEL
 import com.yausername.youtubedl_android.YoutubeDL
@@ -225,12 +225,12 @@ fun GeneralDownloadPreferences(
                                     runCatching {
                                         isUpdating = true
                                         UpdateUtil.updateYtDlp()
-                                        ytdlpVersion = YT_DLP.getString()
+                                        ytdlpVersion = YT_DLP_VERSION.getString()
                                     }.onFailure { th ->
                                         th.printStackTrace()
                                         ToastUtil.makeToastSuspend(App.context.getString(R.string.yt_dlp_update_fail))
                                     }.onSuccess {
-                                        ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date))
+                                        ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP_VERSION.getString()})")
                                     }
                                     isUpdating = false
                                 }
@@ -247,7 +247,6 @@ fun GeneralDownloadPreferences(
                             }
                         )
                     }
-
                 }
                 item {
                     PreferenceSwitch(title = stringResource(id = R.string.download_notification),
@@ -427,12 +426,12 @@ fun GeneralDownloadPreferences(
     }
     if (showYtdlpDialog) {
         var ytdlpUpdateChannel by YT_DLP_UPDATE_CHANNEL.intState
-        var ytdlpAutoUpdate by YT_DLP_UPDATE.booleanState
+        var ytdlpAutoUpdate by YT_DLP_AUTO_UPDATE.booleanState
         SealDialog(
             onDismissRequest = { showYtdlpDialog = false },
             confirmButton = {
                 ConfirmButton {
-                    YT_DLP_UPDATE.updateBoolean(ytdlpAutoUpdate)
+                    YT_DLP_AUTO_UPDATE.updateBoolean(ytdlpAutoUpdate)
                     YT_DLP_UPDATE_CHANNEL.updateInt(ytdlpUpdateChannel)
                     showYtdlpDialog = false
                 }

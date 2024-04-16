@@ -204,6 +204,7 @@ fun DownloadPage(
     val clipboardManager = LocalClipboardManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val useDialog = LocalWindowWidthState.current != WindowWidthSizeClass.Compact
+    val view = LocalView.current
     var showDownloadDialog by rememberSaveable { mutableStateOf(false) }
     var showMeteredNetworkDialog by remember { mutableStateOf(false) }
     var showAds by remember { mutableStateOf(true) }
@@ -267,6 +268,7 @@ fun DownloadPage(
     }
 
     val downloadCallback: () -> Unit = {
+        view.slightHapticFeedback()
         keyboardController?.hide()
         if (viewState.url.isYouTubeLink()) {
             downloadViewModel.onNotSupportError(viewState.url)
@@ -276,10 +278,7 @@ fun DownloadPage(
             }
             if (CONFIGURE.getBoolean()) {
                 showDownloadDialog = true
-                if (!useDialog) scope.launch {
-                    delay(50)
-                    sheetState.show()
-                }
+
             } else {
                 checkPermissionOrDownload()
             }

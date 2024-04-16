@@ -66,6 +66,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.R
+import com.junkfood.seal.database.backup.BackupUtil
 import com.junkfood.seal.database.objects.CommandTemplate
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
 import com.junkfood.seal.ui.common.intState
@@ -78,7 +79,6 @@ import com.junkfood.seal.ui.component.PreferenceItemVariant
 import com.junkfood.seal.ui.component.PreferenceSwitchWithContainer
 import com.junkfood.seal.ui.component.TemplateItem
 import com.junkfood.seal.ui.page.settings.about.ytdlpUrl
-import com.junkfood.seal.database.backup.BackupUtil
 import com.junkfood.seal.util.CUSTOM_COMMAND
 import com.junkfood.seal.util.DatabaseUtil
 import com.junkfood.seal.util.PreferenceUtil
@@ -245,6 +245,7 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         TriStateCheckbox(state = checkBoxState, onClick = {
+                            view.slightHapticFeedback()
                             when (checkBoxState) {
                                 ToggleableState.On -> selectedTemplates.clear()
                                 else -> selectedTemplates.run {
@@ -264,6 +265,7 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
 
                         IconButton(
                             onClick = {
+                                view.slightHapticFeedback()
                                 scope.launch {
                                     snackbarHostState.showSnackbar(
                                         context.getString(R.string.template_exported)
@@ -290,7 +292,10 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                             )
                         }
                         IconButton(
-                            onClick = { showDeleteDialog = true },
+                            onClick = {
+                                view.slightHapticFeedback()
+                                showDeleteDialog = true
+                            },
                             enabled = selectedTemplates.isNotEmpty()
                         ) {
                             Icon(
