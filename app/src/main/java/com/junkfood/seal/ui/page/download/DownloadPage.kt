@@ -400,7 +400,7 @@ fun DownloadPage(
         DownloadSettingDialog(
             useDialog = useDialog,
             showDialog = showDownloadDialog,
-            sheetState = sheetState,
+            //sheetState = sheetState,
             onNavigateToCookieGeneratorPage = onNavigateToCookieGeneratorPage,
             onDownloadConfirm = { checkPermissionOrDownload() },
             onDismissRequest = {
@@ -710,7 +710,6 @@ fun InputUrl(
     onCancel: () -> Unit,
     onValueChange: (String) -> Unit
 ) {
-    val softwareKeyboardController = LocalSoftwareKeyboardController.current
     Box(contentAlignment = Alignment.Center) {
         OutlinedTextField(
             enabled = !showProgressIndicator,
@@ -726,7 +725,6 @@ fun InputUrl(
             maxLines = 3,
             trailingIcon = {
                 if (url.isNotEmpty()) ClearButton { onValueChange("") }
-//            else PasteUrlButton { onPaste() }
             }, keyboardActions = KeyboardActions(onDone = {
 
                 onDone()

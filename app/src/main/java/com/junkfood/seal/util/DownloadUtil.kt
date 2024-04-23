@@ -232,7 +232,7 @@ object DownloadUtil {
         val supportAv1HardwareDecoding: Boolean = checkIfAv1HardwareAccelerated(),
         val forceIpv4: Boolean = FORCE_IPV4.getBoolean(),
         val mergeAudioStream: Boolean = false,
-        val mergeToMkv: Boolean = (downloadSubtitle && embedSubtitle) || MERGE_OUTPUT_MKV.getBoolean()
+        val mergeToMkv: Boolean = (downloadSubtitle && embedSubtitle) || MERGE_OUTPUT_MKV.getBoolean(),
         val withoutWatermark: Boolean = WITHOUT_WATERMARK.getBoolean()
     )
 
