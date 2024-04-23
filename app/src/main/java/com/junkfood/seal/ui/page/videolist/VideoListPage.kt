@@ -20,11 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -54,7 +50,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,6 +74,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.junkfood.seal.App
 import com.junkfood.seal.BuildConfig
@@ -90,7 +86,6 @@ import com.junkfood.seal.database.backup.BackupUtil.toJsonString
 import com.junkfood.seal.database.backup.BackupUtil.toURLListString
 import com.junkfood.seal.database.objects.DownloadedVideoInfo
 import com.junkfood.seal.ui.common.HapticFeedback.slightHapticFeedback
-import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.common.SVGImage
 import com.junkfood.seal.ui.component.AdType
 import com.junkfood.seal.ui.component.BackButton
@@ -463,11 +458,6 @@ fun VideoListPage(
             }
         }
 
-        val cellCount = when (LocalWindowWidthState.current) {
-            WindowWidthSizeClass.Expanded -> 2
-            else -> 1
-        }
-        val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(cellCount) }
         LazyColumn(
             modifier = Modifier.padding(innerPadding),
             state = lazyListState
