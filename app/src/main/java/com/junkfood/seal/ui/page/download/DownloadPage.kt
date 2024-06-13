@@ -187,7 +187,7 @@ fun DownloadPage(
             isPlusMode = (userState as MainActivityUiState.Success).userData.makePro
         }
     }
-    val nativeAd by downloadViewModel.adState
+    val nativeAd by downloadViewModel.adState.collectAsStateWithLifecycle()
     var showNotificationDialog by remember { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS) { isGranted: Boolean ->

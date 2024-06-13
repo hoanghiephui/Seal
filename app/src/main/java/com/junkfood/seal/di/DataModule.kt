@@ -1,7 +1,10 @@
 package com.junkfood.seal.di
 
 import android.content.Context
+import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
+import com.junkfood.seal.R
 import com.junkfood.seal.repository.OfflineFirstRepository
 import com.junkfood.seal.repository.OfflineFirstRepositoryImpl
 import dagger.Binds
@@ -31,4 +34,17 @@ object AppModule {
         context: Context
     ): AppLovinSdk =
         AppLovinSdk.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideSdkInitialization(
+        @ApplicationContext
+        context: Context
+    ): AppLovinSdkInitializationConfiguration =
+        AppLovinSdkInitializationConfiguration.builder(
+            context.getString(R.string.APPLOVIN_SDK_KEY),
+            context
+        )
+            .setMediationProvider(AppLovinMediationProvider.MAX)
+            .build()
 }

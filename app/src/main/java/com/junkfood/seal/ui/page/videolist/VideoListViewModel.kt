@@ -20,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
@@ -42,7 +43,7 @@ class VideoListViewModel @Inject constructor(
     private val nativeAdLoader: MaxTemplateNativeAdViewComposableLoader by lazy {
         MaxTemplateNativeAdViewComposableLoader()
     }
-    val adState: androidx.compose.runtime.State<AdViewState> get() = nativeAdLoader.nativeAdView
+    val adState: StateFlow<AdViewState> get() = nativeAdLoader.nativeAdView
     private val _mediaInfoFlow = DatabaseUtil.getDownloadHistoryFlow()
 
     val videoListFlow: Flow<List<DownloadedVideoInfo>> =

@@ -244,6 +244,7 @@ dependencies {
     implementation(libs.billing)
     implementation(libs.billing.ktx)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.foundation)
 }
 
 class RoomSchemaArgProvider(

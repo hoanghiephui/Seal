@@ -130,9 +130,7 @@
         </provider>
 
         <receiver android:name=".NotificationActionReceiver" />
-        <meta-data
-            android:name="applovin.sdk.key"
-            android:value="@string/APPLOVIN_SDK_KEY" />
+
     </application>
 
 </manifest>

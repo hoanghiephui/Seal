@@ -83,8 +83,7 @@ class QuickDownloadActivity : ComponentActivity() {
     }
 
     @OptIn(
-        ExperimentalMaterial3WindowSizeClassApi::class,
-        ExperimentalMaterial3Api::class
+        ExperimentalMaterial3WindowSizeClassApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,11 +99,7 @@ class QuickDownloadActivity : ComponentActivity() {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT
             )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-            } else {
-                setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
-            }
+            setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
         }
         handleShareIntent(intent)
         runBlocking {
@@ -171,8 +166,8 @@ class QuickDownloadActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        intent?.let { handleShareIntent(it) }
+    override fun onNewIntent(intent: Intent) {
+        handleShareIntent(intent)
         super.onNewIntent(intent)
     }
 

@@ -166,7 +166,7 @@ fun VideoListPage(
     val fileSizeMap by viewModel.fileSizeMapFlow.collectAsStateWithLifecycle(initialValue = emptyMap())
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val hostState = remember { SnackbarHostState() }
-    val adsState by viewModel.adState
+    val adsState by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 =  BuildConfig.DOWNLOAD_LIST) {
         viewModel.loadAds(context, BuildConfig.DOWNLOAD_LIST)
     }

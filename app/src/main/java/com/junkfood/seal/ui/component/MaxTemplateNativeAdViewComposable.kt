@@ -10,7 +10,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,15 +19,18 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
-import com.junkfood.seal.R
 import com.junkfood.seal.SHOW_ADS
 import com.junkfood.seal.ui.common.motion.materialSharedAxisYIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * Ad loader to load Max Native ads with Templates API using Jetpack Compose.
  */
 class MaxTemplateNativeAdViewComposableLoader {
-    var nativeAdView = mutableStateOf<AdViewState>(AdViewState.Default)
+    private var _nativeAdView = MutableStateFlow<AdViewState>(AdViewState.Default)
+    val nativeAdView = _nativeAdView.asStateFlow()
     private var nativeAd: MaxAd? = null
     private var nativeAdLoader: MaxNativeAdLoader? = null
     fun destroy() {
@@ -53,7 +55,7 @@ class MaxTemplateNativeAdViewComposableLoader {
                 // Cleanup any pre-existing native ad to prevent memory leaks.
                 if (nativeAd != null) {
                     nativeAdLoader?.destroy(nativeAd)
-                    nativeAdView.value.let {
+                    _nativeAdView.value.let {
                         if (it is AdViewState.LoadAd) {
                             it.adView.removeAllViews()
                             it.adView.addView(loadedNativeAdView)
@@ -63,12 +65,16 @@ class MaxTemplateNativeAdViewComposableLoader {
 
                 nativeAd = ad // Save ad for cleanup.
                 loadedNativeAdView?.let {
-                    nativeAdView.value = AdViewState.LoadAd(loadedNativeAdView)
+                    _nativeAdView.update {
+                        AdViewState.LoadAd(loadedNativeAdView)
+                    }
                 }
             }
 
             override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
-                nativeAdView.value = AdViewState.LoadFail
+                _nativeAdView.update {
+                    AdViewState.LoadFail
+                }
                 Log.e("Applovin", error.message)
             }
 

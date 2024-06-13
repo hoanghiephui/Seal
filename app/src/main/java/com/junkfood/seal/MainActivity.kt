@@ -158,7 +158,7 @@ class MainActivity : ComponentActivity(), AdRewardedCallback {
 
     override fun onLoaded(rewardedAd: MaxRewardedAd) {
         if (rewardedAd.isReady) {
-            rewardedAd.showAd()
+            rewardedAd.showAd(this)
         }
     }
 
