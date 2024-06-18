@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -34,7 +35,6 @@ android {
         jvmTarget = "17"
     }
     buildFeatures.compose = true
-    composeOptions.kotlinCompilerExtensionVersion = "1.5.14"
 }
 
 dependencies {

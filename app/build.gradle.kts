@@ -12,6 +12,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization")
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.compose.compiler)
 }
 apply(plugin = "dagger.hilt.android.plugin")
 
@@ -139,9 +140,7 @@ android {
     kotlinOptions {
         freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

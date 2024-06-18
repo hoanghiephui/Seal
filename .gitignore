@@ -22,3 +22,4 @@ local.properties
 /.idea/vcs.xml
 /.idea/other.xml
 /.idea/kotlinc.xml
+.kotlin

@@ -1,6 +1,5 @@
 package com.junkfood.seal.ui.page
 
-import android.util.Log
 import android.webkit.CookieManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,8 +24,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.junkfood.seal.Downloader
 import com.android.billing.findActivity
+import com.junkfood.seal.Downloader
 import com.junkfood.seal.ui.common.LocalWindowWidthState
 import com.junkfood.seal.ui.common.Route
 import com.junkfood.seal.ui.common.animatedComposable

@@ -969,7 +969,7 @@ private fun SubtitleSelectionDialog(
                         for ((code, formats) in autoCaptionsFiltered) {
                             item(key = code) {
                                 DialogCheckBoxItem(
-                                    modifier = Modifier.animateItemPlacement(),
+                                    modifier = Modifier.animateItem(),
                                     checked = selectedSubtitles.contains(code),
                                     onClick = {
                                         if (selectedSubtitles.contains(code)) {

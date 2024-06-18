@@ -322,7 +322,7 @@ fun InputUrl(
                     .clip(MaterialTheme.shapes.large),
             )
             else LinearProgressIndicator(
-                progress = progressAnimationValue,
+                progress = { progressAnimationValue },
                 modifier = Modifier
                     .weight(0.75f)
                     .clip(MaterialTheme.shapes.large),
@@ -593,14 +593,14 @@ fun VideoCardV2(
             }
             val progressAnimationValue by animateFloatAsState(
                 targetValue = progress,
-                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec, label = ""
             )
             if (progress < 0f) LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
             )
             else LinearProgressIndicator(
+                progress = { progressAnimationValue / 100f },
                 modifier = Modifier.fillMaxWidth(),
-                progress = progressAnimationValue / 100f,
             )
         }
     }

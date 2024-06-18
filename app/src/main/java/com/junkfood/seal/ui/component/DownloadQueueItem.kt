@@ -171,7 +171,6 @@ enum class TaskStatus {
 
 val greenTonalPalettes = Color.Green.toTonalPalettes()
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomCommandTaskItem(
     modifier: Modifier = Modifier,
@@ -273,12 +272,12 @@ fun CustomCommandTaskItem(
                                 )
                             else
                                 CircularProgressIndicator(
+                                    progress = { animatedProgress },
                                     modifier = Modifier
                                         .padding(8.dp)
                                         .size(24.dp),
+                                    color = accentColor,
                                     strokeWidth = 5.dp,
-                                    progress = animatedProgress,
-                                    color = accentColor
                                 )
                         }
 

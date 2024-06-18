@@ -7,6 +7,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.junkfood.seal.R
 import com.junkfood.seal.SHOW_ADS
 import com.junkfood.seal.database.backup.BackupUtil
@@ -34,7 +35,8 @@ private const val TAG = "VideoListViewModel"
 
 @HiltViewModel
 class VideoListViewModel @Inject constructor(
-    private val appLovinSdk: AppLovinSdk
+    private val appLovinSdk: AppLovinSdk,
+    private val appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
 ) : ViewModel() {
 
     private val mutableStateFlow = MutableStateFlow(VideoListViewState())
@@ -168,7 +170,7 @@ class VideoListViewModel @Inject constructor(
     ) {
         // Initialize ad with ad loader.
         if (SHOW_ADS) {
-            appLovinSdk.initializeSdk {
+            appLovinSdk.initialize(appLovinSdkInitialization) {
                 nativeAdLoader.loadAd(context, adUnitIdentifier)
                 Log.d("Applovin", "loadAds")
             }

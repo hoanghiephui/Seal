@@ -37,8 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -208,10 +208,9 @@ fun AutoUpdateUnavailableDialog(onDismissRequest: () -> Unit = {}) {
         append(text)
         val startIndex = text.indexOf(hyperLinkText)
         val endIndex = startIndex + hyperLinkText.length
-        addUrlAnnotation(
-            UrlAnnotation("https://github.com/JunkFood02/Seal/releases/latest"),
-            start = startIndex,
-            end = endIndex
+        addLink(
+            LinkAnnotation.Url("https://github.com/JunkFood02/Seal/releases/latest"), startIndex,
+            endIndex
         )
         addStyle(
             SpanStyle(
