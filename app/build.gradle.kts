@@ -153,6 +153,11 @@ android {
     }
 
     namespace = "com.junkfood.seal"
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 kotlin {
