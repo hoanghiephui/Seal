@@ -298,6 +298,9 @@ fun FormatPageImpl(
         videoInfo.formats.filter { it.acodec != "none" && it.vcodec == "none" }.reversed()
     val videoAudioFormats =
         videoInfo.formats.filter { it.acodec != "none" && it.vcodec != "none" }.reversed()
+    val watermarked by remember {
+        mutableStateOf(videoInfo.formats.first { "watermarked" == it.formatNote })
+    }
 
     val duration = videoInfo.duration ?: 0.0
 
@@ -309,7 +312,10 @@ fun FormatPageImpl(
         !videoInfo.requestedFormats.isNullOrEmpty() || !videoInfo.requestedDownloads.isNullOrEmpty()
 
     var isSuggestedFormatSelected by remember { mutableStateOf(isSuggestedFormatAvailable) }
-
+    val isWatermarkedAvailable = videoInfo.formats.find { "watermarked" == it.formatNote } != null && !audioOnly
+    var isWatermarkedSelected by remember {
+        mutableStateOf(isWatermarkedAvailable && !isSuggestedFormatSelected)
+    }
 
     var selectedVideoAudioFormat by remember { mutableIntStateOf(NOT_SELECTED) }
     var selectedVideoOnlyFormat by remember { mutableIntStateOf(NOT_SELECTED) }
@@ -360,6 +366,9 @@ fun FormatPageImpl(
                 }
                 videoAudioFormats.getOrNull(selectedVideoAudioFormat)?.let { add(it) }
                 videoOnlyFormats.getOrNull(selectedVideoOnlyFormat)?.let { add(it) }
+                if (isWatermarkedSelected) {
+                    add(watermarked)
+                }
             }
         }
 
@@ -391,7 +400,7 @@ fun FormatPageImpl(
                         videoTitle,
                         selectedLanguageList
                     )
-                }, enabled = isSuggestedFormatSelected || formatList.isNotEmpty()) {
+                }, enabled = isSuggestedFormatSelected || formatList.isNotEmpty() || isWatermarkedSelected) {
                     Text(text = stringResource(R.string.download))
                 }
             })
@@ -553,6 +562,7 @@ fun FormatPageImpl(
                         selectedAudioOnlyFormats.clear()
                         selectedVideoAudioFormat = NOT_SELECTED
                         selectedVideoOnlyFormat = NOT_SELECTED
+                        isWatermarkedSelected = false
                     }
 
                     Row(
@@ -563,6 +573,40 @@ fun FormatPageImpl(
                             modifier = Modifier.weight(1f),
                             videoInfo = videoInfo,
                             selected = isSuggestedFormatSelected,
+                            onClick = onClick
+                        )
+                    }
+                }
+            }
+
+            if (isWatermarkedAvailable) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                            .padding(top = 12.dp, bottom = 4.dp)
+                            .padding(horizontal = 12.dp)
+                    ) {
+                        FormatSubtitle(text = stringResource(R.string.video_with_watermark))
+                    }
+                }
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    val onClick = {
+                        isWatermarkedSelected = true
+                        selectedAudioOnlyFormats.clear()
+                        selectedVideoAudioFormat = NOT_SELECTED
+                        selectedVideoOnlyFormat = NOT_SELECTED
+                        isSuggestedFormatSelected = false
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FormatItem(
+                            modifier = Modifier.weight(1f),
+                            formatInfo = watermarked,
+                            duration = duration,
+                            selected = isWatermarkedSelected,
                             onClick = onClick
                         )
                     }
@@ -617,6 +661,7 @@ fun FormatPageImpl(
                             selectedAudioOnlyFormats.clear()
                         }
                         isSuggestedFormatSelected = false
+                        isWatermarkedSelected = false
                         selectedAudioOnlyFormats.add(index)
                     }
                 }
@@ -669,6 +714,7 @@ fun FormatPageImpl(
                             if (selectedVideoOnlyFormat == index) NOT_SELECTED else {
                                 selectedVideoAudioFormat = NOT_SELECTED
                                 isSuggestedFormatSelected = false
+                                isWatermarkedSelected = false
                                 index
                             }
                     }
@@ -716,6 +762,7 @@ fun FormatPageImpl(
                                 selectedAudioOnlyFormats.clear()
                                 selectedVideoOnlyFormat = NOT_SELECTED
                                 isSuggestedFormatSelected = false
+                                isWatermarkedSelected = false
                                 index
                             }
                     }
@@ -894,7 +941,7 @@ private fun SubtitleSelectionDialog(
                     for ((code, formats) in suggestedSubtitlesFiltered) {
                         item(key = code) {
                             DialogCheckBoxItem(
-                                modifier = Modifier.animateItemPlacement(),
+                                modifier = Modifier.animateItem(),
                                 checked = selectedSubtitles.contains(code),
                                 onClick = {
                                     if (selectedSubtitles.contains(code)) {

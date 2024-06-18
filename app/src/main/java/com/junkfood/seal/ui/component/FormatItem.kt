@@ -43,6 +43,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -333,10 +334,9 @@ fun FormatItem(
         val secondLineText =
             connectWithDelimiter(ext, codec, delimiter = " ").uppercase()
 
-
         FormatItem(
             modifier = modifier,
-            title = format.toString(),
+            title = "$format",
             containsAudio = acodecText.isNotEmpty(),
             containsVideo = vcodecText.isNotEmpty(),
             firstLineText = firstLineText,
@@ -457,9 +457,9 @@ fun FormatItem(
 @Preview(name = "Light")
 fun PreviewFormat() {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
-        var selected by remember { mutableStateOf(-1) }
+        var selected by remember { mutableIntStateOf(-1) }
         Surface {
-            Column() {
+            Column {
 //                FormatSubtitle(text = stringResource(R.string.video_only))
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(150.dp),

@@ -632,7 +632,7 @@ object DownloadUtil {
                 if (newTitle.isNotEmpty()) {
                     addCommands(listOf("--replace-in-metadata", "title", ".+", newTitle))
                 }
-                if (Build.VERSION.SDK_INT > 23 && !sdcard) addOption(
+                if (!sdcard) addOption(
                     "-P", "temp:" + getExternalTempDir()
                 )
 

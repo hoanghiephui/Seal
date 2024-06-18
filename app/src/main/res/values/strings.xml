@@ -458,6 +458,7 @@
 
     <string name="paste_youtube_fail_msg">Sorry, your link is not supported.</string>
     <string name="video_without_watermark">Without watermark</string>
+    <string name="video_with_watermark">With watermark</string>
     <string name="download_complete">Download completed</string>
     <string name="player">Play</string>
 

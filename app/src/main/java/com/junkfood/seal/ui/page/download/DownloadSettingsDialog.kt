@@ -116,7 +116,6 @@ import com.junkfood.seal.util.THUMBNAIL
 import com.junkfood.seal.util.USE_PREVIOUS_SELECTION
 import com.junkfood.seal.util.VIDEO_FORMAT
 import com.junkfood.seal.util.VIDEO_QUALITY
-import com.junkfood.seal.util.WITHOUT_WATERMARK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -149,7 +148,6 @@ fun DownloadSettingDialog(
     var playlist by remember { mutableStateOf(PreferenceUtil.getValue(PLAYLIST)) }
     var subtitle by remember { mutableStateOf(PreferenceUtil.getValue(SUBTITLE)) }
     var formatSelection by FORMAT_SELECTION.booleanState
-    var withoutWaterMark by WITHOUT_WATERMARK.booleanState
     var videoFormatPreference by VIDEO_FORMAT.intState
     var videoQuality by VIDEO_QUALITY.intState
     var cookies by COOKIES.booleanState
@@ -292,35 +290,19 @@ fun DownloadSettingDialog(
             if (!isQuickDownload) {
                 DrawerSheetSubtitle(text = stringResource(id = R.string.format_selection))
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    if (!isTiktok && withoutWaterMark) {
-                        withoutWaterMark = false
-                    }
                     SingleChoiceChip(
-                        selected = (!formatSelection || playlist) && !withoutWaterMark, onClick = {
+                        selected = (!formatSelection || playlist), onClick = {
                             formatSelection = false
-                            withoutWaterMark = false
                             FORMAT_SELECTION.updateBoolean(false)
-                            WITHOUT_WATERMARK.updateBoolean(false)
                         }, enabled = type != DownloadType.Command,
                         label = stringResource(id = R.string.auto)
                     )
-                    if (isTiktok && type == DownloadType.Video) {
-                        SingleChoiceChip(
-                            selected = withoutWaterMark, onClick = {
-                                withoutWaterMark = true
-                                WITHOUT_WATERMARK.updateBoolean(true)
-                                FORMAT_SELECTION.updateBoolean(false)
-                            },
-                            label = stringResource(id = R.string.video_without_watermark)
-                        )
-                    }
+
                     SingleChoiceChip(
-                        selected = formatSelection && !playlist && !withoutWaterMark,
+                        selected = formatSelection && !playlist,
                         onClick = {
                             formatSelection = true
-                            withoutWaterMark = false
                             FORMAT_SELECTION.updateBoolean(true)
-                            WITHOUT_WATERMARK.updateBoolean(false)
                         },
                         enabled = type != DownloadType.Command && !playlist,
                         label = stringResource(id = R.string.custom)
@@ -505,47 +487,47 @@ fun DownloadSettingDialog(
         fun SheetContent(onDismissRequest: () -> Unit) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 AnimatedVisibility(visible = !isPlusMode) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_pro),
-                                    contentDescription = null
-                                )
-                                val titleStyle = MaterialTheme.typography.bodySmall.bold()
-                                val annotatedString = buildAnnotatedString {
-                                    withStyle(
-                                        titleStyle.copy(color = MaterialTheme.colorScheme.primary)
-                                            .toSpanStyle()
-                                    ) {
-                                        append("$lastDownloadCount ")
-                                    }
-                                    append("downloads left today")
-                                }
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp),
-                                    text = annotatedString,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                ButtonChip(
-                                    onClick = {
-                                        if (!isQuickDownload) {
-                                            showGetPointDialog = true
-                                            onDismissRequest()
-                                        } else {
-                                            onMakePlus.invoke()
-                                        }
-                                    },
-                                    label = stringResource(R.string.get_plus),
-                                    icon = Icons.Outlined.ProductionQuantityLimits,
-                                    iconDescription = stringResource(R.string.get_plus)
-                                )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_pro),
+                            contentDescription = null
+                        )
+                        val titleStyle = MaterialTheme.typography.bodySmall.bold()
+                        val annotatedString = buildAnnotatedString {
+                            withStyle(
+                                titleStyle.copy(color = MaterialTheme.colorScheme.primary)
+                                    .toSpanStyle()
+                            ) {
+                                append("$lastDownloadCount ")
                             }
+                            append("downloads left today")
                         }
+                        Text(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 8.dp),
+                            text = annotatedString,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        ButtonChip(
+                            onClick = {
+                                if (!isQuickDownload) {
+                                    showGetPointDialog = true
+                                    onDismissRequest()
+                                } else {
+                                    onMakePlus.invoke()
+                                }
+                            },
+                            label = stringResource(R.string.get_plus),
+                            icon = Icons.Outlined.ProductionQuantityLimits,
+                            iconDescription = stringResource(R.string.get_plus)
+                        )
+                    }
+                }
 
                 Text(
                     text = stringResource(R.string.settings_before_download),

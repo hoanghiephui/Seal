@@ -45,7 +45,7 @@ android {
         applicationId = "com.hubtik.video"
         minSdk = 27
         targetSdk = 34
-        versionCode = 22
+        versionCode = 25
 
         if (splitApks) {
             splits {
@@ -153,7 +153,7 @@ android {
     }
 
     namespace = "com.junkfood.seal"
-    packagingOptions {
+    packaging {
         jniLibs {
             useLegacyPackaging = true
         }
