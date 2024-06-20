@@ -283,7 +283,7 @@ private fun TitleItem(modifier: Modifier = Modifier) {
         append("Buy ")
 
         withStyle(titleStyle.copy(color = MaterialTheme.colorScheme.primary).toSpanStyle()) {
-            append("Wallet+")
+            append("GoPush+")
         }
     }
 
