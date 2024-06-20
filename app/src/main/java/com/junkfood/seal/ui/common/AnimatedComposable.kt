@@ -180,7 +180,6 @@ val springSpec = spring(
     visibilityThreshold = IntOffset.VisibilityThreshold
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.slideInVerticallyComposable(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),

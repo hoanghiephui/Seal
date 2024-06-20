@@ -46,7 +46,7 @@ android {
         applicationId = "com.hubtik.video"
         minSdk = 27
         targetSdk = 34
-        versionCode = 25
+        versionCode = 26
 
         if (splitApks) {
             splits {

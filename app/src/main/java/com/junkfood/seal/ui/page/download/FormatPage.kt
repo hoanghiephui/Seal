@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -72,8 +73,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.R
+import com.junkfood.seal.ui.component.AdType
+import com.junkfood.seal.ui.component.AdViewState
 import com.junkfood.seal.ui.component.ClearButton
 import com.junkfood.seal.ui.component.ConfirmButton
 import com.junkfood.seal.ui.component.DismissButton
@@ -81,6 +85,7 @@ import com.junkfood.seal.ui.component.FormatItem
 import com.junkfood.seal.ui.component.FormatSubtitle
 import com.junkfood.seal.ui.component.FormatVideoPreview
 import com.junkfood.seal.ui.component.HorizontalDivider
+import com.junkfood.seal.ui.component.MaxTemplateNativeAdViewComposable
 import com.junkfood.seal.ui.component.PreferenceInfo
 import com.junkfood.seal.ui.component.SealDialog
 import com.junkfood.seal.ui.component.SealSearchBar
@@ -125,8 +130,12 @@ fun FormatPage(downloadViewModel: DownloadViewModel, onNavigateBack: () -> Unit 
     }
 
     var showUpdateSubtitleDialog by remember { mutableStateOf(false) }
-
+    val nativeAd by downloadViewModel.adState.collectAsStateWithLifecycle()
     var diffSubtitleLanguages by remember { mutableStateOf(emptySet<String>()) }
+    val context = LocalContext.current
+    LaunchedEffect(key1 = BuildConfig.DOWNLOAD_LIST) {
+        downloadViewModel.loadAds(context, BuildConfig.DOWNLOAD_LIST)
+    }
 
     FormatPageImpl(
         videoInfo = videoInfo,
@@ -134,7 +143,8 @@ fun FormatPage(downloadViewModel: DownloadViewModel, onNavigateBack: () -> Unit 
         audioOnly = audioOnly,
         mergeAudioStream = !audioOnly && mergeAudioStream,
         selectedSubtitleCodes = initialSelectedSubtitles,
-        isClippingAvailable = VIDEO_CLIP.getBoolean() && (videoInfo.duration ?: .0) >= 0
+        isClippingAvailable = VIDEO_CLIP.getBoolean() && (videoInfo.duration ?: .0) >= 0,
+        nativeAd = nativeAd
     ) { formatList, videoClips, splitByChapter, title, selectedSubtitleCodes ->
 
         diffSubtitleLanguages = selectedSubtitleCodes.run {
@@ -273,7 +283,8 @@ private fun FormatPagePreview() {
             videoInfo = videoInfo,
             isClippingAvailable = true,
             mergeAudioStream = true,
-            selectedSubtitleCodes = setOf("en", "ja-en")
+            selectedSubtitleCodes = setOf("en", "ja-en"),
+            nativeAd = AdViewState.Default
         )
     }
 }
@@ -287,6 +298,7 @@ fun FormatPageImpl(
     isClippingAvailable: Boolean = false,
     selectedSubtitleCodes: Set<String>,
     onNavigateBack: () -> Unit = {},
+    nativeAd: AdViewState,
     onDownloadPressed: (List<Format>, List<VideoClip>, Boolean, String, List<String>) -> Unit = { _, _, _, _, _ -> }
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -298,9 +310,7 @@ fun FormatPageImpl(
         videoInfo.formats.filter { it.acodec != "none" && it.vcodec == "none" }.reversed()
     val videoAudioFormats =
         videoInfo.formats.filter { it.acodec != "none" && it.vcodec != "none" }.reversed()
-    val watermarked by remember {
-        mutableStateOf(videoInfo.formats.first { "watermarked" == it.formatNote })
-    }
+    val watermarked = videoInfo.formats.find { "watermarked" == it.formatNote }
 
     val duration = videoInfo.duration ?: 0.0
 
@@ -312,7 +322,7 @@ fun FormatPageImpl(
         !videoInfo.requestedFormats.isNullOrEmpty() || !videoInfo.requestedDownloads.isNullOrEmpty()
 
     var isSuggestedFormatSelected by remember { mutableStateOf(isSuggestedFormatAvailable) }
-    val isWatermarkedAvailable = videoInfo.formats.find { "watermarked" == it.formatNote } != null && !audioOnly
+    val isWatermarkedAvailable = watermarked != null && !audioOnly
     var isWatermarkedSelected by remember {
         mutableStateOf(isWatermarkedAvailable && !isSuggestedFormatSelected)
     }
@@ -367,7 +377,7 @@ fun FormatPageImpl(
                 videoAudioFormats.getOrNull(selectedVideoAudioFormat)?.let { add(it) }
                 videoOnlyFormats.getOrNull(selectedVideoOnlyFormat)?.let { add(it) }
                 if (isWatermarkedSelected) {
-                    add(watermarked)
+                    watermarked?.let { add(it) }
                 }
             }
         }
@@ -579,7 +589,18 @@ fun FormatPageImpl(
                 }
             }
 
-            if (isWatermarkedAvailable) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                ElevatedCard(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = nativeAd)
+                }
+            }
+
+            if (isWatermarkedAvailable && watermarked != null) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically, modifier = Modifier
@@ -1141,6 +1162,6 @@ fun UpdateSubtitleLanguageDialog(
             OutlinedButton(onClick = onDismissRequest) {
                 Text(text = stringResource(id = R.string.no_thanks))
             }
-        })
-
+        }
+    )
 }
