@@ -46,7 +46,7 @@ android {
         applicationId = "com.hubtik.video"
         minSdk = 27
         targetSdk = 34
-        versionCode = 26
+        versionCode = 27
 
         if (splitApks) {
             splits {
@@ -59,7 +59,7 @@ android {
             }
         }
 
-        versionName = "0.1.2.0"
+        versionName = "0.1.2.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

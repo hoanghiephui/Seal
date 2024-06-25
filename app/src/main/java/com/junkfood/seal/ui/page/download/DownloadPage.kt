@@ -389,7 +389,8 @@ fun DownloadPage(
                 Downloader.clearErrorState()
                 downloadViewModel.updateUrl(url)
             },
-            nativeAd = nativeAd
+            nativeAd = nativeAd,
+            isStartDownload = isStartDownload
         ) {
             SiteSupport(downloadViewModel.itemsSupport) {
                 onNavigateToSupportedSite.invoke()
@@ -490,6 +491,7 @@ fun DownloadPageImpl(
     onUrlChanged: (String) -> Unit = {},
     isPreview: Boolean = false,
     nativeAd: AdViewState,
+    isStartDownload: Boolean,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -657,7 +659,7 @@ fun DownloadPageImpl(
                             onClick = downloadCallback,
                             icon = Icons.Outlined.FileDownload,
                             text = stringResource(R.string.download),
-                            enabled = viewState.url.isNotBlank()
+                            enabled = viewState.url.isNotBlank() && !isStartDownload
                         )
                     }
 
@@ -960,7 +962,8 @@ fun DownloadPagePreview() {
                 isPreview = true,
                 showDownloadProgress = true,
                 showVideoCard = false,
-                nativeAd = AdViewState.Default
+                nativeAd = AdViewState.Default,
+                isStartDownload = false
             ) {}
         }
     }

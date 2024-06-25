@@ -23,11 +23,11 @@ lottieCompose = "6.4.1"
 markdownviewAndroid = "2.0.0"
 playServicesAdsIdentifier = "18.1.0"
 protobufPlugin = "0.9.4"
-androidxEspresso = "3.5.1"
+androidxEspresso = "3.6.0"
 androidxHiltNavigationCompose = "1.2.0"
 protobuf = "4.27.1"
 androidxDataStore = "1.1.1"
-androidxTestExt = "1.1.5"
+androidxTestExt = "1.2.0"
 
 
 coil = "2.6.0"

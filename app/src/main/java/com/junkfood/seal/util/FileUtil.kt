@@ -2,9 +2,9 @@ package com.junkfood.seal.util
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
-import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -266,5 +266,5 @@ val permissionWriteStore = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSI
 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     listOf(READ_MEDIA_AUDIO, READ_MEDIA_VIDEO)
 } else {
-    listOf(READ_EXTERNAL_STORAGE)
+    listOf(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
 }
