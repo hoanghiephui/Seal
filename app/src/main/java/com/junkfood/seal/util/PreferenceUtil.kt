@@ -259,7 +259,7 @@ object PreferenceUtil {
     fun getAudioFormat(): Int = AUDIO_FORMAT.getInt()
 
     fun isNetworkAvailableForDownload() =
-        CELLULAR_DOWNLOAD.getBoolean() || !App.connectivityManager.isActiveNetworkMetered
+        CELLULAR_DOWNLOAD.getBoolean() || App.connectivityManager?.isActiveNetworkMetered == false
 
     fun isAutoUpdateEnabled() = AUTO_UPDATE.getBoolean(!isFDroidBuild())
 

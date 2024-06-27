@@ -57,7 +57,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     }
 
     private fun copyErrorReport(error: String, notificationId: Int) {
-        App.clipboard.setPrimaryClip(
+        App.clipboard?.setPrimaryClip(
             ClipData.newPlainText(null, error)
         )
         context.let { ToastUtil.makeToastSuspend(it.getString(R.string.error_copied)) }

@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "995794117489",
+    "project_id": "hubtik",
+    "storage_bucket": "hubtik.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995794117489:android:313b1f4692fd94d4648cd0",
+        "android_client_info": {
+          "package_name": "com.hubtik.video"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "995794117489-hoql8jn2op8h21kp6spn7ttula6it6mg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlG-3sgh_m0-VV-08O62yk2L83rXJWCW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995794117489-hoql8jn2op8h21kp6spn7ttula6it6mg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995794117489:android:0b8abee90bb21c1b648cd0",
+        "android_client_info": {
+          "package_name": "com.hubtik.video.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "995794117489-hoql8jn2op8h21kp6spn7ttula6it6mg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlG-3sgh_m0-VV-08O62yk2L83rXJWCW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995794117489-hoql8jn2op8h21kp6spn7ttula6it6mg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -23,3 +23,6 @@ local.properties
 /.idea/other.xml
 /.idea/kotlinc.xml
 .kotlin
+/.idea/detekt.xml
+/.idea/appInsightsSettings.xml
+/.idea/inspectionProfiles/Project_Default.xml

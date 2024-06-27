@@ -13,6 +13,8 @@ plugins {
     kotlin("plugin.serialization")
     alias(libs.plugins.protobuf)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 apply(plugin = "dagger.hilt.android.plugin")
 
@@ -161,6 +163,9 @@ android {
 
 kotlin {
     jvmToolchain(17)
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
 }
 
 // Setup protobuf configuration, generating lite Java and Kotlin classes
@@ -208,6 +213,8 @@ dependencies {
 
     //DI (Dependency Injection - Hilt)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     kapt(libs.hilt.ext.compiler)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

@@ -98,7 +98,7 @@ fun BillingPage(
                     .padding(padding),
                 screenState = screenState,
                 retryAction = {
-
+                    onNavigateBack()
                 },
             ) { uiState ->
                 BillingPlusDialog(

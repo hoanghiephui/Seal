@@ -59,8 +59,8 @@ class App : Application() {
         applicationScope = CoroutineScope(SupervisorJob())
         DynamicColors.applyToActivitiesIfAvailable(this)
 
-        clipboard = getSystemService()!!
-        connectivityManager = getSystemService()!!
+        clipboard = getSystemService()
+        connectivityManager = getSystemService()
 
         applicationScope.launch((Dispatchers.IO)) {
             try {
@@ -86,7 +86,7 @@ class App : Application() {
         if (!PreferenceUtil.containsKey(COMMAND_DIRECTORY)) {
             COMMAND_DIRECTORY.updateString(videoDownloadDir)
         }
-        if (Build.VERSION.SDK_INT >= 26) NotificationUtil.createNotificationChannel()
+        NotificationUtil.createNotificationChannel()
 
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -105,11 +105,11 @@ class App : Application() {
     }
 
     companion object {
-        lateinit var clipboard: ClipboardManager
+        var clipboard: ClipboardManager ? = null
         lateinit var videoDownloadDir: String
         lateinit var audioDownloadDir: String
         lateinit var applicationScope: CoroutineScope
-        lateinit var connectivityManager: ConnectivityManager
+        var connectivityManager: ConnectivityManager ?= null
         lateinit var packageInfo: PackageInfo
 
         var isServiceRunning = false

@@ -185,7 +185,7 @@ fun SettingsPage(
                 SettingItem(
                     title = stringResource(id = R.string.network),
                     description = stringResource(id = R.string.network_settings_desc),
-                    icon = if (App.connectivityManager.isActiveNetworkMetered) Icons.Rounded.SignalCellular4Bar else Icons.Rounded.SignalWifi4Bar
+                    icon = if (App.connectivityManager?.isActiveNetworkMetered == true) Icons.Rounded.SignalCellular4Bar else Icons.Rounded.SignalWifi4Bar
                 ) {
                     onNavigateTo(Route.NETWORK_PREFERENCES)
                 }

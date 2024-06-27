@@ -27,6 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -56,35 +57,45 @@ class BillingPlusViewModel @Inject constructor(
     }
 
     private fun connectBilling() {
-        billingClient.initialize {
-            viewModelScope.launch {
-                val state = runCatching {
-                    val userData = userDataRepository.userData.firstOrNull()
+        billingClient.initialize(
+            callback = {
+                viewModelScope.launch {
+                    val state = runCatching {
+                        val userData = userDataRepository.userData.firstOrNull()
 
-                    BillingPlusUiState(
-                        isPlusMode = userData?.makePro ?: false,
-                        isDeveloperMode = BuildConfig.DEBUG,
-                        productDetails = billingClient.queryProductDetails(
-                            PREMIUM_MONTH,
-                            ProductType.SUBS
-                        ),
-                        purchase = runCatching { verifyPlusUseCase.execute(PREMIUM_MONTH) }.getOrNull(),
-                    )
-                }.fold(
-                    onSuccess = { ScreenState.Idle(it) },
-                    onFailure = {
-                        Log.w("AAA", it)
-                        ScreenState.Error(
-                            message = R.string.error_billing,
-                            retryTitle = R.string.close,
+                        BillingPlusUiState(
+                            isPlusMode = userData?.makePro ?: false,
+                            isDeveloperMode = BuildConfig.DEBUG,
+                            productDetails = billingClient.queryProductDetails(
+                                PREMIUM_MONTH,
+                                ProductType.SUBS
+                            ),
+                            purchase = runCatching { verifyPlusUseCase.execute(PREMIUM_MONTH) }.getOrNull(),
                         )
-                    },
-                )
-                _screenState.emit(
-                    state
-                )
+                    }.fold(
+                        onSuccess = { ScreenState.Idle(it) },
+                        onFailure = {
+                            Log.w("AAA", it)
+                            ScreenState.Error(
+                                message = R.string.error_billing,
+                                retryTitle = R.string.close,
+                            )
+                        },
+                    )
+                    _screenState.emit(
+                        state
+                    )
+                }
+            },
+            onFailed = {
+                _screenState.update {
+                    ScreenState.Error(
+                        message = R.string.error_billing,
+                        retryTitle = R.string.close,
+                    )
+                }
             }
-        }
+        )
     }
 
     suspend fun purchase(activity: Activity): Boolean {
@@ -159,7 +170,7 @@ class BillingPlusViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        //billingClient.dispose()
+        billingClient.dispose()
     }
 }
 
