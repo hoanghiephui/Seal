@@ -136,7 +136,7 @@ fun CookieProfilePage(
 
     DisposableEffect(shouldUpdateCookies) {
         scope.launch(Dispatchers.IO) {
-            DownloadUtil.getCookieListFromDatabase().getOrNull()?.let {
+            DownloadUtil.getCookieListFromDatabase(context = context).getOrNull()?.let {
                 cookieList = it
                 FileUtil.writeContentToFile(it.toCookiesFileContent(), context.getCookiesFile())
             }

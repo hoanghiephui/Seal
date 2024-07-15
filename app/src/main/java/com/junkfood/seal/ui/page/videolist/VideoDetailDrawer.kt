@@ -102,7 +102,7 @@ fun VideoDetailDrawer(
                 uriHandler.openUri(videoUrl)
             }, onShareFile = {
                 view.slightHapticFeedback()
-                FileUtil.createIntentForSharingFile(videoPath)?.runCatching {
+                FileUtil.createIntentForSharingFile(videoPath, context = context)?.runCatching {
                     context.startActivity(
                         Intent.createChooser(this, shareTitle)
                     )

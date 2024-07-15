@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -60,6 +61,7 @@ fun TaskLogPage(onNavigateBack: () -> Unit, taskHashCode: Int) {
     val task = Downloader.mutableTaskList.values.find { it.hashCode() == taskHashCode } ?: return
     val clipboardManager = LocalClipboardManager.current
     var expandLog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -119,7 +121,7 @@ fun TaskLogPage(onNavigateBack: () -> Unit, taskHashCode: Int) {
                                 icon = Icons.Outlined.RestartAlt,
                                 label = stringResource(id = R.string.restart),
                             ) {
-                                onRestart()
+                                onRestart(context = context)
                             }
                         if (!expandLog)
                             ElevatedAssistChip(

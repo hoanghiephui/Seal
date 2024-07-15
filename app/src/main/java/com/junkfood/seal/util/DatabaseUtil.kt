@@ -1,5 +1,6 @@
 package com.junkfood.seal.util
 
+import android.content.Context
 import androidx.room.Room
 import com.junkfood.seal.App.Companion.applicationScope
 import com.junkfood.seal.App.Companion.context
@@ -58,11 +59,12 @@ object DatabaseUtil {
     suspend fun getShortcutList() = dao.getShortcutList()
     suspend fun deleteInfoList(
         infoList: List<DownloadedVideoInfo>,
-        deleteFile: Boolean = false
+        deleteFile: Boolean = false,
+        context: Context
     ) {
         dao.deleteInfoList(infoList)
         infoList.forEach { info ->
-            if (deleteFile) FileUtil.deleteFile(info.videoPath)
+            if (deleteFile) FileUtil.deleteFile(info.videoPath, context)
         }
     }
 

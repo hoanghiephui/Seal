@@ -520,8 +520,8 @@ fun VideoListPage(
                                 else selectedItemIds.add(id)
                             },
                             onClick = {
-                                FileUtil.openFile(path = videoPath) {
-                                    ToastUtil.makeToastSuspend(App.context.getString(R.string.file_unavailable))
+                                FileUtil.openFile(path = videoPath, context = context) {
+                                    ToastUtil.makeToastSuspend(context.getString(R.string.file_unavailable))
                                 }
                             }, onLongClick = {
                                 isSelectEnabled = true

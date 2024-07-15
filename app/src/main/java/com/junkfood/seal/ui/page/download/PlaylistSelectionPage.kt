@@ -42,6 +42,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,7 +73,7 @@ fun PlaylistSelectionPage(onNavigateBack: () -> Unit = {}) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showDialog by remember { mutableStateOf(false) }
     val playlistCount = playlistInfo.entries?.size ?: 0
-
+    val context = LocalContext.current
 //    BackHandler { onDismissRequest() }
 
     Scaffold(modifier = Modifier
@@ -98,7 +99,8 @@ fun PlaylistSelectionPage(onNavigateBack: () -> Unit = {}) {
                             indexList = selectedItems,
                             playlistItemList = playlistInfo.entries?.filterIndexed { index, _ ->
                                 selectedItems.contains(index)
-                            } ?: emptyList()
+                            } ?: emptyList(),
+                            context = context
                         )
                         onDismissRequest()
                     }, enabled = selectedItems.isNotEmpty()

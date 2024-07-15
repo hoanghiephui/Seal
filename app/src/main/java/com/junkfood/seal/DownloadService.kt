@@ -26,7 +26,7 @@ class DownloadService : Service() {
                     PendingIntent.FLAG_IMMUTABLE
                 )
             }
-        val notification = NotificationUtil.makeServiceNotification(pendingIntent)
+        val notification = NotificationUtil.makeServiceNotification(pendingIntent, context = this)
         startForeground(SERVICE_NOTIFICATION_ID, notification)
         return DownloadServiceBinder()
     }

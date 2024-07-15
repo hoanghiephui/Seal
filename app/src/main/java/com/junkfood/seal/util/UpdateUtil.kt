@@ -7,7 +7,6 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.FileProvider
 import com.junkfood.seal.App
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.R
 import com.junkfood.seal.util.FileUtil.getFileProvider
 import com.junkfood.seal.util.PreferenceUtil.getInt
@@ -53,7 +52,7 @@ object UpdateUtil {
 
     private val jsonFormat = Json { ignoreUnknownKeys = true }
 
-    suspend fun updateYtDlp(): YoutubeDL.UpdateStatus? =
+    suspend fun updateYtDlp(context: Context): YoutubeDL.UpdateStatus? =
         withContext(Dispatchers.IO) {
             val channel = when (YT_DLP_UPDATE_CHANNEL.getInt()) {
                 YT_DLP_NIGHTLY -> YoutubeDL.UpdateChannel.NIGHTLY

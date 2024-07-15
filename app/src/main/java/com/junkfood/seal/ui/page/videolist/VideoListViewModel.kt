@@ -18,6 +18,7 @@ import com.junkfood.seal.ui.component.MaxTemplateNativeAdViewComposableLoader
 import com.junkfood.seal.util.DatabaseUtil
 import com.junkfood.seal.util.FileUtil.getFileSize
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,9 @@ private const val TAG = "VideoListViewModel"
 @HiltViewModel
 class VideoListViewModel @Inject constructor(
     private val appLovinSdk: AppLovinSdk,
-    private val appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
+    private val appLovinSdkInitialization: AppLovinSdkInitializationConfiguration,
+    @ApplicationContext
+    val context: Context
 ) : ViewModel() {
 
     private val mutableStateFlow = MutableStateFlow(VideoListViewState())
@@ -78,7 +81,7 @@ class VideoListViewModel @Inject constructor(
 
     val fileSizeMapFlow = videoListFlow.flowOn(Dispatchers.IO).map { list ->
         list.associate {
-            it.id to it.videoPath.getFileSize()
+            it.id to it.videoPath.getFileSize(context = context)
         }
     }
 
@@ -112,7 +115,7 @@ class VideoListViewModel @Inject constructor(
 
     fun deleteDownloadHistory(infoList: List<DownloadedVideoInfo>, deleteFile: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseUtil.deleteInfoList(infoList = infoList, deleteFile = deleteFile)
+            DatabaseUtil.deleteInfoList(infoList = infoList, deleteFile = deleteFile, context = context)
         }
     }
 

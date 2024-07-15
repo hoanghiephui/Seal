@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.content.getSystemService
 import com.google.android.material.color.DynamicColors
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.junkfood.seal.ui.page.settings.directory.Directory
 import com.junkfood.seal.util.AUDIO_DIRECTORY
 import com.junkfood.seal.util.COMMAND_DIRECTORY
@@ -67,7 +68,7 @@ class App : Application() {
                 YoutubeDL.init(this@App)
                 FFmpeg.init(this@App)
                 Aria2c.init(this@App)
-                DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
+                DownloadUtil.getCookiesContentFromDatabase(applicationContext).getOrNull()?.let {
                     FileUtil.writeContentToFile(it, getCookiesFile())
                 }
                 UpdateUtil.deleteOutdatedApk()
@@ -86,7 +87,7 @@ class App : Application() {
         if (!PreferenceUtil.containsKey(COMMAND_DIRECTORY)) {
             COMMAND_DIRECTORY.updateString(videoDownloadDir)
         }
-        NotificationUtil.createNotificationChannel()
+        NotificationUtil.createNotificationChannel(applicationContext)
 
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -95,7 +96,7 @@ class App : Application() {
     }
 
     private fun startCrashReportActivity(th: Throwable) {
-        th.printStackTrace()
+        FirebaseCrashlytics.getInstance().recordException(th)
         startActivity(Intent(
             this, CrashReportActivity::class.java
         ).setAction("$packageName.error_report").apply {
@@ -116,7 +117,7 @@ class App : Application() {
 
         private val connection = object : ServiceConnection {
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
-                val binder = service as DownloadService.DownloadServiceBinder
+                service as DownloadService.DownloadServiceBinder
                 isServiceRunning = true
             }
 

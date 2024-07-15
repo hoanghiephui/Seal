@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.util.NotificationUtil
 import com.junkfood.seal.util.ToastUtil
 import com.yausername.youtubedl_android.YoutubeDL
@@ -33,22 +32,24 @@ class NotificationActionReceiver : BroadcastReceiver() {
         when (action) {
             ACTION_CANCEL_TASK -> {
                 val taskId = intent.getStringExtra(TASK_ID_KEY)
-                cancelTask(taskId, notificationId)
+                if (context != null) {
+                    cancelTask(taskId, notificationId, context)
+                }
             }
 
             ACTION_ERROR_REPORT -> {
                 val errorReport = intent.getStringExtra(ERROR_REPORT_KEY)
                 if (!errorReport.isNullOrEmpty())
-                    copyErrorReport(errorReport, notificationId)
+                    copyErrorReport(errorReport, notificationId, context = context)
             }
         }
     }
 
-    private fun cancelTask(taskId: String?, notificationId: Int) {
+    private fun cancelTask(taskId: String?, notificationId: Int, context: Context) {
         if (taskId.isNullOrEmpty()) return
-        NotificationUtil.cancelNotification(notificationId)
+        NotificationUtil.cancelNotification(notificationId, context = context)
         val result = YoutubeDL.getInstance().destroyProcessById(taskId)
-        NotificationUtil.cancelNotification(notificationId)
+        NotificationUtil.cancelNotification(notificationId, context)
         if (result) {
             Log.d(TAG, "Task (id:$taskId) was killed.")
             Downloader.onProcessCanceled(taskId)
@@ -56,12 +57,14 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun copyErrorReport(error: String, notificationId: Int) {
+    private fun copyErrorReport(error: String, notificationId: Int, context: Context?) {
         App.clipboard?.setPrimaryClip(
             ClipData.newPlainText(null, error)
         )
-        context.let { ToastUtil.makeToastSuspend(it.getString(R.string.error_copied)) }
-        NotificationUtil.cancelNotification(notificationId)
+        context?.let { ToastUtil.makeToastSuspend(it.getString(R.string.error_copied)) }
+        if (context != null) {
+            NotificationUtil.cancelNotification(notificationId, context)
+        }
     }
 
 }

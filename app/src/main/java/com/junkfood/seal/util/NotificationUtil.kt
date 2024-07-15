@@ -8,9 +8,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
 import com.junkfood.seal.App.Companion.context
@@ -27,8 +25,6 @@ private const val TAG = "NotificationUtil"
 
 @SuppressLint("StaticFieldLeak")
 object NotificationUtil {
-    private val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private const val PROGRESS_MAX = 100
     private const val PROGRESS_INITIAL = 0
     private const val CHANNEL_ID = "download_notification"
@@ -43,8 +39,9 @@ object NotificationUtil {
     private val commandNotificationBuilder =
         NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_notify)
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun createNotificationChannel() {
+    fun createNotificationChannel(context: Context) {
+        val notificationManager =
+           context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val name = context.getString(R.string.channel_name)
         val descriptionText = context.getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_LOW
@@ -68,9 +65,12 @@ object NotificationUtil {
         notificationId: Int = DEFAULT_NOTIFICATION_ID,
         progress: Int = PROGRESS_INITIAL,
         taskId: String? = null,
-        text: String? = null
+        text: String? = null,
+        context: Context
     ) {
         if (!PreferenceUtil.getValue(NOTIFICATION)) return
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent = taskId?.let {
             Intent(context.applicationContext, NotificationActionReceiver::class.java)
                 .putExtra(TASK_ID_KEY, taskId)
@@ -108,7 +108,10 @@ object NotificationUtil {
         title: String? = null,
         text: String? = null,
         intent: PendingIntent? = null,
+        context: Context
     ) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         Log.d(TAG, "finishNotification: ")
         notificationManager.cancel(notificationId)
         if (!PreferenceUtil.getValue(NOTIFICATION)) return
@@ -128,8 +131,11 @@ object NotificationUtil {
         notificationId: Int = DEFAULT_NOTIFICATION_ID,
         title: String? = null,
         text: String? = null,
+        context: Context
     ) {
 //        notificationManager.cancel(notificationId)
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val builder =
             NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notify)
@@ -143,7 +149,8 @@ object NotificationUtil {
         notificationManager.notify(notificationId, builder.build())
     }
 
-    fun makeServiceNotification(intent: PendingIntent, text: String? = null): Notification {
+    fun makeServiceNotification(intent: PendingIntent, text: String? = null,
+                                context: Context): Notification {
         serviceNotification = NotificationCompat.Builder(context, SERVICE_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notify)
             .setContentTitle(context.getString(R.string.service_title))
@@ -155,24 +162,32 @@ object NotificationUtil {
         return serviceNotification
     }
 
-    fun updateServiceNotificationForPlaylist(index: Int, itemCount: Int) {
+    fun updateServiceNotificationForPlaylist(index: Int, itemCount: Int,
+                                             context: Context) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         serviceNotification = NotificationCompat.Builder(context, serviceNotification)
             .setContentTitle(context.getString(R.string.service_title) + " ($index/$itemCount)")
             .build()
         notificationManager.notify(SERVICE_NOTIFICATION_ID, serviceNotification)
     }
 
-    fun cancelNotification(notificationId: Int) {
+    fun cancelNotification(notificationId: Int,
+                           context: Context) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(notificationId)
     }
 
     fun makeErrorReportNotification(
+        context: Context,
         title: String = context.getString(R.string.download_error_msg),
         notificationId: Int,
-        error: String,
+        error: String
     ) {
         if (!PreferenceUtil.getValue(NOTIFICATION)) return
-
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent()
             .setClass(context, NotificationActionReceiver::class.java)
             .putExtra(NOTIFICATION_ID_KEY, notificationId)
@@ -205,10 +220,12 @@ object NotificationUtil {
         progress: Int,
         text: String? = null,
         templateName: String,
-        taskUrl: String
+        taskUrl: String,
+        context: Context
     ) {
         if (!PreferenceUtil.getValue(NOTIFICATION)) return
-
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(context.applicationContext, NotificationActionReceiver::class.java)
             .putExtra(TASK_ID_KEY, taskId)
             .putExtra(NOTIFICATION_ID_KEY, notificationId)
@@ -236,11 +253,15 @@ object NotificationUtil {
             }
     }
 
-    fun cancelAllNotifications() {
+    fun cancelAllNotifications(context: Context) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
     }
 
-    fun areNotificationsEnabled(): Boolean {
-        return if (Build.VERSION.SDK_INT <= 24) true else notificationManager.areNotificationsEnabled()
+    fun areNotificationsEnabled(context: Context): Boolean {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.areNotificationsEnabled()
     }
 }

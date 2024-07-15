@@ -220,7 +220,7 @@ fun HomeEntry(
             runCatching {
                 Downloader.updateState(state = Downloader.State.Updating)
                 withContext(Dispatchers.IO) {
-                    UpdateUtil.updateYtDlp()
+                    UpdateUtil.updateYtDlp(context = context)
                 }
             }.onFailure {
                 it.printStackTrace()

@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -91,7 +92,7 @@ import kotlinx.coroutines.launch
 fun TaskListPage(onNavigateBack: () -> Unit, onNavigateToDetail: (Int) -> Unit) {
     val scope = rememberCoroutineScope()
     val view = LocalView.current
-
+    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = androidx.compose.material.rememberModalBottomSheetState(
@@ -144,7 +145,7 @@ fun TaskListPage(onNavigateBack: () -> Unit, onNavigateToDetail: (Int) -> Unit) 
                             onCopyError(clipboardManager)
                         },
                         onRestart = {
-                            onRestart()
+                            onRestart(context = context)
                         },
                         onCopyLog = {
                             onCopyLog(clipboardManager)
@@ -218,7 +219,7 @@ fun TaskListPage(onNavigateBack: () -> Unit, onNavigateToDetail: (Int) -> Unit) 
                         FilledButtonWithIcon(
                             onClick = {
                                 view.slightHapticFeedback()
-                                Downloader.executeCommandWithUrl(url)
+                                Downloader.executeCommandWithUrl(url, context = context)
                                 onDismissRequest()
                             },
                             icon = Icons.Outlined.DownloadDone,

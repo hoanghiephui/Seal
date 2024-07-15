@@ -22,7 +22,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.applovin.mediation.ads.MaxRewardedAd
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.QuickDownloadActivity.Companion.KEY_MAKE
 import com.junkfood.seal.model.MainActivityUiState
 import com.junkfood.seal.ui.ads.AdMaxRewardedLoader
@@ -89,7 +88,6 @@ class MainActivity : ComponentActivity(), AdRewardedCallback {
             }
         }
         billingViewModel.onVerify(this)
-        context = this.baseContext
         setContent {
 
             val cookiesViewModel: CookiesViewModel = viewModel()

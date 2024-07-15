@@ -226,7 +226,7 @@ fun DownloadPage(
         } else {
             isStartDownload = true
             isDownloaded = false
-            downloadViewModel.startDownloadVideo()
+            downloadViewModel.startDownloadVideo(context)
         }
     }
     var permissionRequested: Boolean by rememberSaveable { mutableStateOf(false) }
@@ -271,7 +271,7 @@ fun DownloadPage(
         view.slightHapticFeedback()
         keyboardController?.hide()
         if (viewState.url.isYouTubeLink()) {
-            downloadViewModel.onNotSupportError(viewState.url)
+            downloadViewModel.onNotSupportError(viewState.url, context = context)
         } else {
             if (NOTIFICATION.getBoolean() && notificationPermission?.status?.isGranted == false) {
                 showNotificationDialog = true
@@ -298,11 +298,11 @@ fun DownloadPage(
         MeteredNetworkDialog(
             onDismissRequest = { showMeteredNetworkDialog = false },
             onAllowOnceConfirm = {
-                downloadViewModel.startDownloadVideo()
+                downloadViewModel.startDownloadVideo(context)
                 showMeteredNetworkDialog = false
             },
             onAllowAlwaysConfirm = {
-                downloadViewModel.startDownloadVideo()
+                downloadViewModel.startDownloadVideo(context)
                 CELLULAR_DOWNLOAD.updateBoolean(true)
                 showMeteredNetworkDialog = false
             })
@@ -382,9 +382,9 @@ fun DownloadPage(
             cancelCallback = {
                 isStartDownload = false
                 isDownloaded = false
-                Downloader.cancelDownload()
+                Downloader.cancelDownload(context = context)
             },
-            onVideoCardClicked = { Downloader.openDownloadResult() },
+            onVideoCardClicked = { Downloader.openDownloadResult(context) },
             onUrlChanged = { url ->
                 Downloader.clearErrorState()
                 downloadViewModel.updateUrl(url)
@@ -429,7 +429,7 @@ fun DownloadPage(
             showDialog = showDownloadCompleteDialog,
             sheetState = sheetState,
             onShare = {
-                FileUtil.createIntentForSharingFile("${Downloader.filePathDownloaded}")
+                FileUtil.createIntentForSharingFile("${Downloader.filePathDownloaded}", context = context)
                     ?.runCatching {
                         context.startActivity(
                             Intent.createChooser(this, shareTitle)
@@ -447,7 +447,7 @@ fun DownloadPage(
             },
             taskState = taskState,
             onVideoCardClicked = {
-                Downloader.openDownloadResult()
+                Downloader.openDownloadResult(context = context)
             }
         )
 

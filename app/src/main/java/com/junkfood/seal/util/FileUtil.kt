@@ -19,7 +19,6 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.CheckResult
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.R
 import okhttp3.internal.closeQuietly
 import java.io.File
@@ -30,10 +29,11 @@ const val SUBTITLE_REGEX = "\\.(lrc|vtt|srt|ass|json3|srv.|ttml)$"
 private const val PRIVATE_DIRECTORY_SUFFIX = ".VidSave"
 
 object FileUtil {
-    fun openFileFromResult(downloadResult: Result<List<String>>) {
+    fun openFileFromResult(downloadResult: Result<List<String>>,
+                           context: Context) {
         val filePaths = downloadResult.getOrNull()
         if (filePaths.isNullOrEmpty()) return
-        openFile(filePaths.first()) {
+        openFile(filePaths.first(), context = context) {
             ToastUtil.makeToastSuspend(context.getString(R.string.file_unavailable))
         }
     }
@@ -41,15 +41,16 @@ object FileUtil {
     val Result<List<String>>.filePath
         get() =
             this.getOrNull()?.first()
-    inline fun openFile(path: String, onFailureCallback: (Throwable) -> Unit) =
+    inline fun openFile(path: String, context: Context, onFailureCallback: (Throwable) -> Unit) =
         path.runCatching {
-            createIntentForOpeningFile(this)?.run { context.startActivity(this) }
+            createIntentForOpeningFile(this, context = context)?.run { context.startActivity(this) }
                 ?: throw Exception()
         }.onFailure {
             onFailureCallback(it)
         }
 
-    private fun createIntentForFile(path: String?): Intent? {
+    private fun createIntentForFile(path: String?,
+                                    context: Context): Intent? {
         if (path == null) return null
 
         val uri = path.runCatching {
@@ -72,14 +73,16 @@ object FileUtil {
         }
     }
 
-    fun createIntentForOpeningFile(path: String?): Intent? = createIntentForFile(path)?.let {
+    fun createIntentForOpeningFile(path: String?,
+                                   context: Context): Intent? = createIntentForFile(path, context = context)?.let {
         it.apply {
             action = (Intent.ACTION_VIEW)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
     }
 
-    fun createIntentForSharingFile(path: String?): Intent? = createIntentForFile(path)?.apply {
+    fun createIntentForSharingFile(path: String?,
+                                   context: Context): Intent? = createIntentForFile(path, context = context)?.apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_STREAM, data)
         val mimeType = data?.let { context.contentResolver.getType(it) } ?: "media/*"
@@ -93,14 +96,14 @@ object FileUtil {
 
     fun Context.getFileProvider() = "$packageName.provider"
 
-    fun String.getFileSize(): Long = this.run {
+    fun String.getFileSize(context: Context): Long = this.run {
         val length = File(this).length()
         if (length == 0L)
             DocumentFile.fromSingleUri(context, Uri.parse(this))?.length() ?: 0L
         else length
     }
 
-    fun String.getFileName(): String = this.run {
+    fun String.getFileName(context: Context): String = this.run {
         File(this).nameWithoutExtension.ifEmpty {
             DocumentFile.fromSingleUri(
                 context,
@@ -109,14 +112,16 @@ object FileUtil {
         }
     }
 
-    fun deleteFile(path: String) =
+    fun deleteFile(path: String,
+                   context: Context) =
         path.runCatching {
             if (!File(path).delete())
                 DocumentFile.fromSingleUri(context, Uri.parse(this))?.delete()
         }
 
     @CheckResult
-    fun scanFileToMediaLibraryPostDownload(title: String, downloadDir: String): List<String> =
+    fun scanFileToMediaLibraryPostDownload(title: String, downloadDir: String,
+                                           context: Context): List<String> =
         File(downloadDir)
             .walkTopDown()
             .filter { it.isFile && it.absolutePath.contains(title) }
@@ -131,7 +136,8 @@ object FileUtil {
             }
 
 
-    fun scanDownloadDirectoryToMediaLibrary(downloadDir: String) =
+    fun scanDownloadDirectoryToMediaLibrary(downloadDir: String,
+                                            context: Context) =
         File(downloadDir).walkTopDown().filter { it.isFile }.map { it.absolutePath }.run {
             MediaScannerConnection.scanFile(
                 context, this.toList().toTypedArray(),
@@ -143,7 +149,8 @@ object FileUtil {
     @CheckResult
     fun moveFilesToSdcard(
         tempPath: File,
-        sdcardUri: String
+        sdcardUri: String,
+        context: Context
     ): Result<List<String>> {
         val uriList = mutableListOf<String>()
         val destDir = Uri.parse(sdcardUri).run {

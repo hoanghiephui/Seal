@@ -158,6 +158,7 @@ fun FormatPage(downloadViewModel: DownloadViewModel, onNavigateBack: () -> Unit 
             splitByChapter = splitByChapter,
             newTitle = title,
             selectedSubtitleCodes = selectedSubtitleCodes,
+            context = context
         )
 
         if (diffSubtitleLanguages.isNotEmpty()) {

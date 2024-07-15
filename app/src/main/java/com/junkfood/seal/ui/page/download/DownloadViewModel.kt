@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.junkfood.seal.App.Companion.applicationScope
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.Downloader.State
 import com.junkfood.seal.Downloader.manageDownloadError
@@ -71,6 +70,7 @@ class DownloadViewModel @Inject constructor(
     val adState: StateFlow<AdViewState> get() = nativeAdLoader.nativeAdView
     private val _makeUpStateFlow = MutableStateFlow("")
     val makeUpStateFlow = _makeUpStateFlow.asStateFlow()
+
     data class ViewState(
         val showPlaylistSelectionDialog: Boolean = false,
         val url: String = "",
@@ -85,14 +85,14 @@ class DownloadViewModel @Inject constructor(
             )
         }
 
-    fun startDownloadVideo() {
+    fun startDownloadVideo(context: Context) {
         val url = viewStateFlow.value.url
         Downloader.clearErrorState()
         if (CUSTOM_COMMAND.getBoolean()) {
-            applicationScope.launch(Dispatchers.IO) { DownloadUtil.executeCommandInBackground(url) }
+            applicationScope.launch(Dispatchers.IO) { DownloadUtil.executeCommandInBackground(url, context = context) }
             return
         }
-        if (!Downloader.isDownloaderAvailable())
+        if (!Downloader.isDownloaderAvailable(context))
             return
         if (url.isBlank()) {
             ToastUtil.makeToast(context.getString(R.string.url_empty))
@@ -103,36 +103,40 @@ class DownloadViewModel @Inject constructor(
             return
         }
         if (PLAYLIST.getBoolean()) {
-            viewModelScope.launch(Dispatchers.IO) { parsePlaylistInfo(url) }
+            viewModelScope.launch(Dispatchers.IO) { parsePlaylistInfo(url, context) }
             return
         }
 
         if (FORMAT_SELECTION.getBoolean()) {
-            viewModelScope.launch(Dispatchers.IO) { fetchInfoForFormatSelection(url) }
+            viewModelScope.launch(Dispatchers.IO) { fetchInfoForFormatSelection(url, context) }
             return
         }
 
-        Downloader.getInfoAndDownload(url)
+        Downloader.getInfoAndDownload(url, context = context)
     }
 
 
-    private fun fetchInfoForFormatSelection(url: String) {
+    private fun fetchInfoForFormatSelection(url: String,
+                                            context: Context) {
         Downloader.updateState(State.FetchingInfo)
-        DownloadUtil.fetchVideoInfoFromUrl(url = url).onSuccess {
-            showFormatSelectionPageOrDownload(it)
+        DownloadUtil.fetchVideoInfoFromUrl(url = url, context = context).onSuccess {
+            showFormatSelectionPageOrDownload(it, context)
         }.onFailure {
-            manageDownloadError(th = it, url = url, isFetchingInfo = true, isTaskAborted = true)
+            manageDownloadError(th = it, url = url, isFetchingInfo = true, isTaskAborted = true, context = context)
         }
         Downloader.updateState(State.Idle)
     }
 
 
-    private fun parsePlaylistInfo(url: String): Unit =
+    private fun parsePlaylistInfo(
+        url: String,
+        context: Context
+    ): Unit =
         Downloader.run {
-            if (!isDownloaderAvailable()) return
+            if (!isDownloaderAvailable(context)) return
             clearErrorState()
             updateState(State.FetchingInfo)
-            DownloadUtil.getPlaylistOrVideoInfo(url).onSuccess { info ->
+            DownloadUtil.getPlaylistOrVideoInfo(url, context = context).onSuccess { info ->
                 updateState(State.Idle)
                 when (info) {
                     is PlaylistResult -> {
@@ -142,9 +146,9 @@ class DownloadViewModel @Inject constructor(
                     is VideoInfo -> {
                         if (FORMAT_SELECTION.getBoolean()) {
 
-                            showFormatSelectionPageOrDownload(info)
-                        } else if (isDownloaderAvailable()) {
-                            downloadVideoWithInfo(info = info)
+                            showFormatSelectionPageOrDownload(info, context)
+                        } else if (isDownloaderAvailable(context)) {
+                            downloadVideoWithInfo(info = info, context = context)
                         }
                     }
                 }
@@ -153,7 +157,8 @@ class DownloadViewModel @Inject constructor(
                     th = it,
                     url = url,
                     isFetchingInfo = true,
-                    isTaskAborted = true
+                    isTaskAborted = true,
+                    context = context
                 )
             }
         }
@@ -167,9 +172,10 @@ class DownloadViewModel @Inject constructor(
         }
     }
 
-    private fun showFormatSelectionPageOrDownload(info: VideoInfo) {
+    private fun showFormatSelectionPageOrDownload(info: VideoInfo,
+                                                  context: Context) {
         if (info.format.isNullOrEmpty())
-            Downloader.downloadVideoWithInfo(info)
+            Downloader.downloadVideoWithInfo(info, context = context)
         else {
             videoInfoFlow.update { info }
             mutableViewStateFlow.update {
@@ -192,7 +198,8 @@ class DownloadViewModel @Inject constructor(
         mutableViewStateFlow.update { it.copy(isUrlSharingTriggered = false) }
     }
 
-    fun onNotSupportError(url: String) {
+    fun onNotSupportError(url: String,
+                          context: Context) {
         notSupportError(url = url, errorReport = context.getString(R.string.paste_youtube_fail_msg))
     }
 

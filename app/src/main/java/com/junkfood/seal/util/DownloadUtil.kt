@@ -1,5 +1,6 @@
 package com.junkfood.seal.util
 
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.OPEN_READONLY
 import android.media.MediaCodecList
@@ -9,7 +10,6 @@ import android.webkit.CookieManager
 import androidx.annotation.CheckResult
 import com.junkfood.seal.App
 import com.junkfood.seal.App.Companion.audioDownloadDir
-import com.junkfood.seal.App.Companion.context
 import com.junkfood.seal.App.Companion.videoDownloadDir
 import com.junkfood.seal.Downloader
 import com.junkfood.seal.Downloader.onProcessEnded
@@ -21,7 +21,6 @@ import com.junkfood.seal.Downloader.toNotificationId
 import com.junkfood.seal.R
 import com.junkfood.seal.database.objects.CommandTemplate
 import com.junkfood.seal.database.objects.DownloadedVideoInfo
-import com.junkfood.seal.ui.common.booleanState
 import com.junkfood.seal.ui.page.settings.network.Cookie
 import com.junkfood.seal.util.FileUtil.getArchiveFile
 import com.junkfood.seal.util.FileUtil.getConfigFile
@@ -90,7 +89,8 @@ object DownloadUtil {
 
     @CheckResult
     fun getPlaylistOrVideoInfo(
-        playlistURL: String, downloadPreferences: DownloadPreferences = DownloadPreferences()
+        playlistURL: String, downloadPreferences: DownloadPreferences = DownloadPreferences(),
+        context: Context
     ): Result<YoutubeDLInfo> = YoutubeDL.runCatching {
         ToastUtil.makeToastSuspend(context.getString(R.string.fetching_playlist_info))
         val request = YoutubeDLRequest(playlistURL)
@@ -113,7 +113,7 @@ object DownloadUtil {
                     addOption("-4")
                 }
                 if (cookies) {
-                    enableCookies(userAgentString)
+                    enableCookies(userAgentString, context)
                 }
                 if (restrictFilenames) {
                     addOption("--restrict-filenames")
@@ -139,7 +139,8 @@ object DownloadUtil {
     @CheckResult
     fun fetchVideoInfoFromUrl(
         url: String, playlistItem: Int = 0,
-        preferences: DownloadPreferences = DownloadPreferences()
+        preferences: DownloadPreferences = DownloadPreferences(),
+        context: Context
     ): Result<VideoInfo> {
         with(preferences) {
             val request = YoutubeDLRequest(url).apply {
@@ -152,7 +153,7 @@ object DownloadUtil {
                 }
                 applyFormatSorter(this@with, toFormatSorter())
                 if (cookies) {
-                    enableCookies(userAgentString)
+                    enableCookies(userAgentString, context = context)
                 }
                 if (proxy) {
                     enableProxy(proxyUrl)
@@ -243,7 +244,8 @@ object DownloadUtil {
         val withoutWatermark: Boolean = WITHOUT_WATERMARK.getBoolean()
     )
 
-    private fun YoutubeDLRequest.enableCookies(userAgentString: String): YoutubeDLRequest =
+    private fun YoutubeDLRequest.enableCookies(userAgentString: String,
+                                               context: Context): YoutubeDLRequest =
         this.addOption("--cookies", context.getCookiesFile().absolutePath).apply {
             if (userAgentString.isNotEmpty()) {
                 addOption("--add-header", "User-Agent:$userAgentString")
@@ -253,12 +255,12 @@ object DownloadUtil {
     private fun YoutubeDLRequest.enableProxy(proxyUrl: String): YoutubeDLRequest =
         this.addOption("--proxy", proxyUrl)
 
-    private fun YoutubeDLRequest.useDownloadArchive(): YoutubeDLRequest =
+    private fun YoutubeDLRequest.useDownloadArchive(context: Context): YoutubeDLRequest =
         this.addOption("--download-archive", context.getArchiveFile().absolutePath)
 
 
     @CheckResult
-    fun getCookieListFromDatabase(): Result<List<Cookie>> = runCatching {
+    fun getCookieListFromDatabase(context: Context): Result<List<Cookie>> = runCatching {
         CookieManager.getInstance().run {
             if (!hasCookies()) throw Exception("There is no cookies in the database!")
             flush()
@@ -310,7 +312,7 @@ object DownloadUtil {
             acc.append(cookie.toNetscapeCookieString()).append("\n")
         }.toString()
 
-    fun getCookiesContentFromDatabase(): Result<String> = getCookieListFromDatabase().mapCatching {
+    fun getCookiesContentFromDatabase(context: Context): Result<String> = getCookieListFromDatabase(context).mapCatching {
         it.toCookiesFileContent()
     }
 
@@ -423,7 +425,8 @@ object DownloadUtil {
     )
 
     private fun YoutubeDLRequest.addOptionsForAudioDownloads(
-        id: String, preferences: DownloadPreferences, playlistUrl: String
+        id: String, preferences: DownloadPreferences, playlistUrl: String,
+        context: Context
     ): YoutubeDLRequest = this.apply {
         with(preferences) {
             addOption("-x")
@@ -510,10 +513,11 @@ object DownloadUtil {
         )
     }
 
-    private fun insertSplitChapterIntoHistory(videoInfo: VideoInfo, filePaths: List<String>) =
+    private fun insertSplitChapterIntoHistory(videoInfo: VideoInfo, filePaths: List<String>,
+                                              context: Context) =
         filePaths.onEach {
             DatabaseUtil.insertInfo(
-                videoInfo.toDownloadedVideoInfo(videoPath = it).copy(videoTitle = it.getFileName())
+                videoInfo.toDownloadedVideoInfo(videoPath = it).copy(videoTitle = it.getFileName(context))
             )
         }
 
@@ -524,6 +528,7 @@ object DownloadUtil {
         playlistItem: Int = 0,
         taskId: String,
         downloadPreferences: DownloadPreferences,
+        context: Context,
         progressCallback: ((Float, Long, String) -> Unit)?
     ): Result<List<String>> {
         if (videoInfo == null) return Result.failure(Throwable(context.getString(R.string.fetch_info_error_msg)))
@@ -544,7 +549,7 @@ object DownloadUtil {
                 addOption("--no-mtime")
 //                addOption("-v")
                 if (cookies) {
-                    enableCookies(userAgentString)
+                    enableCookies(userAgentString, context)
                 }
                 if (restrictFilenames) {
                     addOption("--restrict-filenames")
@@ -568,7 +573,7 @@ object DownloadUtil {
                     if (archiveFileContent.contains("${videoInfo.extractor} ${videoInfo.id}")) {
                         return Result.failure(YoutubeDLException(context.getString(R.string.download_archive_error)))
                     } else {
-                        useDownloadArchive()
+                        useDownloadArchive(context)
                     }
                 }
 
@@ -598,7 +603,8 @@ object DownloadUtil {
                     addOptionsForAudioDownloads(
                         id = videoInfo.id,
                         preferences = downloadPreferences,
-                        playlistUrl = playlistUrl
+                        playlistUrl = playlistUrl,
+                        context = context
                     )
                 } else {
                     if (privateDirectory) pathBuilder.append(App.privateDownloadDir)
@@ -664,7 +670,8 @@ object DownloadUtil {
                         preferences = this,
                         videoInfo = videoInfo,
                         downloadPath = pathBuilder.toString(),
-                        sdcardUri = sdcardUri
+                        sdcardUri = sdcardUri,
+                        context = context
                     )
                 } else Result.failure(th)
             }
@@ -672,7 +679,8 @@ object DownloadUtil {
                 preferences = this,
                 videoInfo = videoInfo,
                 downloadPath = pathBuilder.toString(),
-                sdcardUri = sdcardUri
+                sdcardUri = sdcardUri,
+                context = context
             )
         }
     }
@@ -681,7 +689,8 @@ object DownloadUtil {
         preferences: DownloadPreferences,
         videoInfo: VideoInfo,
         downloadPath: String,
-        sdcardUri: String
+        sdcardUri: String,
+        context: Context
     ): Result<List<String>> = preferences.run {
         val fileName = preferences.newTitle.ifEmpty {
             videoInfo.filename ?: videoInfo.requestedDownloads?.firstOrNull()?.filename
@@ -691,24 +700,26 @@ object DownloadUtil {
         Log.d(TAG, "onFinishDownloading: $fileName")
         if (sdcard) {
             moveFilesToSdcard(
-                sdcardUri = sdcardUri, tempPath = context.getSdcardTempDir(videoInfo.id)
+                sdcardUri = sdcardUri, tempPath = context.getSdcardTempDir(videoInfo.id),
+                context = context
             ).onSuccess {
                 if (privateMode) {
                     return Result.success(emptyList())
                 } else if (splitByChapter) {
-                    insertSplitChapterIntoHistory(videoInfo, it)
+                    insertSplitChapterIntoHistory(videoInfo, it, context)
                 } else {
                     insertInfoIntoDownloadHistory(videoInfo, it)
                 }
             }
         } else {
             FileUtil.scanFileToMediaLibraryPostDownload(
-                title = fileName, downloadDir = downloadPath
+                title = fileName, downloadDir = downloadPath,
+                context = context
             ).run {
                 if (privateMode) Result.success(emptyList())
                 else Result.success(
                     if (splitByChapter) {
-                        insertSplitChapterIntoHistory(videoInfo, this)
+                        insertSplitChapterIntoHistory(videoInfo, this, context)
                     } else {
                         insertInfoIntoDownloadHistory(videoInfo, this)
                     }
@@ -721,6 +732,7 @@ object DownloadUtil {
         url: String,
         template: CommandTemplate = PreferenceUtil.getTemplate(),
         downloadPreferences: DownloadPreferences = DownloadPreferences(),
+        context: Context
     ) {
         downloadPreferences.run {
             val taskId = Downloader.makeKey(url = url, templateName = template.name)
@@ -737,7 +749,7 @@ object DownloadUtil {
                     enableAria2c()
                 }
                 if (useDownloadArchive) {
-                    useDownloadArchive()
+                    useDownloadArchive(context)
                 }
                 if (restrictFilenames) {
                     addOption("--restrict-filenames")
@@ -748,7 +760,7 @@ object DownloadUtil {
                     ).absolutePath
                 )
                 if (cookies) {
-                    enableCookies(userAgentString)
+                    enableCookies(userAgentString, context)
                 }
             }
 
@@ -766,19 +778,20 @@ object DownloadUtil {
                         progress = progress.toInt(),
                         templateName = template.name,
                         taskUrl = url,
-                        text = text
+                        text = text,
+                        context = context
                     )
                     Downloader.updateTaskOutput(
                         template = template, url = url, line = text, progress = progress
                     )
                 }
-                onTaskEnded(template, url, response.out + "\n" + response.err)
+                onTaskEnded(template, url, response.out + "\n" + response.err, context = context)
             }.onFailure {
                 it.printStackTrace()
                 if (it is YoutubeDL.CanceledException) return@onFailure
                 it.message.run {
-                    if (isNullOrEmpty()) onTaskEnded(template, url)
-                    else onTaskError(this, template, url)
+                    if (isNullOrEmpty()) onTaskEnded(template, url, context = context)
+                    else onTaskError(this, template, url, context)
                 }
             }
             onProcessEnded()

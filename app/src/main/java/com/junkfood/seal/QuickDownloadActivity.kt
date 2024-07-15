@@ -10,7 +10,6 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -19,15 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.junkfood.seal.model.MainActivityUiState
 import com.junkfood.seal.ui.common.LocalDarkTheme
 import com.junkfood.seal.ui.common.LocalDynamicColorSwitch
@@ -44,7 +39,6 @@ import com.junkfood.seal.util.ToastUtil
 import com.junkfood.seal.util.matchUrlFromSharedText
 import com.junkfood.seal.util.setLanguage
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 private const val TAG = "ShareActivity"
@@ -77,9 +71,9 @@ class QuickDownloadActivity : ComponentActivity() {
 
     private fun onDownloadStarted(customCommand: Boolean) {
         if (customCommand)
-            Downloader.executeCommandWithUrl(url)
+            Downloader.executeCommandWithUrl(url, this)
         else
-            Downloader.quickDownload(url = url)
+            Downloader.quickDownload(url = url, context = this)
     }
 
     @OptIn(
@@ -119,7 +113,6 @@ class QuickDownloadActivity : ComponentActivity() {
         }
 
         setContent {
-            val scope = rememberCoroutineScope()
             SettingsProvider(
                 windowWidthSizeClass = calculateWindowSizeClass(this).widthSizeClass
             ) {
@@ -174,7 +167,7 @@ class QuickDownloadActivity : ComponentActivity() {
     private fun startActivityWithData(context: Context, data: String) {
         val intent = Intent(context, MainActivity::class.java).apply {
             putExtra(KEY_MAKE, data)
-            setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
     }

@@ -20,22 +20,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.HistoryToggleOff
 import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.MoneyOff
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.outlined.PlaylistAddCheck
-import androidx.compose.material.icons.outlined.Print
-import androidx.compose.material.icons.outlined.PrintDisabled
 import androidx.compose.material.icons.outlined.RemoveDone
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material.icons.outlined.Update
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -75,7 +67,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import com.junkfood.seal.App
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.booleanState
 import com.junkfood.seal.ui.common.intState
@@ -84,7 +75,6 @@ import com.junkfood.seal.ui.component.ConfirmButton
 import com.junkfood.seal.ui.component.DismissButton
 import com.junkfood.seal.ui.component.PreferenceInfo
 import com.junkfood.seal.ui.component.PreferenceItem
-import com.junkfood.seal.ui.component.PreferenceSubtitle
 import com.junkfood.seal.ui.component.PreferenceSwitch
 import com.junkfood.seal.ui.component.PreferenceSwitchWithDivider
 import com.junkfood.seal.ui.component.SealDialog
@@ -116,11 +106,10 @@ import com.junkfood.seal.util.UpdateUtil
 import com.junkfood.seal.util.YT_DLP_AUTO_UPDATE
 import com.junkfood.seal.util.YT_DLP_NIGHTLY
 import com.junkfood.seal.util.YT_DLP_STABLE
-import com.junkfood.seal.util.YT_DLP_AUTO_UPDATE
-import com.junkfood.seal.util.permissionWriteStore
 import com.junkfood.seal.util.YT_DLP_UPDATE_CHANNEL
 import com.junkfood.seal.util.YT_DLP_UPDATE_INTERVAL
 import com.junkfood.seal.util.YT_DLP_VERSION
+import com.junkfood.seal.util.permissionWriteStore
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -157,7 +146,7 @@ fun GeneralDownloadPreferences(
 
     var isPreviewDisabled by remember { mutableStateOf(PreferenceUtil.getValue(DISABLE_PREVIEW)) }
     var isNotificationPermissionGranted by remember {
-        mutableStateOf(NotificationUtil.areNotificationsEnabled())
+        mutableStateOf(NotificationUtil.areNotificationsEnabled(context))
     }
 
     val notificationPermission =
@@ -236,11 +225,11 @@ fun GeneralDownloadPreferences(
                                 scope.launch {
                                     runCatching {
                                         isUpdating = true
-                                        UpdateUtil.updateYtDlp()
+                                        UpdateUtil.updateYtDlp(context = context)
                                         ytdlpVersion = YT_DLP_VERSION.getString()
                                     }.onFailure { th ->
                                         th.printStackTrace()
-                                        ToastUtil.makeToastSuspend(App.context.getString(R.string.yt_dlp_update_fail))
+                                        ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_update_fail))
                                     }.onSuccess {
                                         ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP_VERSION.getString()})")
                                     }
@@ -275,7 +264,7 @@ fun GeneralDownloadPreferences(
                                 showNotificationDialog = true
                             } else if (isNotificationPermissionGranted) {
                                 if (downloadNotification)
-                                    NotificationUtil.cancelAllNotifications()
+                                    NotificationUtil.cancelAllNotifications(context)
                                 downloadNotification = !downloadNotification
                                 PreferenceUtil.updateValue(
                                     NOTIFICATION, downloadNotification

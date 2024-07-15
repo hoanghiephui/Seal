@@ -204,7 +204,7 @@ fun DownloadSettingDialog(
 
     LaunchedEffect(showCookiesDialog) {
         withContext(Dispatchers.IO) {
-            DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
+            DownloadUtil.getCookiesContentFromDatabase(context).getOrNull()?.let {
                 FileUtil.writeContentToFile(it, context.getCookiesFile())
             }
         }
