@@ -160,7 +160,7 @@ fun HomeEntry(
                     onMakePlus = { navController.navigate(Route.DONATE) }
                 )
             }
-            animatedComposable(Route.DOWNLOADS) { VideoListPage { onNavigateBack() } }
+            animatedComposable(Route.DOWNLOADS) { VideoListPage(onMakePlus = { navController.navigate(Route.DONATE) }) { onNavigateBack() } }
             animatedComposableVariant(Route.TASK_LIST) {
                 TaskListPage(
                     onNavigateBack = onNavigateBack,
@@ -179,7 +179,12 @@ fun HomeEntry(
 
 //            animatedComposable(Route.DOWNLOAD_QUEUE) { DownloadQueuePage { onNavigateBack() } }
             slideInVerticallyComposable(Route.PLAYLIST) { PlaylistSelectionPage { onNavigateBack() } }
-            slideInVerticallyComposable(Route.FORMAT_SELECTION) { FormatPage(downloadViewModel) { onNavigateBack() } }
+            slideInVerticallyComposable(Route.FORMAT_SELECTION) {
+                FormatPage(
+                    downloadViewModel,
+                    onMakePlus = { navController.navigate(Route.DONATE) }
+                ) { onNavigateBack() }
+            }
             slideInVerticallyComposable(Route.SUPPORTED_SITE_ROUTER) { SupportedSite { onNavigateBack() } }
             settingsGraph(
                 cookiesViewModel = cookiesViewModel,
@@ -275,7 +280,10 @@ fun NavGraphBuilder.settingsGraph(
         animatedComposable(Route.APPEARANCE) {
             AppearancePreferences(
                 onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo
+                onNavigateTo = onNavigateTo,
+                onMakePlus = {
+                    onNavigateTo(Route.DONATE)
+                }
             )
         }
         animatedComposable(Route.INTERACTION) { InteractionPreferencePage(onBack = onNavigateBack) }

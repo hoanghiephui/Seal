@@ -92,11 +92,12 @@ private val DrawableList = listOf(
 
 
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
+    ExperimentalMaterial3Api::class
 )
 @Composable
 fun AppearancePreferences(
     onNavigateBack: () -> Unit,
+    onMakePlus: () -> Unit,
     onNavigateTo: (String) -> Unit
 ) {
     val scrollBehavior =
@@ -136,7 +137,10 @@ fun AppearancePreferences(
             ) {
 
                 VideoCard(
-                    modifier = Modifier.padding(18.dp), thumbnailUrl = image, nativeAd = AdViewState.Default
+                    modifier = Modifier.padding(18.dp),
+                    thumbnailUrl = image,
+                    nativeAd = AdViewState.Default,
+                    onMakePlus = onMakePlus
                 )
                 val pageCount = ColorList.size + 1
 

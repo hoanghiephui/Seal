@@ -140,6 +140,7 @@ private const val TAG = "VideoListPage"
 @Composable
 fun VideoListPage(
     viewModel: VideoListViewModel = hiltViewModel(),
+    onMakePlus: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val viewState by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -490,7 +491,7 @@ fun VideoListPage(
                         .fillMaxWidth(),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState)
+                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState, onMakePlus = onMakePlus)
                 }
             }
             items(

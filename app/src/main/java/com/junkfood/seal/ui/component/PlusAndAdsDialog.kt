@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.junkfood.seal.R
 
 @Composable
-@Preview
 fun PlusAndAdsDialog(
     onDismissRequest: () -> Unit = {},
     onMakePlus: () -> Unit = {},
@@ -52,4 +51,10 @@ fun PlusAndAdsDialog(
             }
         },
     )
+}
+
+@Preview
+@Composable
+fun PreviewPlusAndAdsDialog() {
+    PlusAndAdsDialog()
 }

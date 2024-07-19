@@ -64,6 +64,7 @@ fun VideoCard(
     isPreview: Boolean = false,
     isAds: Boolean = false,
     nativeAd: AdViewState,
+    onMakePlus: () -> Unit
 ) {
     ElevatedCard(
         modifier = modifier
@@ -172,14 +173,16 @@ fun VideoCard(
                         )
                 }
             } else {
-                MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM)
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM, onMakePlus)
             }
         }
     }
 }
 
 @Composable
-fun AdsView() {
+fun AdsView(
+    onMakePlus: () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -220,9 +223,7 @@ fun AdsView() {
             modifier = Modifier
                 .padding(top = 12.dp, bottom = 12.dp)
                 .fillMaxWidth(),
-            onClick = {
-
-            },
+            onClick = onMakePlus,
         ) {
             Text("Buy GoPush+")
         }
@@ -236,7 +237,8 @@ fun VideoCardPreview() {
     SealTheme {
         VideoCard(
             isPreview = true,
-            nativeAd = AdViewState.Default
+            nativeAd = AdViewState.Default,
+            onMakePlus = {}
         )
     }
 }
@@ -249,7 +251,8 @@ fun AdsCardPreview() {
         VideoCard(
             isPreview = true,
             isAds = true,
-            nativeAd = AdViewState.Default
+            nativeAd = AdViewState.Default,
+            onMakePlus = {}
         )
     }
 }

@@ -54,7 +54,7 @@ object BackupUtil {
             context.getString(R.string.app_name),
             App.packageInfo.versionName,
             Date().toString()
-        ).joinToString(separator = "-") { it }
+        ).joinToString(separator = "-") { it.toString() }
     }
 
     enum class BackupDestination {

@@ -59,7 +59,8 @@ fun DownloadCompleteDialog(
                 onClick = onVideoCardClicked,
                 isPreview = false,
                 isAds = false,
-                nativeAd = AdViewState.Default
+                nativeAd = AdViewState.Default,
+                onMakePlus = {}
             )
         }
     }

@@ -115,7 +115,11 @@ import kotlin.math.roundToInt
 private const val TAG = "FormatPage"
 
 @Composable
-fun FormatPage(downloadViewModel: DownloadViewModel, onNavigateBack: () -> Unit = {}) {
+fun FormatPage(
+    downloadViewModel: DownloadViewModel,
+    onMakePlus: () -> Unit,
+    onNavigateBack: () -> Unit = {}
+) {
     val videoInfo by downloadViewModel.videoInfoFlow.collectAsStateWithLifecycle()
     if (videoInfo.formats.isNullOrEmpty()) return
     val audioOnly = EXTRACT_AUDIO.getBoolean()
@@ -144,7 +148,8 @@ fun FormatPage(downloadViewModel: DownloadViewModel, onNavigateBack: () -> Unit 
         mergeAudioStream = !audioOnly && mergeAudioStream,
         selectedSubtitleCodes = initialSelectedSubtitles,
         isClippingAvailable = VIDEO_CLIP.getBoolean() && (videoInfo.duration ?: .0) >= 0,
-        nativeAd = nativeAd
+        nativeAd = nativeAd,
+        onMakePlus = onMakePlus
     ) { formatList, videoClips, splitByChapter, title, selectedSubtitleCodes ->
 
         diffSubtitleLanguages = selectedSubtitleCodes.run {
@@ -285,7 +290,8 @@ private fun FormatPagePreview() {
             isClippingAvailable = true,
             mergeAudioStream = true,
             selectedSubtitleCodes = setOf("en", "ja-en"),
-            nativeAd = AdViewState.Default
+            nativeAd = AdViewState.Default,
+            onMakePlus = {}
         )
     }
 }
@@ -300,6 +306,7 @@ fun FormatPageImpl(
     selectedSubtitleCodes: Set<String>,
     onNavigateBack: () -> Unit = {},
     nativeAd: AdViewState,
+    onMakePlus: () -> Unit,
     onDownloadPressed: (List<Format>, List<VideoClip>, Boolean, String, List<String>) -> Unit = { _, _, _, _, _ -> }
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -597,7 +604,11 @@ fun FormatPageImpl(
                         .fillMaxWidth(),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = nativeAd)
+                    MaxTemplateNativeAdViewComposable(
+                        adType = AdType.SMALL,
+                        adViewState = nativeAd,
+                        onMakePlus = onMakePlus
+                    )
                 }
             }
 

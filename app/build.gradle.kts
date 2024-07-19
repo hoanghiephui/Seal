@@ -26,6 +26,7 @@ val abiFilterList = (properties["ABI_FILTERS"] as String).split(';')
 
 
 android {
+    compileSdk = 35
     if (keystorePropertiesFile.exists()) {
         val keystoreProperties = Properties()
         keystoreProperties.load(FileInputStream(keystorePropertiesFile))
@@ -40,15 +41,13 @@ android {
         }
     }
 
-    compileSdk = 34
-
 
 
     defaultConfig {
         applicationId = "com.hubtik.video"
         minSdk = 27
-        targetSdk = 34
-        versionCode = 27
+        targetSdk = 35
+        versionCode = 28
 
         if (splitApks) {
             splits {
@@ -61,7 +60,7 @@ android {
             }
         }
 
-        versionName = "0.1.2.1"
+        versionName = "0.1.2.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

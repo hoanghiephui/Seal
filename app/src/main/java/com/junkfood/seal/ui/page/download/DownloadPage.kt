@@ -390,7 +390,8 @@ fun DownloadPage(
                 downloadViewModel.updateUrl(url)
             },
             nativeAd = nativeAd,
-            isStartDownload = isStartDownload
+            isStartDownload = isStartDownload,
+            onMakePlus = onMakePlus
         ) {
             SiteSupport(downloadViewModel.itemsSupport) {
                 onNavigateToSupportedSite.invoke()
@@ -492,6 +493,7 @@ fun DownloadPageImpl(
     isPreview: Boolean = false,
     nativeAd: AdViewState,
     isStartDownload: Boolean,
+    onMakePlus: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -612,7 +614,8 @@ fun DownloadPageImpl(
                             onClick = onVideoCardClicked,
                             isPreview = isPreview,
                             isAds = showAdsCard,
-                            nativeAd = nativeAd
+                            nativeAd = nativeAd,
+                            onMakePlus = onMakePlus
                         )
                     }
                     InputUrl(
@@ -963,7 +966,8 @@ fun DownloadPagePreview() {
                 showDownloadProgress = true,
                 showVideoCard = false,
                 nativeAd = AdViewState.Default,
-                isStartDownload = false
+                isStartDownload = false,
+                onMakePlus = {}
             ) {}
         }
     }

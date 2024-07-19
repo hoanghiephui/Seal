@@ -97,7 +97,8 @@ class MaxTemplateNativeAdViewComposableLoader {
 @Composable
 fun MaxTemplateNativeAdViewComposable(
     adViewState: AdViewState,
-    adType: AdType = AdType.MEDIUM
+    adType: AdType = AdType.MEDIUM,
+    onMakePlus: () -> Unit
 ) {
     if (!SHOW_ADS) return
     AnimatedContent(targetState = adViewState, label = "", transitionSpec = {
@@ -108,7 +109,7 @@ fun MaxTemplateNativeAdViewComposable(
         when (viewState) {
             is AdViewState.LoadFail,
             is AdViewState.Default -> {
-                AdsView()
+                AdsView(onMakePlus)
             }
 
             is AdViewState.LoadAd -> {

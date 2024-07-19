@@ -200,7 +200,7 @@ class App : Application() {
                 .append("dlp version: ${YT_DLP_VERSION.getString()}\n").toString()
         }
 
-        fun isFDroidBuild(): Boolean = packageInfo.versionName.contains("F-Droid")
+        fun isFDroidBuild(): Boolean = packageInfo.versionName?.contains("F-Droid") ?: false
 
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
