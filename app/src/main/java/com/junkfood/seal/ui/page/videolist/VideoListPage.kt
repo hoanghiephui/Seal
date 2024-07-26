@@ -24,15 +24,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DriveFileMove
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,7 +74,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.junkfood.seal.App
 import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.R
 import com.junkfood.seal.database.backup.BackupUtil
@@ -134,9 +131,7 @@ fun DownloadedVideoInfo.filterByExtractor(extractor: String?): Boolean {
     return extractor.isNullOrEmpty() || (this.extractor == extractor)
 }
 
-private const val TAG = "VideoListPage"
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListPage(
     viewModel: VideoListViewModel = hiltViewModel(),
@@ -165,7 +160,8 @@ fun VideoListPage(
     val clipboardManager = LocalClipboardManager.current
 
     val fileSizeMap by viewModel.fileSizeMapFlow.collectAsStateWithLifecycle(initialValue = emptyMap())
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val sheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val hostState = remember { SnackbarHostState() }
     val adsState by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 =  BuildConfig.DOWNLOAD_LIST) {
@@ -445,6 +441,15 @@ fun VideoListPage(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState, onMakePlus = onMakePlus)
+                    }
+
                     SVGImage(
                         SVGString = VideoStreamSVG,
                         contentDescription = null,
@@ -457,94 +462,92 @@ fun VideoListPage(
                     )
                 }
             }
-        }
-
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding),
-            state = lazyListState
-        ) {
-            if (fullVideoList.isNotEmpty()) {
-                item {
-                    Column {
-                        AnimatedVisibility(visible = viewState.isSearching) {
-                            SealSearchBar(
+        } else {
+            LazyColumn(
+                modifier = Modifier.padding(innerPadding),
+                state = lazyListState
+            ) {
+                if (fullVideoList.isNotEmpty()) {
+                    item {
+                        Column {
+                            AnimatedVisibility(visible = viewState.isSearching) {
+                                SealSearchBar(
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .padding(vertical = 8.dp),
+                                    text = viewState.searchText,
+                                    placeholderText = stringResource(R.string.search_in_downloads),
+                                    onValueChange = viewModel::updateSearchText
+                                )
+                            }
+                            FilterChips(
                                 modifier = Modifier
-                                    .padding(horizontal = 12.dp)
-                                    .padding(vertical = 8.dp),
-                                text = viewState.searchText,
-                                placeholderText = stringResource(R.string.search_in_downloads),
-                                onValueChange = viewModel::updateSearchText
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
                             )
                         }
-                        FilterChips(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        )
                     }
                 }
-            }
-            item {
-                ElevatedCard(
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .fillMaxWidth(),
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState, onMakePlus = onMakePlus)
-                }
-            }
-            items(
-                items = videoList,
-                key = {it.id},
-                contentType = { it.videoPath.contains(AUDIO_REGEX) }) {info ->
-                with(info) {
-                    AnimatedVisibility(
-                        modifier = Modifier,visible = info.filterSort(viewState, filterSet),
-                        exit = shrinkVertically() + fadeOut(),
-                        enter = expandVertically() + fadeIn()
+                item {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small
                     ) {
-                        MediaListItem(
-                            modifier = Modifier,
-                            title = videoTitle,
-                            author = videoAuthor,
-                            thumbnailUrl = thumbnailUrl,
-                            videoPath = videoPath,
-                            videoFileSize = fileSizeMap.getOrElse(id) { 0L },
-                            videoUrl = videoUrl,
-                            isSelectEnabled = { isSelectEnabled },
-                            isSelected = { selectedItemIds.contains(id) },
-                            onSelect = {
-                                if (selectedItemIds.contains(id)) selectedItemIds.remove(
-                                    id
-                                )
-                                else selectedItemIds.add(id)
-                            },
-                            onClick = {
-                                FileUtil.openFile(path = videoPath, context = context) {
-                                    ToastUtil.makeToastSuspend(context.getString(R.string.file_unavailable))
-                                }
-                            }, onLongClick = {
-                                isSelectEnabled = true
-                                selectedItemIds.add(id)
-                            },
-                            onShowContextMenu = {
-                                view.slightHapticFeedback()
-                                currentVideoInfo = info
-                                scope.launch {
-                                    showBottomSheet = true
-                                    delay(50)
-                                    sheetState.show()
-                                }
-                            }
-                        )
+                        MaxTemplateNativeAdViewComposable(adType = AdType.SMALL, adViewState = adsState, onMakePlus = onMakePlus)
                     }
                 }
+                items(
+                    items = videoList,
+                    key = {it.id},
+                    contentType = { it.videoPath.contains(AUDIO_REGEX) }) {info ->
+                    with(info) {
+                        AnimatedVisibility(
+                            modifier = Modifier,visible = info.filterSort(viewState, filterSet),
+                            exit = shrinkVertically() + fadeOut(),
+                            enter = expandVertically() + fadeIn()
+                        ) {
+                            MediaListItem(
+                                modifier = Modifier,
+                                title = videoTitle,
+                                author = videoAuthor,
+                                thumbnailUrl = thumbnailUrl,
+                                videoPath = videoPath,
+                                videoFileSize = fileSizeMap.getOrElse(id) { 0L },
+                                videoUrl = videoUrl,
+                                isSelectEnabled = { isSelectEnabled },
+                                isSelected = { selectedItemIds.contains(id) },
+                                onSelect = {
+                                    if (selectedItemIds.contains(id)) selectedItemIds.remove(
+                                        id
+                                    )
+                                    else selectedItemIds.add(id)
+                                },
+                                onClick = {
+                                    FileUtil.openFile(path = videoPath, context = context) {
+                                        ToastUtil.makeToastSuspend(context.getString(R.string.file_unavailable))
+                                    }
+                                }, onLongClick = {
+                                    isSelectEnabled = true
+                                    selectedItemIds.add(id)
+                                },
+                                onShowContextMenu = {
+                                    view.slightHapticFeedback()
+                                    currentVideoInfo = info
+                                    scope.launch {
+                                        showBottomSheet = true
+                                        delay(50)
+                                        sheetState.show()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
-
         }
-
-
     }
 
 
