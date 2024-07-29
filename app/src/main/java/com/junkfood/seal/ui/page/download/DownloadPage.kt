@@ -1015,7 +1015,7 @@ private fun SiteSupport(
             Button(modifier = Modifier
                 .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
                 .fillMaxWidth(), onClick = navigateToSupportedSite) {
-                Text(text = "View all")
+                Text(text = "and more")
             }
         }
     }
