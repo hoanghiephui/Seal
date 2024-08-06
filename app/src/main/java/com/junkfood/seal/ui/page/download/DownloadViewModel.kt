@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.video.data.repository.TiktokExploreRepository
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.junkfood.seal.App.Companion.applicationScope
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,7 +52,8 @@ import javax.inject.Inject
 class DownloadViewModel @Inject constructor(
     private val repository: OfflineFirstRepository,
     private val appLovinSdk: AppLovinSdk,
-    private val appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
+    private val appLovinSdkInitialization: AppLovinSdkInitializationConfiguration,
+    private val tiktokExploreRepository: TiktokExploreRepository
 ) : ViewModel() {
     val uiState: StateFlow<MainActivityUiState> = repository.userData.map {
         MainActivityUiState.Success(it)
@@ -294,6 +297,23 @@ class DownloadViewModel @Inject constructor(
             _makeUpStateFlow.update {
                 type
             }
+        }
+    }
+
+    fun initialLoadIfNeeded(
+        screenHeight: Int,
+        screenWidth: Int,
+    ) {
+        val unixTime = System.currentTimeMillis() / 1000
+        viewModelScope.launch {
+            tiktokExploreRepository.getExploreVideos(
+                webIdLastTime = unixTime,
+                appLanguage = Locale.getDefault().language,
+                screenHeight = screenHeight,
+                screenWidth = screenWidth,
+                region =  Locale.getDefault().country,
+                language = Locale.getDefault().language
+            )
         }
     }
 

@@ -52,6 +52,10 @@ firebaseCrashlytics = "19.0.3"
 googleGmsGoogleServices = "4.4.2"
 googleFirebaseCrashlytics = "3.0.2"
 firebaseAnalytics = "22.0.2"
+junit = "1.1.5"
+retrofit = "2.11.0"
+moshi = "1.15.1"
+
 [libraries]
 
 
@@ -144,6 +148,18 @@ androidx-dataStore-core = { group = "androidx.datastore", name = "datastore", ve
 applovin-sdk = { module = "com.applovin:applovin-sdk", version.ref = "applovin" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+
+retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+retrofit-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
+retrofit-mock = { module = "com.squareup.retrofit2:retrofit-mock", version.ref = "retrofit" }
+retrofit-protobuf = { module = "com.squareup.retrofit2:converter-protobuf", version.ref = "retrofit" }
+retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+retrofit-response-keeper = { module = "com.squareup.retrofit2:response-type-keeper", version.ref = "retrofit" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+moshi-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
+okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

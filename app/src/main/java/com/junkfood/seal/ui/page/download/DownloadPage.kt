@@ -86,6 +86,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -165,7 +166,7 @@ fun DownloadPage(
     onNavigateToSupportedSite: () -> Unit = {},
     onViewAds: () -> Unit,
     onMakePlus: () -> Unit,
-    downloadViewModel: DownloadViewModel = hiltViewModel(),
+    downloadViewModel: DownloadViewModel,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -199,6 +200,17 @@ fun DownloadPage(
     } else null
     LaunchedEffect(key1 = BuildConfig.HOME_NATIVE) {
         downloadViewModel.loadAds(context, BuildConfig.HOME_NATIVE)
+    }
+
+    val configuration = LocalConfiguration.current
+    LaunchedEffect(downloadViewModel) {
+        val screenHeight = configuration.screenHeightDp
+        val screenWidth = configuration.screenWidthDp
+        downloadViewModel.initialLoadIfNeeded(
+            screenWidth = screenWidth,
+            screenHeight = screenHeight,
+        )
+
     }
     val updateState = rememberInAppUpdateState()
     val clipboardManager = LocalClipboardManager.current

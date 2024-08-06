@@ -191,6 +191,9 @@ dependencies {
     implementation(project(":color"))
     implementation(project(":billing"))
     implementation(project(":in-app-update"))
+    implementation(project(":core:data"))
+    implementation(project(":core:network"))
+    implementation(project(":core:model"))
 
     //Core libs for the app
     implementation(libs.bundles.core)

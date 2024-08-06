@@ -92,6 +92,7 @@ class App : Application() {
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
             startCrashReportActivity(e)
+            e.printStackTrace()
         }
     }
 
