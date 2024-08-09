@@ -61,6 +61,7 @@ import com.junkfood.seal.ui.page.settings.network.CookieProfilePage
 import com.junkfood.seal.ui.page.settings.network.CookiesViewModel
 import com.junkfood.seal.ui.page.settings.network.NetworkPreferences
 import com.junkfood.seal.ui.page.settings.network.WebViewPage
+import com.junkfood.seal.ui.page.v2.DownloadPageHost
 import com.junkfood.seal.ui.page.videolist.VideoListPage
 import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
@@ -140,7 +141,16 @@ fun HomeEntry(
             startDestination = Route.HOME
         ) {
             animatedComposable(Route.HOME) {
-                DownloadPage(
+                DownloadPageHost(
+                    downloadViewModel = downloadViewModel,
+                    navHostController = navController,
+                    onNavigateToCookieGeneratorPage = {
+                        cookiesViewModel.updateUrl(it)
+                        navController.navigate(Route.COOKIE_GENERATOR_WEBVIEW)
+                    },
+                    onViewAds = onViewAds
+                )
+                /*DownloadPage(
                     navigateToDownloads = { navController.navigate(Route.DOWNLOADS) },
                     navigateToSettings = {
                         navController.navigate(Route.SETTINGS) {
@@ -158,7 +168,7 @@ fun HomeEntry(
                     onNavigateToSupportedSite = { navController.navigate(Route.SUPPORTED_SITE_ROUTER) },
                     onViewAds = onViewAds,
                     onMakePlus = { navController.navigate(Route.DONATE) }
-                )
+                )*/
             }
             animatedComposable(Route.DOWNLOADS) { VideoListPage(onMakePlus = { navController.navigate(Route.DONATE) }) { onNavigateBack() } }
             animatedComposableVariant(Route.TASK_LIST) {

@@ -11,6 +11,7 @@ plugins {
     kotlin("kapt")
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization")
+    id("kotlin-parcelize")
     alias(libs.plugins.protobuf)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.gms.google.services)
@@ -209,6 +210,7 @@ dependencies {
 
     //Coil (For Jetpack Compose)
     implementation(libs.coil.kt.compose)
+    implementation(libs.coil.kt.svg)
 
     //Serialization
     implementation(libs.kotlinx.serialization.json)

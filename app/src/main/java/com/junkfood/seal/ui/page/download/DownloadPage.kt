@@ -23,23 +23,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.ContentPaste
@@ -99,8 +108,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.video.model.ItemListItem
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -122,7 +131,6 @@ import com.junkfood.seal.ui.component.ClearButton
 import com.junkfood.seal.ui.component.FilledButtonWithIcon
 import com.junkfood.seal.ui.component.HeaderUpdate
 import com.junkfood.seal.ui.component.HelpDialog
-import com.junkfood.seal.ui.component.NavigationBarSpacer
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.VideoCard
 import com.junkfood.seal.ui.theme.PreviewThemeLight
@@ -170,6 +178,7 @@ fun DownloadPage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    //val exploreVideos by downloadViewModel.exploreVideos.collectAsStateWithLifecycle()
     val downloaderState by Downloader.downloaderState.collectAsStateWithLifecycle()
     val taskState by Downloader.taskState.collectAsStateWithLifecycle()
     val viewState by downloadViewModel.viewStateFlow.collectAsStateWithLifecycle()
@@ -368,7 +377,8 @@ fun DownloadPage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        DownloadPageImpl(downloaderState = downloaderState,
+        DownloadPageImpl(
+            downloaderState = downloaderState,
             taskState = taskState,
             viewState = viewState,
             errorState = errorState,
@@ -403,7 +413,8 @@ fun DownloadPage(
             },
             nativeAd = nativeAd,
             isStartDownload = isStartDownload,
-            onMakePlus = onMakePlus
+            onMakePlus = onMakePlus,
+            exploreVideos = emptyList()
         ) {
             SiteSupport(downloadViewModel.itemsSupport) {
                 onNavigateToSupportedSite.invoke()
@@ -506,6 +517,7 @@ fun DownloadPageImpl(
     nativeAd: AdViewState,
     isStartDownload: Boolean,
     onMakePlus: () -> Unit,
+    exploreVideos: List<ItemListItem>?,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -513,7 +525,10 @@ fun DownloadPageImpl(
 
     val showCancelButton =
         downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = {
         TopAppBar(title = {}, modifier = Modifier.padding(horizontal = 8.dp), navigationIcon = {
             TooltipBox(
                 state = rememberTooltipState(),
@@ -538,36 +553,6 @@ fun DownloadPageImpl(
             }
 
         }, actions = {
-            /*BadgedBox(badge = {
-                if (processCount > 0)
-                    Badge(
-                        modifier = Modifier.offset(
-                            x = (-16).dp,
-                            y = (8).dp
-                        )
-                    ) { Text("$processCount") }
-            }) {
-                TooltipBox(state = rememberTooltipState(),
-                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                    tooltip = {
-                        PlainTooltip {
-                            Text(text = stringResource(id = R.string.running_tasks))
-                        }
-                    }) {
-                    IconButton(
-                        onClick = {
-                            view.slightHapticFeedback()
-                            onNavigateToTaskList()
-                        },
-                        modifier = Modifier
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Terminal,
-                            contentDescription = stringResource(id = R.string.running_tasks)
-                        )
-                    }
-                }
-            }*/
             TooltipBox(state = rememberTooltipState(),
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {
@@ -589,127 +574,143 @@ fun DownloadPageImpl(
                 }
             }
         })
-    }) {
-        Column(
+        }) { padding ->
+        val state = rememberLazyStaggeredGridState()
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(300.dp),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalItemSpacing = 16.dp,
             modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
+                ),
+            state = state,
         ) {
-            TitleWithProgressIndicator(
-                isDownloadingPlaylist = downloaderState is Downloader.State.DownloadingPlaylist,
-                showDownloadText = showCancelButton,
-                currentIndex = downloaderState.run { if (this is Downloader.State.DownloadingPlaylist) currentItem else 0 },
-                downloadItemCount = downloaderState.run { if (this is Downloader.State.DownloadingPlaylist) itemCount else 0 },
-            )
-
-
-            Column(
-                Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 16.dp)
-            ) {
-                with(taskState) {
-                    AnimatedVisibility(
-                        visible = showDownloadProgress && showVideoCard || showAdsCard
-                    ) {
-                        VideoCard(
-                            modifier = Modifier,
-                            title = title,
-                            author = uploader,
-                            thumbnailUrl = thumbnailUrl,
+            item(span = StaggeredGridItemSpan.FullLine, contentType = "onboarding") {
+                TitleWithProgressIndicator(
+                    isDownloadingPlaylist = downloaderState is Downloader.State.DownloadingPlaylist,
+                    showDownloadText = showCancelButton,
+                    currentIndex = downloaderState.run { if (this is Downloader.State.DownloadingPlaylist) currentItem else 0 },
+                    downloadItemCount = downloaderState.run { if (this is Downloader.State.DownloadingPlaylist) itemCount else 0 },
+                )
+            }
+            item(span = StaggeredGridItemSpan.FullLine, contentType = "bottomSpacing") {
+                Column {
+                    with(taskState) {
+                        AnimatedVisibility(
+                            visible = showDownloadProgress && showVideoCard || showAdsCard
+                        ) {
+                            VideoCard(
+                                modifier = Modifier,
+                                title = title,
+                                author = uploader,
+                                thumbnailUrl = thumbnailUrl,
+                                progress = progress,
+                                showCancelButton = downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo,
+                                onCancel = cancelCallback,
+                                fileSizeApprox = fileSizeApprox,
+                                duration = duration,
+                                onClick = onVideoCardClicked,
+                                isPreview = isPreview,
+                                isAds = showAdsCard,
+                                nativeAd = nativeAd,
+                                onMakePlus = onMakePlus
+                            )
+                        }
+                        InputUrl(
+                            url = viewState.url,
                             progress = progress,
-                            showCancelButton = downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo,
+                            showDownloadProgress = showDownloadProgress && !showVideoCard,
+                            error = errorState != Downloader.ErrorState.None,
+                            showCancelButton = showCancelButton && !showVideoCard,
                             onCancel = cancelCallback,
-                            fileSizeApprox = fileSizeApprox,
-                            duration = duration,
-                            onClick = onVideoCardClicked,
-                            isPreview = isPreview,
-                            isAds = showAdsCard,
-                            nativeAd = nativeAd,
-                            onMakePlus = onMakePlus
-                        )
+                            onDone = downloadCallback,
+                            showProgressIndicator = downloaderState is Downloader.State.FetchingInfo
+                        ) { url -> onUrlChanged(url) }
+
+                        AnimatedVisibility(
+                            modifier = Modifier.fillMaxWidth(),
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut(),
+                            visible = progressText.isNotEmpty() && showOutput
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                text = progressText,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 0.dp),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedButtonWithIcon(
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                                onClick = pasteCallback,
+                                icon = Icons.Outlined.ContentPaste,
+                                text = stringResource(R.string.paste)
+                            )
+
+                            FilledButtonWithIcon(
+                                onClick = downloadCallback,
+                                icon = Icons.Outlined.FileDownload,
+                                text = stringResource(R.string.download),
+                                enabled = viewState.url.isNotBlank() && !isStartDownload
+                            )
+                        }
+
                     }
-                    InputUrl(
-                        url = viewState.url,
-                        progress = progress,
-                        showDownloadProgress = showDownloadProgress && !showVideoCard,
-                        error = errorState != Downloader.ErrorState.None,
-                        showCancelButton = showCancelButton && !showVideoCard,
+                    AnimatedVisibility(visible = errorState != Downloader.ErrorState.None) {
+                        ErrorMessage(
+                            title = errorState.title,
+                            errorReport = errorState.report,
+                            showButton = errorState != Downloader.ErrorState.VerifyError(
+                                viewState.url,
+                                stringResource(id = R.string.paste_youtube_fail_msg)
+                            )
+                        ) {
+                            view.longPressHapticFeedback()
+                            clipboardManager.setText(AnnotatedString(App.getVersionReport() + "\nURL: ${errorState.url}\n${errorState.report}"))
+                            ToastUtil.makeToast(R.string.error_copied)
+                        }
+                    }
+                }
+
+            }
+            exploreVideos?.let { itemVideos ->
+                items(
+                    items = itemVideos,
+                    key = { it.id ?: "" },
+                    contentType = { "exploreFeedItem" },
+                ) { exploreFeedItem ->
+                    VideoCard(
+                        modifier = Modifier,
+                        title = exploreFeedItem.contents?.first()?.desc ?: "",
+                        author = exploreFeedItem.author?.nickname ?: "",
+                        thumbnailUrl = exploreFeedItem.video?.cover ?: "",
+                        showCancelButton = downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo,
                         onCancel = cancelCallback,
-                        onDone = downloadCallback,
-                        showProgressIndicator = downloaderState is Downloader.State.FetchingInfo
-                    ) { url -> onUrlChanged(url) }
-
-                    AnimatedVisibility(
-                        modifier = Modifier.fillMaxWidth(),
-                        enter = expandVertically() + fadeIn(),
-                        exit = shrinkVertically() + fadeOut(),
-                        visible = progressText.isNotEmpty() && showOutput
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(bottom = 12.dp),
-                            text = progressText,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 0.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedButtonWithIcon(
-                            modifier = Modifier.padding(horizontal = 12.dp),
-                            onClick = pasteCallback,
-                            icon = Icons.Outlined.ContentPaste,
-                            text = stringResource(R.string.paste)
-                        )
-
-                        FilledButtonWithIcon(
-                            onClick = downloadCallback,
-                            icon = Icons.Outlined.FileDownload,
-                            text = stringResource(R.string.download),
-                            enabled = viewState.url.isNotBlank() && !isStartDownload
-                        )
-                    }
-
+                        onClick = onVideoCardClicked,
+                        isPreview = false,
+                        isAds = false,
+                        nativeAd = nativeAd,
+                        onMakePlus = onMakePlus
+                    )
                 }
-                AnimatedVisibility(visible = errorState != Downloader.ErrorState.None) {
-                    ErrorMessage(
-                        title = errorState.title,
-                        errorReport = errorState.report,
-                        showButton = errorState != Downloader.ErrorState.VerifyError(
-                            viewState.url,
-                            stringResource(id = R.string.paste_youtube_fail_msg)
-                        )
-                    ) {
-                        view.longPressHapticFeedback()
-                        clipboardManager.setText(AnnotatedString(App.getVersionReport() + "\nURL: ${errorState.url}\n${errorState.report}"))
-                        ToastUtil.makeToast(R.string.error_copied)
-                    }
-                }
+            }
+            item(span = StaggeredGridItemSpan.FullLine, contentType = "content") {
                 content()
-//                val output = Downloader.mutableProcessOutput
-//                LazyRow() {
-//                    items(output.toList()) { entry ->
-//                        TextField(
-//                            value = entry.second,
-//                            label = { Text(entry.first) },
-//                            onValueChange = {},
-//                            readOnly = true,
-//                            minLines = 10,
-//                            maxLines = 10,
-//                        )
-//                    }
-//                }
-//                    PreviewFormat()
-                NavigationBarSpacer()
-                Spacer(modifier = Modifier.height(160.dp))
             }
         }
     }
@@ -806,19 +807,17 @@ fun TitleWithProgressIndicator(
     currentIndex: Int = 1,
     downloadItemCount: Int = 4,
 ) {
-    Column(modifier = Modifier.padding(start = 12.dp, top = 0.dp)) {
-        AnimatedVisibility(visible = showDownloadText) {
-            Text(
-                if (isDownloadingPlaylist) stringResource(R.string.playlist_indicator_text).format(
-                    currentIndex,
-                    downloadItemCount
-                )
-                else stringResource(R.string.downloading_indicator_text),
-                modifier = Modifier.padding(start = 12.dp, top = 3.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+    AnimatedVisibility(visible = showDownloadText) {
+        Text(
+            if (isDownloadingPlaylist) stringResource(R.string.playlist_indicator_text).format(
+                currentIndex,
+                downloadItemCount
             )
-        }
+            else stringResource(R.string.downloading_indicator_text),
+            modifier = Modifier.padding(start = 5.dp, top = 3.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -973,14 +972,16 @@ fun DownloadPagePreview() {
                     url = "",
                     report = ERROR_REPORT_SAMPLE
                 ),
+                showVideoCard = false,
+                showDownloadProgress = true,
                 processCount = 99,
                 isPreview = true,
-                showDownloadProgress = true,
-                showVideoCard = false,
                 nativeAd = AdViewState.Default,
                 isStartDownload = false,
-                onMakePlus = {}
-            ) {}
+                onMakePlus = {},
+                content = {},
+                exploreVideos = emptyList()
+            )
         }
     }
 }

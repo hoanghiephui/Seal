@@ -79,7 +79,8 @@ fun VideoCard(
             if (!type) {
                 Column {
                     Box(Modifier.fillMaxWidth()) {
-                        Crossfade(targetState = thumbnailUrl, label = "") {AsyncImageImpl(
+                        Crossfade(targetState = thumbnailUrl, label = "") {
+                            AsyncImageImpl(
                             modifier = Modifier
                                 .padding()
                                 .fillMaxWidth()
@@ -90,22 +91,23 @@ fun VideoCard(
                             contentScale = ContentScale.Crop,
                             isPreview = isPreview)
                 }
-
-                        Surface(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .align(Alignment.BottomEnd),
-                            color = Color.Black.copy(alpha = 0.68f),
-                            shape = MaterialTheme.shapes.extraSmall
-                        ) {
-                            val fileSizeText = fileSizeApprox.toFileSizeText()
-                            val durationText = duration.toDurationText()
-                            Text(
-                                modifier = Modifier.padding(horizontal = 4.dp),
-                                text = "$fileSizeText · $durationText",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White
-                            )
+                        if (duration != 0) {
+                            Surface(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .align(Alignment.BottomEnd),
+                                color = Color.Black.copy(alpha = 0.68f),
+                                shape = MaterialTheme.shapes.extraSmall
+                            ) {
+                                val fileSizeText = fileSizeApprox.toFileSizeText()
+                                val durationText = duration.toDurationText()
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    text = "$fileSizeText · $durationText",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White
+                                )
+                            }
                         }
 
                         Column(

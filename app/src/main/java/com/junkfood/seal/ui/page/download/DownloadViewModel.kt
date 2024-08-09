@@ -4,10 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.video.data.repository.TiktokExploreRepository
+import com.android.video.model.TiktokExploreResponse
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.junkfood.seal.App.Companion.applicationScope
@@ -19,6 +21,7 @@ import com.junkfood.seal.Downloader.updatePlaylistResult
 import com.junkfood.seal.R
 import com.junkfood.seal.SHOW_ADS
 import com.junkfood.seal.model.MainActivityUiState
+import com.junkfood.seal.model.ParcelableResult
 import com.junkfood.seal.model.SupportModel
 import com.junkfood.seal.repository.OfflineFirstRepository
 import com.junkfood.seal.ui.component.AdViewState
@@ -42,6 +45,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -241,7 +245,7 @@ class DownloadViewModel @Inject constructor(
         if (currentDay != lastUpdatedDay) {
             // Nếu đã qua ngày mới, reset điểm và cập nhật ngày
             viewModelScope.launch {
-                repository.setDownloadCount(5)
+                repository.setDownloadCount(3)
             }
             viewModelScope.launch {
                 repository.setLastDay(System.currentTimeMillis())
@@ -299,22 +303,44 @@ class DownloadViewModel @Inject constructor(
             }
         }
     }
+    var exploreVideos: ParcelableResult<TiktokExploreResponse>? by mutableStateOf(null)
+        private set
+    var isRefreshLoading by mutableStateOf(false)
+        private set
+
+    var isInitialLoading by mutableStateOf(false)
+        private set
 
     fun initialLoadIfNeeded(
         screenHeight: Int,
         screenWidth: Int,
     ) {
-        val unixTime = System.currentTimeMillis() / 1000
         viewModelScope.launch {
-            tiktokExploreRepository.getExploreVideos(
-                webIdLastTime = unixTime,
-                appLanguage = Locale.getDefault().language,
-                screenHeight = screenHeight,
-                screenWidth = screenWidth,
-                region =  Locale.getDefault().country,
-                language = Locale.getDefault().language
-            )
+            if (isInitialLoading || isRefreshLoading) {
+                return@launch
+            }
+            val unixTime = System.currentTimeMillis() / 1000
+            isInitialLoading = true
+
+            exploreVideos = withContext(Dispatchers.IO) {
+                ParcelableResult.Success(
+                    tiktokExploreRepository.getExploreVideos(
+                        webIdLastTime = unixTime,
+                        appLanguage = Locale.getDefault().language,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth,
+                        region = Locale.getDefault().country,
+                        language = Locale.getDefault().language
+                    )
+                )
+            }
+            isInitialLoading = false
+
         }
+    }
+
+    fun refreshLoad() {
+
     }
 
     companion object {

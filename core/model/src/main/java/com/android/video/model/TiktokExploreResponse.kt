@@ -22,7 +22,7 @@ data class TiktokExploreResponse(
 	val statusMsg: String? = null,
 
 	@SerialName("itemList")
-	val itemList: List<ItemListItem>? = null,
+	val itemList: List<ItemListItem> = emptyList(),
 
 	@SerialName("log_pb")
 	val logPb: LogPb? = null,
@@ -70,7 +70,7 @@ data class VideoSuggestWordsStructItem(
 data class ContentsItem(
 
 	@SerialName("textExtra")
-	val textExtra: List<TextExtraItem?>? = null,
+	val textExtra: List<TextExtraItem>? = null,
 
 	@SerialName("desc")
 	val desc: String? = null
@@ -300,7 +300,7 @@ data class ItemListItem(
 	val aIGCDescription: String? = null,
 
 	@SerialName("contents")
-	val contents: List<ContentsItem?>? = null,
+	val contents: List<ContentsItem>? = null,
 
 	@SerialName("createTime")
 	val createTime: Int? = null,

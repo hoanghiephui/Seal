@@ -14,6 +14,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.content.getSystemService
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.google.android.material.color.DynamicColors
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.junkfood.seal.ui.page.settings.directory.Directory
@@ -44,9 +46,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), ImageLoaderFactory {
+    @Inject
+    lateinit var imageLoader: dagger.Lazy<ImageLoader>
 
     override fun onCreate() {
         super.onCreate()
@@ -206,5 +211,7 @@ class App : Application() {
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
     }
+
+    override fun newImageLoader(): ImageLoader = imageLoader.get()
 }
 const val SHOW_ADS = true

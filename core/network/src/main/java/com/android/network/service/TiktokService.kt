@@ -30,7 +30,7 @@ val queryParams = mapOf(
     "categoryType" to "120",
     "channel" to "tiktok_web",
     "cookie_enabled" to "true",
-    "count" to "16",
+    "count" to "25",
     "data_collection_enabled" to "true",
     "device_id" to "7379830111291622930",
     "device_platform" to "web_pc",
